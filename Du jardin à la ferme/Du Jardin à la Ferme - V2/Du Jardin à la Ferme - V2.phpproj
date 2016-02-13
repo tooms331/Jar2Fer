@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>Du_Jardin_à_la_Ferme___V2</Name>
+    <ProjectGuid>4fb4f6a6-fdb1-448d-ba76-2e52fcef4fb6</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Du_Jardin_à_la_Ferme___V2</RootNamespace>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+    <AssemblyName>Du Jardin à la Ferme - V2</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="index.php" />
+    <Compile Include="private\bdd.php" />
+    <Compile Include="private\config.php" />
+    <Compile Include="private\entities.php" />
+    <Compile Include="private\password.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="private\" />
+  </ItemGroup>
+</Project>
