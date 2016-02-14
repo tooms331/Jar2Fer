@@ -15,19 +15,19 @@ require_once 'entities.php';
 class BDD
 {
     /**
-     * lien vers la base de donnée
+     * lien vers la base de donnÃ©e
      * @var \PDO
      */
     private $pdolink;
     
     /**
-     * Ouverture de la base de donnée
+     * Ouverture de la base de donnÃ©e
      */
     public function __construct()
     {
         $this->pdolink = new \PDO(
-			"mysql:host=".BDD_SERVER.";dbname=".BDD_SCHEMA.";charset=utf8",
-			BDD_USER , 
+			"mysql:host=".BDD_SERVER.";dbname=".BDD_SCHEMA.";",//charset=utf8",
+			BDD_USER ,  
 			BDD_PASSWORD,
 			array(
 				\PDO::ATTR_ERRMODE				=> \PDO::ERRMODE_EXCEPTION,
@@ -35,7 +35,10 @@ class BDD
 				\PDO::MYSQL_ATTR_LOCAL_INFILE	=> 1
 			)
 		);
-        $this->pdolink->exec("SET NAMES 'UTF8'");
+        //$this->pdolink->exec("SET CHARACTER SET utf8");
+        //$this->pdolink->exec("SET NAMES 'utf8' COLLATE 'utf8_general_ci'");
+        
+
     }
     
     private function bindValues(PDOStatement $statement, $parameters)
@@ -56,9 +59,9 @@ class BDD
     /**
      * Execute une requette et revois les lignes sous forme d'un tableau d'objet
      * @param string $class 
-     * Classe de l'objet à retourné
+     * Classe de l'objet Ã  retournÃ©
      * @param string $sql 
-     * Requette à exécuté
+     * Requette Ã  exÃ©cutÃ©
      * @param array $parameters 
      * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
      * @throws ErrorException 
@@ -78,7 +81,7 @@ class BDD
     /**
      * Execute une requette et revois les lignes sous forme d'un tableau de tableau associatif
      * @param string $sql 
-     * Requette à exécuté
+     * Requette Ã  exÃ©cutÃ©
      * @param array $parameters 
      * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
      * @throws ErrorException 
@@ -96,11 +99,11 @@ class BDD
     }
     
     /**
-     * Execute une requette et revois la première ligne sous forme d'objet
+     * Execute une requette et revois la premiÃ¨re ligne sous forme d'objet
      * @param string $class 
-     * Classe de l'objet à retourné
+     * Classe de l'objet Ã  retournÃ©
      * @param string $sql 
-     * Requette à exécuté
+     * Requette Ã  exÃ©cutÃ©
      * @param array $parameters 
      * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
      * @throws ErrorException 
@@ -118,9 +121,9 @@ class BDD
     }
     
     /**
-     * Execute une requette et revois la première ligne sous forme d'un tableau associatif
+     * Execute une requette et revois la premiÃ¨re ligne sous forme d'un tableau associatif
      * @param string $sql 
-     * Requette à exécuté
+     * Requette Ã  exÃ©cutÃ©
      * @param array $parameters 
      * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
      * @throws ErrorException 
@@ -137,6 +140,15 @@ class BDD
         return $return_object;
     }
     
+    /**
+     * Execute une requette et revois la valeur de la premiere colone de la premiÃ¨re ligne.
+     * @param string $sql 
+     * Requette Ã  exÃ©cutÃ©
+     * @param array $parameters 
+     * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
+     * @throws ErrorException 
+     * @return mixed
+     */
     public function getScalar($sql, $parameters)
     {
         $statement = $this->pdolink->prepare($sql);
@@ -144,14 +156,13 @@ class BDD
         $statement->execute();
         $return_object = $statement->fetchColumn(0);
         $statement->closeCursor();
-        if(!$return_object)$return_object=null;
         return $return_object;
     }
     
     /**
-     * Execute une requette et revois le nombre de ligne affectée
+     * Execute une requette et revois le nombre de ligne affectÃ©e
      * @param string $sql 
-     * Requette à exécuté
+     * Requette Ã  exÃ©cutÃ©
      * @param array $parameters 
      * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
      * @throws ErrorException 
@@ -168,9 +179,9 @@ class BDD
     }
     
     /**
-     * Execute une requette et revois l'ID de la derniére insertion
+     * Execute une requette et revois l'ID de la derniÃ©re insertion
      * @param string $sql 
-     * Requette à exécuté
+     * Requette Ã  exÃ©cutÃ©
      * @param array $parameters 
      * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
      * @throws ErrorException 
@@ -184,8 +195,8 @@ class BDD
     }
     
     /**
-     * Supprime toutes les données dans la Base de donnée
-     * (la structure est conservé)
+     * Supprime toutes les donnÃ©es dans la Base de donnÃ©e
+     * (la structure est conservÃ©)
      */
     public function CLEAR_ALL()
     {
@@ -198,7 +209,7 @@ class BDD
     }
     
     /**
-     * Récupere un compte spécifique
+     * RÃ©cupere un compte spÃ©cifique
      * @param int $id_compte 
      * @throws ErrorException 
      * @return Compte
@@ -224,7 +235,7 @@ class BDD
     }
     
     /**
-     * Créer un nouveau compte et retourne les informations de celui-ci
+     * CrÃ©er un nouveau compte et retourne les informations de celui-ci
      * @param string $email 
      * @param string $password 
      * @throws ErrorException 
@@ -234,11 +245,11 @@ class BDD
     {
         $email=(string)$email;
         $password=(string)$password;
-            
-        //on hash le mot de passe pour la sécurité
+        
+        //on hash le mot de passe pour la sÃ©curitÃ©
         $password = password_hash($password,PASSWORD_DEFAULT);
         
-        // on vérifie si l'identifiant éxiste déjà
+        // on vÃ©rifie si l'identifiant Ã©xiste dÃ©jÃ 
         $compte_exists = $this->getScalar(
             'SELECT COUNT(*) 
             FROM comptes 
@@ -274,9 +285,9 @@ class BDD
     /**
      * Authentifie un compte et retourne les infos de celui-ci'
      * @param string $email 
-     * Email du compte à authentifier
+     * Email du compte Ã  authentifier
      * @param string $password 
-     * Mot de passe du compte à authentifier
+     * Mot de passe du compte Ã  authentifier
      * @throws ErrorException 
      * @return Compte
      */
@@ -285,7 +296,7 @@ class BDD
         $email=(string)$email;
         $password=(string)$password;
         
-        // on récupére le hash et l'id du compte
+        // on rÃ©cupÃ©re le hash et l'id du compte
         $compte_infos = $this->getSingle(
             'SELECT 
                 id_compte, 
@@ -301,11 +312,11 @@ class BDD
         $hash = (string)$compte_infos['hash'];
         $id_compte = (int)$compte_infos['id_compte'];
         
-        // on vérifie le hash
+        // on vÃ©rifie le hash
         if(!password_verify($password, $hash))
             return null;
         
-        // on vérifie si le hash doit être mis à jour
+        // on vÃ©rifie si le hash doit Ãªtre mis Ã  jour
         if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {
             $hash = password_hash($password, PASSWORD_DEFAULT);
             
@@ -324,11 +335,11 @@ class BDD
     }
     
     /**
-     * Modifie l'état du compte
+     * Modifie l'Ã©tat du compte
      * @param int $id_compte 
-     * ID du compte à modifier
+     * ID du compte Ã  modifier
      * @param bool $actif 
-     * Nouvel état du compte
+     * Nouvel Ã©tat du compte
      * @throws ErrorException 
      * @return Compte
      */
@@ -351,9 +362,9 @@ class BDD
     }
     
     /**
-     * Récupére un produit spécifique
+     * RÃ©cupÃ©re un produit spÃ©cifique
      * @param int $id_produit
-     * ID du produit à récupérer
+     * ID du produit Ã  rÃ©cupÃ©rer
      * @throws ErrorException 
      * @return Produit
      */
@@ -396,9 +407,9 @@ class BDD
     }
     
     /**
-     * Récupére un produit spécifique
+     * RÃ©cupÃ©re un produit spÃ©cifique
      * @param string $nom 
-     * Nom du produit à créer
+     * Nom du produit Ã  crÃ©er
      * @param string $description 
      * Description du produit
      * @throws ErrorException 
@@ -408,8 +419,8 @@ class BDD
     {
         $nom = (string)$nom;
         $description = (string)$description;
-            
-        // on vérifie si l'identifiant éxiste déjà
+        
+        // on vÃ©rifie si l'identifiant Ã©xiste dÃ©jÃ 
         $count = $this->getScalar(
             'SELECT COUNT(*) 
             FROM produits 
@@ -422,7 +433,7 @@ class BDD
         if($count>0)
             return null;
         
-        //On créer le produit
+        //On crÃ©er le produit
         $id_produit = (int)$this->execInsert(
             'INSERT INTO produits 
             (
@@ -444,7 +455,7 @@ class BDD
     }
     
     /**
-     * Liste tous les produits dont le stock prévisionnel est positif
+     * Liste tous les produits dont le stock prÃ©visionnel est positif
      * @throws ErrorException 
      * @return Stock[]
      */
@@ -490,9 +501,9 @@ class BDD
     }
     
     /**
-     * Récupère le détail d'une variation de stock spécifique
+     * RÃ©cupÃ¨re le dÃ©tail d'une variation de stock spÃ©cifique
      * @param int $id_variation_stock 
-     * ID de la variation de stock à récupérer
+     * ID de la variation de stock Ã  rÃ©cupÃ©rer
      * @return VariationStock
      */
     public function VariationStock_Recuperer($id_variation_stock)
@@ -518,15 +529,15 @@ class BDD
     }
     
     /**
-     * Créer une entrée de variation de stock
+     * CrÃ©er une entrÃ©e de variation de stock
      * @param int $id_produit 
      * L'id du produit dont le stock varie
      * @param double $variation 
-     * Montant de la variation (négative quand le stock baisse)
+     * Montant de la variation (nÃ©gative quand le stock baisse)
      * @param string $type 
-     * Type de variation : Récolte, Vente, Perte, etc...
+     * Type de variation : RÃ©colte, Vente, Perte, etc...
      * @param string $remarque 
-     * Informations complémentaires sur la variation
+     * Informations complÃ©mentaires sur la variation
      * @throws ErrorException 
      * @return VariationStock
      */
@@ -537,7 +548,7 @@ class BDD
         $type = (string)$type;
         $remarque = (string)$remarque;
         
-        //On créer la variation
+        //On crÃ©er la variation
         $id_variation_stock = (int)$this->execInsert(
             'INSERT INTO variations_stock
             (
@@ -564,13 +575,13 @@ class BDD
     }
     
     /**
-     * Récupère une commande spécifique
+     * RÃ©cupÃ¨re une commande spÃ©cifique
      * @param int $id_commande 
-     * ID de la commande à récupérer
+     * ID de la commande Ã  rÃ©cupÃ©rer
      * @throws ErrorException 
      * @return Commande
      */
-    public function Commande_Récupere($id_commande)
+    public function Commande_RÃ©cupere($id_commande)
     {
         $id_commande=(int)$id_commande;
         //On cherche la commande
@@ -592,15 +603,15 @@ class BDD
     }
     
     /**
-     * Récupére la commande en cours de création du compte, ou en créer une nouvelle.
+     * RÃ©cupÃ©re la commande en cours de crÃ©ation du compte, ou en crÃ©er une nouvelle.
      * @param int $id_compte 
      * ID du compte dont on veux obtenir la commande
      * @return Commande
      */
-    public function Commande_Récupéré_EnCreation($id_compte)
+    public function Commande_RÃ©cupÃ©rÃ©_EnCreation($id_compte)
     {   
         $id_compte=(int)$id_compte;
-        //On cherche une commande existante en création
+        //On cherche une commande existante en crÃ©ation
         $commande = $this->getSingleObject(
             'Commande',
             'SELECT 
@@ -611,19 +622,19 @@ class BDD
                 etat 
             FROM commandes 
             WHERE id_compte = :id_compte 
-            AND etat = \'Création\' 
+            AND etat = \'CrÃ©ation\' 
             LIMIT 1',
             [
                 ':id_compte'=>$id_compte
             ]
         );
         
-        //La commande éxiste déjà
+        //La commande Ã©xiste dÃ©jÃ 
         if($commande) {
             return $commande;
         }
         
-        //On créer la commande
+        //On crÃ©er la commande
         $id_commande = (int)$this->execInsert(
             'INSERT INTO commandes 
             (
@@ -638,13 +649,13 @@ class BDD
             ]
         );
         
-        return $this->Commande_Récupere($id_commande);
+        return $this->Commande_RÃ©cupere($id_commande);
     }
     
     /**
      * Liste les elements d'une commande'
      * @param int $id_commande 
-     * ID de la commande à rècupérer
+     * ID de la commande Ã  rÃ¨cupÃ©rer
      * @return ElementCommande[]
      */
     public function Commande_lister_Elements($id_commande)
@@ -669,13 +680,13 @@ class BDD
     }
     
     /**
-     * Ajoute, modifie ou supprime un élément de commande
+     * Ajoute, modifie ou supprime un Ã©lÃ©ment de commande
      * @param int $id_commande
-     * ID de la commande à modifier
+     * ID de la commande Ã  modifier
      * @param int $id_produit 
-     * ID du produit commandé
+     * ID du produit commandÃ©
      * @param double $quantite 
-     * Quantité commandé (si = 0, l'élément est supprimé de la commande)
+     * QuantitÃ© commandÃ© (si = 0, l'Ã©lÃ©ment est supprimÃ© de la commande)
      * @return ElementCommande
      */
     public function Commande_Modifier_ElementQuantite($id_commande,$id_produit,$quantite)
@@ -686,7 +697,7 @@ class BDD
         
         if($quantite==0)
         {
-            //On supprime l'élément de commande
+            //On supprime l'Ã©lÃ©ment de commande
             $this->exec(
                 'DELETE FROM elements_commande
                 WHERE id_commande = :id_commande
@@ -699,7 +710,7 @@ class BDD
         }
         else
         {
-            //On créer/modifie l'élément de commande
+            //On crÃ©er/modifie l'Ã©lÃ©ment de commande
             $this->execInsert(
                 'INSERT INTO elements_commande 
                 (

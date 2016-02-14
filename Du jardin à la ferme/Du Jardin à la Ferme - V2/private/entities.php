@@ -30,7 +30,7 @@ class Produit
      * @var int
      */
     public $id_produit;
-    /**
+    /** 
      * @var string
      */
     public $nom;
@@ -71,11 +71,11 @@ class Stock
 
 class Commande
 {
-    const ETAT_CREATION = 'Création';
-    const ETAT_VALIDE = 'Validé';
-    const ETAT_PREPARATION = 'Préparation';
+    const ETAT_CREATION = 'CrÃ©ation';
+    const ETAT_VALIDE = 'ValidÃ©';
+    const ETAT_PREPARATION = 'PrÃ©paration';
     const ETAT_LIVRAISON = 'Livraison';
-    const ETAT_TERMINE = 'Terminé';
+    const ETAT_TERMINE = 'TerminÃ©';
     
     /**
      * @var int

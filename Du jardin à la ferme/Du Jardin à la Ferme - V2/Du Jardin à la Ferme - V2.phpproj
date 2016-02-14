@@ -8,6 +8,15 @@
     <RootNamespace>Du_Jardin_à_la_Ferme___V2</RootNamespace>
     <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
     <AssemblyName>Du Jardin à la Ferme - V2</AssemblyName>
+    <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+    <Server>PHPDev</Server>
+    <CustomServerUrl>http://localhost/djalf2/</CustomServerUrl>
+    <PublishEvent>BeforeRun</PublishEvent>
+    <PublishBeforeDebugProfile>LOCAL DJALF2</PublishBeforeDebugProfile>
+    <PHPDevAutoPort>True</PHPDevAutoPort>
+    <PHPDevPort>37253</PHPDevPort>
+    <PHPDevHostName>localhost</PHPDevHostName>
+    <IISProjectUrl>http://localhost:37253/</IISProjectUrl>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <IncludeDebugInformation>true</IncludeDebugInformation>
