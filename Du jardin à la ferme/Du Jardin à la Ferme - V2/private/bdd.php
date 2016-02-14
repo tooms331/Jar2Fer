@@ -40,7 +40,7 @@ class BDD
     
     private function bindValues(PDOStatement $statement, $parameters)
     {
-        foreach($parameters as $name => $value )
+        foreach($parameters as $name => $value)
         {
             $type = PDO::PARAM_STR;
             if(is_bool($value))
@@ -53,29 +53,60 @@ class BDD
         }
     }
     
-    public function getAllObjects($class,$sql,$parameters)
+    /**
+     * Execute une requette et revois les lignes sous forme d'un tableau d'objet
+     * @param string $class 
+     * Classe de l'objet à retourné
+     * @param string $sql 
+     * Requette à exécuté
+     * @param array $parameters 
+     * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
+     * @throws ErrorException 
+     * @return array
+     */
+    public function getAllObjects($class, $sql, $parameters)
     {
         $statement = $this->pdolink->prepare($sql);
         $this->bindValues($statement, $parameters);
         $statement->execute();
         $return_objects = $statement->fetchAll(PDO::FETCH_CLASS,$class);
         $statement->closeCursor();
-        if(!$return_objects)$return_objects=null;
+        if(!$return_objects)$return_objects=[];
         return $return_objects;
     }
     
-    public function getAll($sql,$parameters)
+    /**
+     * Execute une requette et revois les lignes sous forme d'un tableau de tableau associatif
+     * @param string $sql 
+     * Requette à exécuté
+     * @param array $parameters 
+     * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
+     * @throws ErrorException 
+     * @return array
+     */
+    public function getAll($sql, $parameters)
     {
         $statement = $this->pdolink->prepare($sql);
         $this->bindValues($statement, $parameters);
         $statement->execute();
         $return_objects = $statement->fetchAll();
         $statement->closeCursor();
-        if(!$return_objects)$return_objects=null;
+        if(!$return_objects)$return_objects=[];
         return $return_objects;
     }
     
-    public function getSingleObject($class,$sql,$parameters)
+    /**
+     * Execute une requette et revois la première ligne sous forme d'objet
+     * @param string $class 
+     * Classe de l'objet à retourné
+     * @param string $sql 
+     * Requette à exécuté
+     * @param array $parameters 
+     * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
+     * @throws ErrorException 
+     * @return object|null
+     */
+    public function getSingleObject($class, $sql, $parameters)
     {
         $statement = $this->pdolink->prepare($sql);
         $this->bindValues($statement, $parameters);
@@ -86,7 +117,16 @@ class BDD
         return $return_object;
     }
     
-    public function getSingle($sql,$parameters)
+    /**
+     * Execute une requette et revois la première ligne sous forme d'un tableau associatif
+     * @param string $sql 
+     * Requette à exécuté
+     * @param array $parameters 
+     * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
+     * @throws ErrorException 
+     * @return array|null
+     */
+    public function getSingle($sql, $parameters)
     {
         $statement = $this->pdolink->prepare($sql);
         $this->bindValues($statement, $parameters);
@@ -97,7 +137,7 @@ class BDD
         return $return_object;
     }
     
-    public function getScalar($sql,$parameters)
+    public function getScalar($sql, $parameters)
     {
         $statement = $this->pdolink->prepare($sql);
         $this->bindValues($statement, $parameters);
@@ -108,6 +148,15 @@ class BDD
         return $return_object;
     }
     
+    /**
+     * Execute une requette et revois le nombre de ligne affectée
+     * @param string $sql 
+     * Requette à exécuté
+     * @param array $parameters 
+     * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
+     * @throws ErrorException 
+     * @return mixed
+     */
     public function exec($sql,$parameters)
     {
         $statement = $this->pdolink->prepare($sql);
@@ -118,6 +167,15 @@ class BDD
         return $rowCount;
     }
     
+    /**
+     * Execute une requette et revois l'ID de la derniére insertion
+     * @param string $sql 
+     * Requette à exécuté
+     * @param array $parameters 
+     * Paramettres de la requettes(ex: [':id'=>(int)$id,':nom'=>(string)$nom])
+     * @throws ErrorException 
+     * @return string|null
+     */
     public function execInsert($sql,$parameters)
     {
         $rowCount = $this->exec($sql,$parameters);
@@ -125,6 +183,10 @@ class BDD
         return $lastId;
     }
     
+    /**
+     * Supprime toutes les données dans la Base de donnée
+     * (la structure est conservé)
+     */
     public function CLEAR_ALL()
     {
         $this->pdolink->exec('TRUNCATE TABLE variations_stock');
@@ -143,6 +205,8 @@ class BDD
      */
     public function Compte_Recuperer($id_compte)
     {
+        $id_compte = (int)$id_compte;
+        
         $compte = $this->getSingleObject(
             'Compte',
             'SELECT 
@@ -152,9 +216,9 @@ class BDD
                 actif 
             FROM comptes 
             WHERE id_compte = :id_compte',
-            array(
+            [
                 ':id_compte' => $id_compte
-            )
+            ]
         );
         return $compte;
     }
@@ -168,6 +232,9 @@ class BDD
      */
     public function Compte_Creer($email, $password)
     {
+        $email=(string)$email;
+        $password=(string)$password;
+            
         //on hash le mot de passe pour la sécurité
         $password = password_hash($password,PASSWORD_DEFAULT);
         
@@ -176,16 +243,16 @@ class BDD
             'SELECT COUNT(*) 
             FROM comptes 
             WHERE email = :email',
-            array(
+            [
                 ':email' => $email
-            )
+            ]
         );
         
-        if($compte_exists>0)
-            throw new ErrorException("Le compte éxiste déjà");
+        if($compte_exists > 0)
+            return null;
         
         //on insert le nouveau compte
-        $id_compte = (int) $this->execInsert(
+        $id_compte = (int)$this->execInsert(
             'INSERT INTO Comptes 
             (
                 email,
@@ -207,12 +274,17 @@ class BDD
     /**
      * Authentifie un compte et retourne les infos de celui-ci'
      * @param string $email 
+     * Email du compte à authentifier
      * @param string $password 
+     * Mot de passe du compte à authentifier
      * @throws ErrorException 
      * @return Compte
      */
     public function Compte_Authentifier($email, $password)
     {
+        $email=(string)$email;
+        $password=(string)$password;
+        
         // on récupére le hash et l'id du compte
         $compte_infos = $this->getSingle(
             'SELECT 
@@ -221,13 +293,13 @@ class BDD
             FROM comptes 
             WHERE actif = 1 
             AND email = :email',
-            array(
+            [
                 ':email'=>$email
-            )
+            ]
         );
         
-        $hash = $compte_infos['hash'];
-        $id_compte = $compte_infos['id_compte'];
+        $hash = (string)$compte_infos['hash'];
+        $id_compte = (int)$compte_infos['id_compte'];
         
         // on vérifie le hash
         if(!password_verify($password, $hash))
@@ -241,10 +313,10 @@ class BDD
                 'UPDATE Comptes 
                 SET hash = :hash 
                 WHERE id_compte = :id_compte',
-                array(
+                [
                     ':id_compte'=>$id_compte,
                     ':hash'=>$password
-                )
+                ]
             );
         }
 
@@ -252,22 +324,27 @@ class BDD
     }
     
     /**
-     * Modifie l'état du compte'
+     * Modifie l'état du compte
      * @param int $id_compte 
+     * ID du compte à modifier
      * @param bool $actif 
+     * Nouvel état du compte
      * @throws ErrorException 
      * @return Compte
      */
     public function Compte_Modifier_Actif($id_compte, $actif)
     {
+        $id_compte=(int)$id_compte;
+        $actif=(bool)$actif;
+        
         $this->exec(
             'UPDATE Comptes 
             SET actif = :actif 
             WHERE id_compte = :id_compte',
-            array(
+            [
                 ':id_compte'=>$id_compte,
                 ':actif'=>$actif
-            )
+            ]
         );
         
         return $this->Compte_Recuperer($id_compte);
@@ -275,12 +352,15 @@ class BDD
     
     /**
      * Récupére un produit spécifique
-     * @param int $id_produit 
+     * @param int $id_produit
+     * ID du produit à récupérer
      * @throws ErrorException 
      * @return Produit
      */
     public function Produits_Recuperer($id_produit)
     {
+        $id_produit = (int)$id_produit;
+        
         $produit = $this->getSingleObject(
             'Produit',
             'SELECT 
@@ -299,7 +379,7 @@ class BDD
     /**
      * Liste tous les produits
      * @throws ErrorException 
-     * @return array
+     * @return Produit[]
      */
     public function Produits_Lister()
     {
@@ -310,35 +390,41 @@ class BDD
                 nom, 
                 description 
             FROM produits',
-            array()
+            []
         );
-        return $produits;
+        return $produits ?: [];
     }
     
     /**
      * Récupére un produit spécifique
      * @param string $nom 
+     * Nom du produit à créer
      * @param string $description 
+     * Description du produit
      * @throws ErrorException 
      * @return Produit
      */
-    public function Produits_Ajouter($nom, $description)
+    public function Produits_Creer($nom, $description)
     {
+        $nom = (string)$nom;
+        $description = (string)$description;
+            
         // on vérifie si l'identifiant éxiste déjà
-        $statement = $this->pdolink->prepare('
-            SELECT COUNT(*) 
+        $count = $this->getScalar(
+            'SELECT COUNT(*) 
             FROM produits 
-            WHERE nom = :nom
-        ');
-        $statement->bindValue(':nom',$nom,PDO::PARAM_STR);
-        $statement->execute();
-        if($statement->fetchColumn(0)>0)
-            throw new ErrorException('Le produit existe déjà');
-        $statement->closeCursor();
+            WHERE nom = :nom',
+            [
+                ':nom'=>$nom
+            ]
+        );
+        
+        if($count>0)
+            return null;
         
         //On créer le produit
-        $statement = $this->pdolink->prepare('
-            INSERT INTO produits 
+        $id_produit = (int)$this->execInsert(
+            'INSERT INTO produits 
             (
                 nom, 
                 description
@@ -347,13 +433,12 @@ class BDD
             (
                 :nom,
                 :description
-            )
-        ');
-        $statement->bindValue(':nom',$nom,PDO::PARAM_STR);
-        $statement->bindValue(':description',$description,PDO::PARAM_STR);
-        $statement->execute();
-        $id_produit = (int)$this->pdolink->lastInsertId();
-        $statement->closeCursor();
+            )',
+            [
+                ':nom'=>$nom,
+                ':description'=>$description
+            ]
+        );
         
         return $this->Produits_Recuperer($id_produit);
     }
@@ -361,12 +446,13 @@ class BDD
     /**
      * Liste tous les produits dont le stock prévisionnel est positif
      * @throws ErrorException 
-     * @return array
+     * @return Stock[]
      */
     public function StockPrevisionel_Lister()
     {
-        $statement = $this->pdolink->prepare('
-            SELECT 
+        $stocks = $this->getAllObjects(
+            'Stock',
+            'SELECT 
                 prod.id_produit, 
                 prod.nom, 
                 prod.description, 
@@ -374,23 +460,22 @@ class BDD
             FROM produits as prod
             INNER JOIN stocks_previsionnel as stocks
                 ON prod.id_produit = stocks.id_produit
-            WHERE stocks.stock > 0
-        ');
-        $statement->execute();
-        $stocks = $statement->fetchAll(PDO::FETCH_CLASS,"Stock");
-        $statement->closeCursor();
-        return $stocks;
+            WHERE stocks.stock > 0',
+            []
+        );
+        return $stocks ?: array();
     }
     
     /**
      * Liste tous les produits dont le stock est positif
      * @throws ErrorException 
-     * @return array
+     * @return Stock[]
      */
     public function Stock_Lister()
     {
-        $statement = $this->pdolink->prepare('
-            SELECT 
+        $stocks = $this->getAllObjects(
+            'Stock',
+            'SELECT 
                 prod.id_produit, 
                 prod.nom, 
                 prod.description, 
@@ -398,26 +483,62 @@ class BDD
             FROM produits as prod
             INNER JOIN stocks as stocks
                 ON prod.id_produit = stocks.id_produit
-            WHERE stocks.stock > 0
-        ');
-        $statement->execute();
-        $stocks = $statement->fetchAll(PDO::FETCH_CLASS,"Stock");
-        $statement->closeCursor();
-        return $stocks;
+            WHERE stocks.stock > 0',
+            []
+        );
+        return $stocks ?: [];
     }
     
     /**
-     * Summary of VariationsStock_Ajouter
+     * Récupère le détail d'une variation de stock spécifique
+     * @param int $id_variation_stock 
+     * ID de la variation de stock à récupérer
+     * @return VariationStock
+     */
+    public function VariationStock_Recuperer($id_variation_stock)
+    {
+        $id_variation_stock=(int)$id_variation_stock;
+        
+        $variation = $this->getSingleObject(
+            'VariationStock',
+            'SELECT 
+                id_variation_stock, 
+                id_produit, 
+                date_variation, 
+                variation, 
+                type_variation, 
+                remarque
+            FROM variations_stock 
+            WHERE id_variation_stock = :id_variation_stock',
+            [
+                ':id_variation_stock'=>$id_variation_stock
+            ]
+        );
+        return $variation;
+    }
+    
+    /**
+     * Créer une entrée de variation de stock
      * @param int $id_produit 
+     * L'id du produit dont le stock varie
      * @param double $variation 
+     * Montant de la variation (négative quand le stock baisse)
      * @param string $type 
+     * Type de variation : Récolte, Vente, Perte, etc...
      * @param string $remarque 
+     * Informations complémentaires sur la variation
      * @throws ErrorException 
+     * @return VariationStock
      */
     public function VariationsStock_Ajouter($id_produit,$variation,$type,$remarque)
     {
+        $id_produit = (int)$id_produit;
+        $variation = (double)$variation;
+        $type = (string)$type;
+        $remarque = (string)$remarque;
+        
         //On créer la variation
-        $id_produit = $this->execInsert(
+        $id_variation_stock = (int)$this->execInsert(
             'INSERT INTO variations_stock
             (
                 id_produit, 
@@ -432,129 +553,178 @@ class BDD
                 :type, 
                 :remarque
             )',
-            array(
+            [
                 ':id_produit'=>$id_produit,
                 ':variation'=>$variation,
                 ':type'=>$type,
                 ':remarque'=>$remarque
-            )
-        )
+            ]
+        );
+        return $this->VariationStock_Recuperer($id_variation_stock);
     }
     
     /**
-     * Summary of Commande_Récupere
+     * Récupère une commande spécifique
      * @param int $id_commande 
+     * ID de la commande à récupérer
      * @throws ErrorException 
      * @return Commande
      */
     public function Commande_Récupere($id_commande)
     {
+        $id_commande=(int)$id_commande;
         //On cherche la commande
-        $statement = $this->pdolink->prepare('
-            SELECT 
+        $commande = $this->getSingleObject(
+            'Commande',
+            'SELECT 
                 id_commande, 
                 id_compte, 
                 date_creation, 
                 remarque, 
                 etat 
             FROM commandes 
-            WHERE id_commande = :id_commande
-        ');
-        $statement->bindValue(':id_commande',$id_commande,PDO::PARAM_INT);
-        $statement->execute();
-        $commande = $statement->fetchObject("Commande");
-        $statement->closeCursor();
+            WHERE id_commande = :id_commande',
+            [
+                ':id_commande'=>$id_commande
+            ]
+        );
         return $commande;
     }
+    
     /**
      * Récupére la commande en cours de création du compte, ou en créer une nouvelle.
      * @param int $id_compte 
+     * ID du compte dont on veux obtenir la commande
      * @return Commande
      */
-    public function Commande_Récupéré_Creer_Creation($id_compte)
-    {
-        
+    public function Commande_Récupéré_EnCreation($id_compte)
+    {   
+        $id_compte=(int)$id_compte;
         //On cherche une commande existante en création
-        $statement = $this->pdolink->prepare('SELECT id_commande, id_compte, date_creation, remarque, etat FROM commandes WHERE id_compte = :id_compte AND etat = \'Création\' LIMIT 1');
-        $statement->bindValue(':id_compte',$id_compte,PDO::PARAM_STR);
-        $statement->execute();
-        $commande = $statement->fetchObject("Commande");
-        if($commande)
-        {
-            $statement->closeCursor();
+        $commande = $this->getSingleObject(
+            'Commande',
+            'SELECT 
+                id_commande, 
+                id_compte, 
+                date_creation, 
+                remarque, 
+                etat 
+            FROM commandes 
+            WHERE id_compte = :id_compte 
+            AND etat = \'Création\' 
+            LIMIT 1',
+            [
+                ':id_compte'=>$id_compte
+            ]
+        );
+        
+        //La commande éxiste déjà
+        if($commande) {
             return $commande;
         }
         
         //On créer la commande
-        $statement = $this->pdolink->prepare('INSERT INTO commandes (id_compte)VALUES(:id_compte)');
-        $statement->bindValue(':id_compte',$id_compte,PDO::PARAM_INT);
-        $statement->execute();
-        if($statement->rowCount()!=1)
-            throw new ErrorException('Création de la commande échoué');
-        $id_commande = (int)$this->pdolink->lastInsertId();
-        $statement->closeCursor();
+        $id_commande = (int)$this->execInsert(
+            'INSERT INTO commandes 
+            (
+                id_compte
+            )
+            VALUES
+            (
+                :id_compte
+            )',
+            [
+                ':id_compte'=>$id_compte
+            ]
+        );
         
         return $this->Commande_Récupere($id_commande);
-        
     }
     
     /**
      * Liste les elements d'une commande'
      * @param int $id_commande 
-     * @return array
+     * ID de la commande à rècupérer
+     * @return ElementCommande[]
      */
     public function Commande_lister_Elements($id_commande)
     {
-        $statement = $this->pdolink->prepare('
-            SELECT 
+        $id_commande=(int)$id_commande;
+        
+        $elements = $this->getAllObjects(
+            'ElementCommande',
+            'SELECT 
                 id_element_commande, 
                 id_commande, 
                 id_produit, 
                 quantite_commande, 
                 quantite_reel 
             FROM elements_commande 
-            WHERE id_commande = :id_commande
-        ');
-        $statement->bindValue(':id_commande',$id_commande,PDO::PARAM_INT);
-        $statement->execute();
-        $elements = $statement->fetchAll(PDO::FETCH_CLASS,"ElementCommande");
-        $statement->closeCursor();
-        return $elements;
+            WHERE id_commande = :id_commande',
+            [
+                ':id_commande'=>$id_commande
+            ]
+        );
+        return $elements ?: [];
     }
+    
     /**
-     * Summary of Commande_Modifier_ElementQuantite
-     * @param int $id_commande 
+     * Ajoute, modifie ou supprime un élément de commande
+     * @param int $id_commande
+     * ID de la commande à modifier
      * @param int $id_produit 
-     * @param float $quantite 
+     * ID du produit commandé
+     * @param double $quantite 
+     * Quantité commandé (si = 0, l'élément est supprimé de la commande)
      * @return ElementCommande
      */
     public function Commande_Modifier_ElementQuantite($id_commande,$id_produit,$quantite)
     {
+        $quantite=(double)$quantite;
+        $id_commande=(int)$id_commande;
+        $id_produit=(int)$id_produit;
         
-        //On créer le produit
-        $statement = $this->pdolink->prepare('
-            INSERT INTO elements_commande 
-            (
-                id_commande, 
-                id_produit, 
-                quantite_commande
-            )
-            VALUES(
-                :id_commande, 
-                :id_produit, 
-                :quantite_commande
-            )
-            ON DUPLICATE KEY UPDATE
-                quantite_commande = :quantite_commande
-        ');
-        $statement->bindValue(':id_commande',$id_commande,PDO::PARAM_INT);
-        $statement->bindValue(':id_produit',$id_produit,PDO::PARAM_INT);
-        $statement->bindValue(':quantite_commande',$quantite,PDO::PARAM_STR);
-        $statement->execute();
-        $statement->closeCursor();
+        if($quantite==0)
+        {
+            //On supprime l'élément de commande
+            $this->exec(
+                'DELETE FROM elements_commande
+                WHERE id_commande = :id_commande
+                AND  id_produit = :id_produit',
+                [
+                    ':id_commande'=>$id_commande,
+                    ':id_produit'=>$id_produit
+                ]
+            );
+        }
+        else
+        {
+            //On créer/modifie l'élément de commande
+            $this->execInsert(
+                'INSERT INTO elements_commande 
+                (
+                    id_commande, 
+                    id_produit, 
+                    quantite_commande
+                )
+                VALUES(
+                    :id_commande, 
+                    :id_produit, 
+                    :quantite_commande
+                )
+                ON DUPLICATE KEY UPDATE
+                    quantite_commande = :quantite_commande',
+                [
+                    ':id_commande'=>$id_commande,
+                    ':id_produit'=>$id_produit,
+                    ':quantite_commande'=>$quantite
+                ]
+            );
+        }
         
-        $statement = $this->pdolink->prepare('
-            SELECT 
+        $element = $this->getSingleObject(
+            'ElementCommande',
+            'SELECT 
                 id_element_commande, 
                 id_commande, 
                 id_produit, 
@@ -562,13 +732,12 @@ class BDD
                 quantite_reel 
             FROM elements_commande 
             WHERE id_commande = :id_commande
-            AND id_produit = :id_produit
-        ');
-        $statement->bindValue(':id_commande',$id_commande,PDO::PARAM_INT);
-        $statement->bindValue(':id_produit',$id_produit,PDO::PARAM_INT);
-        $statement->execute();
-        $element = $statement->fetchObject("ElementCommande");
-        $statement->closeCursor();
+            AND id_produit = :id_produit',
+            [
+                ':id_commande'=>$id_commande,
+                ':id_produit'=>$id_produit
+            ]
+        );
         return $element;
     }
 }
