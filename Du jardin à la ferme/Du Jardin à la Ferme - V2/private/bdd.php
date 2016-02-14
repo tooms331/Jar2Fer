@@ -4,9 +4,10 @@ require_once 'password.php';
 require_once 'entities.php';
 
 /**
- * bdd short summary.
+ * Couche de liaison à la BDD.
  *
- * bdd description.
+ * permet l'acces à la base de donnée et fournis 
+ * les principale fonctionnalité
  *
  * @version 1.0
  * @author Romain
@@ -26,7 +27,7 @@ class BDD
     public function __construct()
     {
         $this->pdolink = new \PDO(
-			"mysql:host=".BDD_SERVER.";dbname=".BDD_SCHEMA.";",//charset=utf8",
+			"mysql:host=".BDD_SERVER.";dbname=".BDD_SCHEMA.";charset=utf8",
 			BDD_USER ,  
 			BDD_PASSWORD,
 			array(
@@ -35,12 +36,65 @@ class BDD
 				\PDO::MYSQL_ATTR_LOCAL_INFILE	=> 1
 			)
 		);
-        //$this->pdolink->exec("SET CHARACTER SET utf8");
-        //$this->pdolink->exec("SET NAMES 'utf8' COLLATE 'utf8_general_ci'");
-        
-
+        $this->pdolink->exec("SET NAMES 'utf8' COLLATE 'utf8_general_ci'");
     }
     
+    
+    
+    private $transactionCounter = 0;
+
+    public function beginTransaction()
+    {
+        if (!$this->transactionCounter++) {
+            return $this->pdolink->beginTransaction();
+        }
+        $this->pdolink->exec('SAVEPOINT trans'.$this->transactionCounter);
+        return true;
+    }
+
+    public function commit()
+    {
+        if (!--$this->transactionCounter) {
+            return $this->pdolink->commit();
+        }
+        else{
+            $this->pdolink->exec('RELEASE SAVEPOINT trans'.($this->transactionCounter + 1));
+            return true;
+        }
+    }
+
+    public function rollback()
+    {
+        if (--$this->transactionCounter) {
+            $this->pdolink->exec('ROLLBACK TO SAVEPOINT trans'.($this->transactionCounter + 1));
+            return true;
+        }
+        return $this->pdolink->rollback();
+    }
+    
+    public function InTransaction(callable $function)
+    {   
+        $this->beginTransaction();
+        try{
+            $result = $function();
+            $this->commit();
+        }
+        catch(Exception $ex)
+        {   
+            $this->rollBack();
+            throw $ex;
+        }
+        return $result;
+    }
+    
+    /**
+     * bind les paramettres d'une requettes.
+     * Le type de bind est automatiquement définie en fonction du type de valeur.
+     * @param PDOStatement $statement
+     * La requettes préparé
+     * @param array $parameters
+     * Les paramettres à binder
+     */
     private function bindValues(PDOStatement $statement, $parameters)
     {
         foreach($parameters as $name => $value)
@@ -200,12 +254,14 @@ class BDD
      */
     public function CLEAR_ALL()
     {
-        $this->pdolink->exec('TRUNCATE TABLE variations_stock');
-        $this->pdolink->exec('TRUNCATE TABLE elements_commande');
-        $this->pdolink->exec('TRUNCATE TABLE variations_stock');
-        $this->pdolink->exec('TRUNCATE TABLE commandes');
-        $this->pdolink->exec('TRUNCATE TABLE produits');
-        $this->pdolink->exec('TRUNCATE TABLE comptes');
+        $this->InTransaction(function(){
+            $this->pdolink->exec('TRUNCATE TABLE variations_stock');
+            $this->pdolink->exec('TRUNCATE TABLE elements_commande');
+            $this->pdolink->exec('TRUNCATE TABLE variations_stock');
+            $this->pdolink->exec('TRUNCATE TABLE commandes');
+            $this->pdolink->exec('TRUNCATE TABLE produits');
+            $this->pdolink->exec('TRUNCATE TABLE comptes');
+        });
     }
     
     /**
@@ -218,20 +274,22 @@ class BDD
     {
         $id_compte = (int)$id_compte;
         
-        $compte = $this->getSingleObject(
-            'Compte',
-            'SELECT 
-                id_compte, 
-                email, 
-                date_creation, 
-                actif 
-            FROM comptes 
-            WHERE id_compte = :id_compte',
-            [
-                ':id_compte' => $id_compte
-            ]
-        );
-        return $compte;
+        return $this->InTransaction(function()use($id_compte){
+            $compte = $this->getSingleObject(
+                'Compte',
+                'SELECT 
+                    id_compte, 
+                    email, 
+                    date_creation, 
+                    actif 
+                FROM comptes 
+                WHERE id_compte = :id_compte',
+                [
+                    ':id_compte' => $id_compte
+                ]
+            );
+            return $compte;
+        });
     }
     
     /**
@@ -243,43 +301,47 @@ class BDD
      */
     public function Compte_Creer($email, $password)
     {
-        $email=(string)$email;
+        $email=mb_strimwidth((string)$email,0,255);
         $password=(string)$password;
         
         //on hash le mot de passe pour la sécurité
         $password = password_hash($password,PASSWORD_DEFAULT);
         
-        // on vérifie si l'identifiant éxiste déjà
-        $compte_exists = $this->getScalar(
-            'SELECT COUNT(*) 
-            FROM comptes 
-            WHERE email = :email',
-            [
-                ':email' => $email
-            ]
-        );
         
-        if($compte_exists > 0)
-            return null;
+        return $this->InTransaction(function()use($email, $password){
         
-        //on insert le nouveau compte
-        $id_compte = (int)$this->execInsert(
-            'INSERT INTO Comptes 
-            (
-                email,
-                hash
-            )
-            VALUES(
-                :email,
-                :hash
-            )',
-            array(
-                ':email'=>$email,
-                ':hash'=>$password
-            )
-        );
+            // on vérifie si l'identifiant éxiste déjà
+            $compte_exists = $this->getScalar(
+                'SELECT COUNT(*) 
+                FROM comptes 
+                WHERE email = :email',
+                [
+                    ':email' => $email
+                ]
+            );
         
-        return $this->Compte_Recuperer($id_compte);
+            if($compte_exists > 0)
+                return null;
+        
+            //on insert le nouveau compte
+            $id_compte = (int)$this->execInsert(
+                'INSERT INTO Comptes 
+                (
+                    email,
+                    hash
+                )
+                VALUES(
+                    :email,
+                    :hash
+                )',
+                array(
+                    ':email'=>$email,
+                    ':hash'=>$password
+                )
+            );
+        
+            return $this->Compte_Recuperer($id_compte);
+        });
     }
     
     /**
@@ -293,45 +355,48 @@ class BDD
      */
     public function Compte_Authentifier($email, $password)
     {
-        $email=(string)$email;
+        $email=mb_strimwidth((string)$email,0,255);
         $password=(string)$password;
         
-        // on récupére le hash et l'id du compte
-        $compte_infos = $this->getSingle(
-            'SELECT 
-                id_compte, 
-                hash 
-            FROM comptes 
-            WHERE actif = 1 
-            AND email = :email',
-            [
-                ':email'=>$email
-            ]
-        );
+        return $this->InTransaction(function()use($email, $password){
         
-        $hash = (string)$compte_infos['hash'];
-        $id_compte = (int)$compte_infos['id_compte'];
-        
-        // on vérifie le hash
-        if(!password_verify($password, $hash))
-            return null;
-        
-        // on vérifie si le hash doit être mis à jour
-        if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {
-            $hash = password_hash($password, PASSWORD_DEFAULT);
-            
-            $this->exec(
-                'UPDATE Comptes 
-                SET hash = :hash 
-                WHERE id_compte = :id_compte',
+            // on récupére le hash et l'id du compte
+            $compte_infos = $this->getSingle(
+                'SELECT 
+                    id_compte, 
+                    hash 
+                FROM comptes 
+                WHERE actif = 1 
+                AND email = :email',
                 [
-                    ':id_compte'=>$id_compte,
-                    ':hash'=>$password
+                    ':email'=>$email
                 ]
             );
-        }
-
-        return $this->Compte_Recuperer($id_compte);
+        
+            $hash = (string)$compte_infos['hash'];
+            $id_compte = (int)$compte_infos['id_compte'];
+        
+            // on vérifie le hash
+            if(!password_verify($password, $hash))
+                return null;
+        
+            // on vérifie si le hash doit être mis à jour
+            if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {
+                $hash = password_hash($password, PASSWORD_DEFAULT);
+            
+                $this->exec(
+                    'UPDATE Comptes 
+                    SET hash = :hash 
+                    WHERE id_compte = :id_compte',
+                    [
+                        ':id_compte'=>$id_compte,
+                        ':hash'=>$password
+                    ]
+                );
+            }
+        
+            return $this->Compte_Recuperer($id_compte);
+        });
     }
     
     /**
@@ -348,17 +413,19 @@ class BDD
         $id_compte=(int)$id_compte;
         $actif=(bool)$actif;
         
-        $this->exec(
-            'UPDATE Comptes 
-            SET actif = :actif 
-            WHERE id_compte = :id_compte',
-            [
-                ':id_compte'=>$id_compte,
-                ':actif'=>$actif
-            ]
-        );
+        return $this->InTransaction(function()use($id_compte, $actif){
+            $this->exec(
+                'UPDATE Comptes 
+                SET actif = :actif 
+                WHERE id_compte = :id_compte',
+                [
+                    ':id_compte'=>$id_compte,
+                    ':actif'=>$actif
+                ]
+            );
         
-        return $this->Compte_Recuperer($id_compte);
+            return $this->Compte_Recuperer($id_compte);
+        });
     }
     
     /**
@@ -372,19 +439,21 @@ class BDD
     {
         $id_produit = (int)$id_produit;
         
-        $produit = $this->getSingleObject(
-            'Produit',
-            'SELECT 
-                id_produit, 
-                nom, 
-                description 
-            FROM produits 
-            WHERE id_produit = :id_produit',
-            array(
-                ':id_produit'=>$id_produit
-            )
-        );
-        return $produit;
+        return $this->InTransaction(function()use($id_produit){
+            $produit = $this->getSingleObject(
+                'Produit',
+                'SELECT 
+                    id_produit, 
+                    nom, 
+                    description 
+                FROM produits 
+                WHERE id_produit = :id_produit',
+                array(
+                    ':id_produit'=>$id_produit
+                )
+            );
+            return $produit;
+        });
     }
     
     /**
@@ -394,16 +463,18 @@ class BDD
      */
     public function Produits_Lister()
     {
-        $produits = $this->getAllObjects(
-            'Produit',
-            'SELECT 
-                id_produit, 
-                nom, 
-                description 
-            FROM produits',
-            []
-        );
-        return $produits ?: [];
+        return $this->InTransaction(function(){
+            $produits = $this->getAllObjects(
+                'Produit',
+                'SELECT 
+                    id_produit, 
+                    nom, 
+                    description 
+                FROM produits',
+                []
+            );
+            return $produits ?: [];
+        });
     }
     
     /**
@@ -417,41 +488,44 @@ class BDD
      */
     public function Produits_Creer($nom, $description)
     {
-        $nom = (string)$nom;
-        $description = (string)$description;
+        $nom = mb_strimwidth((string)$nom,0,100);
+        $description = mb_strimwidth((string)$description,0,500);
         
-        // on vérifie si l'identifiant éxiste déjà
-        $count = $this->getScalar(
-            'SELECT COUNT(*) 
-            FROM produits 
-            WHERE nom = :nom',
-            [
-                ':nom'=>$nom
-            ]
-        );
+        return $this->InTransaction(function()use($nom, $description){
         
-        if($count>0)
-            return null;
+            // on vérifie si l'identifiant éxiste déjà
+            $count = $this->getScalar(
+                'SELECT COUNT(*) 
+                FROM produits 
+                WHERE nom = :nom',
+                [
+                    ':nom'=>$nom
+                ]
+            );
         
-        //On créer le produit
-        $id_produit = (int)$this->execInsert(
-            'INSERT INTO produits 
-            (
-                nom, 
-                description
-            )
-            VALUES
-            (
-                :nom,
-                :description
-            )',
-            [
-                ':nom'=>$nom,
-                ':description'=>$description
-            ]
-        );
+            if($count>0)
+                return null;
         
-        return $this->Produits_Recuperer($id_produit);
+            //On créer le produit
+            $id_produit = (int)$this->execInsert(
+                'INSERT INTO produits 
+                (
+                    nom, 
+                    description
+                )
+                VALUES
+                (
+                    :nom,
+                    :description
+                )',
+                [
+                    ':nom'=>$nom,
+                    ':description'=>$description
+                ]
+            );
+        
+            return $this->Produits_Recuperer($id_produit);
+        });
     }
     
     /**
@@ -461,20 +535,22 @@ class BDD
      */
     public function StockPrevisionel_Lister()
     {
-        $stocks = $this->getAllObjects(
-            'Stock',
-            'SELECT 
-                prod.id_produit, 
-                prod.nom, 
-                prod.description, 
-                stocks.stock
-            FROM produits as prod
-            INNER JOIN stocks_previsionnel as stocks
-                ON prod.id_produit = stocks.id_produit
-            WHERE stocks.stock > 0',
-            []
-        );
-        return $stocks ?: array();
+        return $this->InTransaction(function(){
+            $stocks = $this->getAllObjects(
+                'Stock',
+                'SELECT 
+                    prod.id_produit, 
+                    prod.nom, 
+                    prod.description, 
+                    stocks.stock
+                FROM produits as prod
+                INNER JOIN stocks_previsionnel as stocks
+                    ON prod.id_produit = stocks.id_produit
+                WHERE stocks.stock > 0',
+                []
+            );
+            return $stocks ?: [];
+        });
     }
     
     /**
@@ -484,20 +560,22 @@ class BDD
      */
     public function Stock_Lister()
     {
-        $stocks = $this->getAllObjects(
-            'Stock',
-            'SELECT 
-                prod.id_produit, 
-                prod.nom, 
-                prod.description, 
-                stocks.stock
-            FROM produits as prod
-            INNER JOIN stocks as stocks
-                ON prod.id_produit = stocks.id_produit
-            WHERE stocks.stock > 0',
-            []
-        );
-        return $stocks ?: [];
+        return $this->InTransaction(function(){
+            $stocks = $this->getAllObjects(
+                'Stock',
+                'SELECT 
+                    prod.id_produit, 
+                    prod.nom, 
+                    prod.description, 
+                    stocks.stock
+                FROM produits as prod
+                INNER JOIN stocks as stocks
+                    ON prod.id_produit = stocks.id_produit
+                WHERE stocks.stock > 0',
+                []
+            );
+            return $stocks ?: [];
+        });
     }
     
     /**
@@ -510,22 +588,24 @@ class BDD
     {
         $id_variation_stock=(int)$id_variation_stock;
         
-        $variation = $this->getSingleObject(
-            'VariationStock',
-            'SELECT 
-                id_variation_stock, 
-                id_produit, 
-                date_variation, 
-                variation, 
-                type_variation, 
-                remarque
-            FROM variations_stock 
-            WHERE id_variation_stock = :id_variation_stock',
-            [
-                ':id_variation_stock'=>$id_variation_stock
-            ]
-        );
-        return $variation;
+        return $this->InTransaction(function()use($id_variation_stock){
+            $variation = $this->getSingleObject(
+                'VariationStock',
+                'SELECT 
+                    id_variation_stock, 
+                    id_produit, 
+                    date_variation, 
+                    variation, 
+                    type_variation, 
+                    remarque
+                FROM variations_stock 
+                WHERE id_variation_stock = :id_variation_stock',
+                [
+                    ':id_variation_stock'=>$id_variation_stock
+                ]
+            );
+            return $variation;
+        });
     }
     
     /**
@@ -541,37 +621,39 @@ class BDD
      * @throws ErrorException 
      * @return VariationStock
      */
-    public function VariationsStock_Ajouter($id_produit,$variation,$type,$remarque)
+    public function VariationStock_Ajouter($id_produit,$variation,$type,$remarque)
     {
         $id_produit = (int)$id_produit;
         $variation = (double)$variation;
         $type = (string)$type;
-        $remarque = (string)$remarque;
+        $remarque = mb_strimwidth((string)$remarque,0,500);
         
-        //On créer la variation
-        $id_variation_stock = (int)$this->execInsert(
-            'INSERT INTO variations_stock
-            (
-                id_produit, 
-                variation, 
-                type_variation, 
-                remarque
-            )
-            VALUES
-            (
-                :id_produit, 
-                :variation, 
-                :type, 
-                :remarque
-            )',
-            [
-                ':id_produit'=>$id_produit,
-                ':variation'=>$variation,
-                ':type'=>$type,
-                ':remarque'=>$remarque
-            ]
-        );
-        return $this->VariationStock_Recuperer($id_variation_stock);
+        return $this->InTransaction(function()use($id_produit,$variation,$type,$remarque){
+            //On créer la variation
+            $id_variation_stock = (int)$this->execInsert(
+                'INSERT INTO variations_stock
+                (
+                    id_produit, 
+                    variation, 
+                    type_variation, 
+                    remarque
+                )
+                VALUES
+                (
+                    :id_produit, 
+                    :variation, 
+                    :type, 
+                    :remarque
+                )',
+                [
+                    ':id_produit'=>$id_produit,
+                    ':variation'=>$variation,
+                    ':type'=>$type,
+                    ':remarque'=>$remarque
+                ]
+            );
+            return $this->VariationStock_Recuperer($id_variation_stock);
+        });
     }
     
     /**
@@ -584,72 +666,25 @@ class BDD
     public function Commande_Récupere($id_commande)
     {
         $id_commande=(int)$id_commande;
-        //On cherche la commande
-        $commande = $this->getSingleObject(
-            'Commande',
-            'SELECT 
-                id_commande, 
-                id_compte, 
-                date_creation, 
-                remarque, 
-                etat 
-            FROM commandes 
-            WHERE id_commande = :id_commande',
-            [
-                ':id_commande'=>$id_commande
-            ]
-        );
-        return $commande;
-    }
-    
-    /**
-     * Récupére la commande en cours de création du compte, ou en créer une nouvelle.
-     * @param int $id_compte 
-     * ID du compte dont on veux obtenir la commande
-     * @return Commande
-     */
-    public function Commande_Récupéré_EnCreation($id_compte)
-    {   
-        $id_compte=(int)$id_compte;
-        //On cherche une commande existante en création
-        $commande = $this->getSingleObject(
-            'Commande',
-            'SELECT 
-                id_commande, 
-                id_compte, 
-                date_creation, 
-                remarque, 
-                etat 
-            FROM commandes 
-            WHERE id_compte = :id_compte 
-            AND etat = \'Création\' 
-            LIMIT 1',
-            [
-                ':id_compte'=>$id_compte
-            ]
-        );
         
-        //La commande éxiste déjà
-        if($commande) {
+        return $this->InTransaction(function()use($id_commande){
+            //On cherche la commande
+            $commande = $this->getSingleObject(
+                'Commande',
+                'SELECT 
+                    id_commande, 
+                    id_compte, 
+                    date_creation, 
+                    remarque, 
+                    etat 
+                FROM commandes 
+                WHERE id_commande = :id_commande',
+                [
+                    ':id_commande'=>$id_commande
+                ]
+            );
             return $commande;
-        }
-        
-        //On créer la commande
-        $id_commande = (int)$this->execInsert(
-            'INSERT INTO commandes 
-            (
-                id_compte
-            )
-            VALUES
-            (
-                :id_compte
-            )',
-            [
-                ':id_compte'=>$id_compte
-            ]
-        );
-        
-        return $this->Commande_Récupere($id_commande);
+        });
     }
     
     /**
@@ -662,93 +697,252 @@ class BDD
     {
         $id_commande=(int)$id_commande;
         
-        $elements = $this->getAllObjects(
-            'ElementCommande',
-            'SELECT 
-                id_element_commande, 
-                id_commande, 
-                id_produit, 
-                quantite_commande, 
-                quantite_reel 
-            FROM elements_commande 
-            WHERE id_commande = :id_commande',
-            [
-                ':id_commande'=>$id_commande
-            ]
-        );
-        return $elements ?: [];
+        return $this->InTransaction(function()use($id_commande){
+            $elements = $this->getAllObjects(
+                'ElementCommande',
+                'SELECT 
+                    id_element_commande, 
+                    id_commande, 
+                    id_produit, 
+                    quantite_commande, 
+                    quantite_reel 
+                FROM elements_commande 
+                WHERE id_commande = :id_commande',
+                [
+                    ':id_commande'=>$id_commande
+                ]
+            );
+            return $elements ?: [];
+        });
     }
     
     /**
-     * Ajoute, modifie ou supprime un élément de commande
-     * @param int $id_commande
-     * ID de la commande à modifier
+     * récupére l'ID du panier d'un compte, si le panier n'éxiste pas il est créer.
+     * @param int $id_compte 
+     * ID du compte dont veux veux récupéré l'ID de panier
+     * @return int
+     */
+    private function PanierID_RecupererOuCreer($id_compte)
+    {
+        $id_compte=(int)$id_compte;
+        
+        return $this->InTransaction(function()use($id_compte){
+            
+            //On cherche une commande existante en création
+            $id_commande = (int)$this->getScalar(
+                'SELECT 
+                    id_commande
+                FROM commandes 
+                WHERE id_compte = :id_compte 
+                AND etat = \'Création\' 
+                LIMIT 1',
+                [
+                    ':id_compte'=>$id_compte
+                ]
+            );
+            if($id_commande)
+                return $id_commande;
+            
+            $id_commande = (int)$this->execInsert(
+                'INSERT INTO commandes 
+                (
+                    id_compte
+                )
+                VALUES
+                (
+                    :id_compte
+                )',
+                [
+                    ':id_compte'=>$id_compte
+                ]
+            );
+                
+            return $id_commande;
+        });
+    }
+    
+    /**
+     * Récupére le panier d'un compte.
+     * @param int $id_compte 
+     * ID du compte dont on veux obtenir la commande
+     * @return Commande
+     */
+    public function Panier_Récuperer($id_compte)
+    {   
+        $id_compte=(int)$id_compte;
+        
+        return $this->InTransaction(function()use($id_compte){
+            
+            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
+        
+            return $this->Commande_Récupere($id_commande);
+        });
+    }
+    
+    /**
+     * Ajoute, modifie ou supprime un élément dans le panier d'un compte'
+     * @param int $id_compte
+     * ID du compte dont on modifie le panier
      * @param int $id_produit 
      * ID du produit commandé
      * @param double $quantite 
      * Quantité commandé (si = 0, l'élément est supprimé de la commande)
      * @return ElementCommande
      */
-    public function Commande_Modifier_ElementQuantite($id_commande,$id_produit,$quantite)
+    public function Panier_Modifier_Element($id_compte,$id_produit,$quantite)
     {
         $quantite=(double)$quantite;
-        $id_commande=(int)$id_commande;
+        $id_compte=(int)$id_compte;
         $id_produit=(int)$id_produit;
         
-        if($quantite==0)
-        {
-            //On supprime l'élément de commande
-            $this->exec(
-                'DELETE FROM elements_commande
+        return $this->InTransaction(function()use($id_compte,$id_produit,$quantite){
+        
+            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
+            
+            if($quantite==0)
+            {
+                //On supprime l'élément de commande
+                $this->exec(
+                    'DELETE FROM elements_commande
+                    WHERE id_commande = :id_commande
+                    AND  id_produit = :id_produit',
+                    [
+                        ':id_commande'=>$id_commande,
+                        ':id_produit'=>$id_produit
+                    ]
+                );
+            }
+            else
+            {
+                //On créer/modifie l'élément de commande
+                $this->execInsert(
+                    'INSERT INTO elements_commande
+                    (
+                        id_commande, 
+                        id_produit, 
+                        quantite_commande
+                    )
+                    VALUES(
+                        :id_commande, 
+                        :id_produit, 
+                        :quantite_commande
+                    )
+                    ON DUPLICATE KEY UPDATE
+                        quantite_commande = :quantite_commande',
+                    [
+                        ':id_commande'=>$id_commande,
+                        ':id_produit'=>$id_produit,
+                        ':quantite_commande'=>$quantite
+                    ]
+                );
+            }
+        
+            $element = $this->getSingleObject(
+                'ElementCommande',
+                'SELECT 
+                    id_element_commande, 
+                    id_commande, 
+                    id_produit, 
+                    quantite_commande, 
+                    quantite_reel 
+                FROM elements_commande 
                 WHERE id_commande = :id_commande
-                AND  id_produit = :id_produit',
+                AND id_produit = :id_produit',
                 [
                     ':id_commande'=>$id_commande,
                     ':id_produit'=>$id_produit
                 ]
             );
-        }
-        else
-        {
-            //On créer/modifie l'élément de commande
-            $this->execInsert(
-                'INSERT INTO elements_commande 
-                (
+        
+            return $element;
+        });
+    }
+    
+    /**
+     * Liste les elements du panier d'un compte'
+     * @param int $id_compte 
+     * ID du compte dont on veux lister les éléments
+     * @return ElementCommande[]
+     */
+    public function Panier_lister_Elements($id_compte)
+    {
+        $id_compte=(int)$id_compte;
+        
+        return $this->InTransaction(function()use($id_compte){
+            
+            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
+            
+            $elements = $this->getAllObjects(
+                'ElementCommande',
+                'SELECT 
+                    id_element_commande, 
                     id_commande, 
                     id_produit, 
-                    quantite_commande
-                )
-                VALUES(
-                    :id_commande, 
-                    :id_produit, 
-                    :quantite_commande
-                )
-                ON DUPLICATE KEY UPDATE
-                    quantite_commande = :quantite_commande',
+                    quantite_commande, 
+                    quantite_reel 
+                FROM elements_commande 
+                WHERE id_commande = :id_commande',
                 [
-                    ':id_commande'=>$id_commande,
-                    ':id_produit'=>$id_produit,
-                    ':quantite_commande'=>$quantite
+                    ':id_commande'=>$id_commande
                 ]
             );
-        }
+            return $elements ?: [];
+        });
+    }
+    
+    /**
+     * Valide le panier d'un compte.
+     * @param int $id_compte 
+     * ID du compte dont on veux valider le panier
+     * @return Commande
+     */
+    public function Panier_Valider($id_compte)
+    {   
+        $id_compte=(int)$id_compte;
         
-        $element = $this->getSingleObject(
-            'ElementCommande',
-            'SELECT 
-                id_element_commande, 
-                id_commande, 
-                id_produit, 
-                quantite_commande, 
-                quantite_reel 
-            FROM elements_commande 
-            WHERE id_commande = :id_commande
-            AND id_produit = :id_produit',
-            [
-                ':id_commande'=>$id_commande,
-                ':id_produit'=>$id_produit
-            ]
-        );
-        return $element;
+        return $this->InTransaction(function()use($id_compte){
+        
+            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
+            
+            //On valide la commande
+            $this->exec(
+                'UPDATE commandes
+                    SET etat = \'Validé\'
+                WHERE id_commande = :id_commande 
+                    AND etat = \'Création\'',
+                [
+                    ':id_commande'=>$id_commande
+                ]
+            );
+            
+            return $this->Commande_Récupere($id_commande);
+        });
+    }
+    
+    /**
+     * Vide le pannier d'un compte.
+     * @param int $id_compte 
+     * ID du compte dont on veux vider le panier
+     * @return Commande
+     */
+    public function Panier_Vider($id_compte)
+    {   
+        $id_compte=(int)$id_compte;
+        
+        return $this->InTransaction(function()use($id_compte){
+        
+            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
+            
+            //On valide la commande
+            $this->exec(
+                'DELETE elements_commande
+                WHERE id_commande = :id_commande',
+                [
+                    ':id_commande'=>$id_commande
+                ]
+            );
+            
+            return $this->Commande_Récupere($id_commande);
+        });
     }
 }
