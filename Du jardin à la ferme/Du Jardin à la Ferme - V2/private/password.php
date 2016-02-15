@@ -265,14 +265,14 @@ namespace PasswordCompat\binary {
          * @param int    $length
          *
          * @internal
-         * @return string The substring
+         * @return string The substring 
          */
         function _substr($binary_string, $start, $length) {
             if (function_exists('mb_substr')) {
                 return mb_substr($binary_string, $start, $length, '8bit');
             }
             return substr($binary_string, $start, $length);
-        }
+        } 
         /**
          * Check if current PHP version is compatible with the library
          *

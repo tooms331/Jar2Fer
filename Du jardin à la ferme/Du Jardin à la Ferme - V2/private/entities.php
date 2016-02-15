@@ -1,14 +1,18 @@
 <?php
 class Compte
 {
+    const ETAT_Nouveau='Nouveau';
+    const ETAT_Compte='Compte';
+    const ETAT_Admin='Admin';
+    const ETAT_Désactivé='Désactivé';
     /**
      * @var int
      */
     public $id_compte;
     /**
-     * @var bool
+     * @var string
      */
-    public $actif;
+    public $etat;
     /**
      * @var string
      */
@@ -20,7 +24,6 @@ class Compte
     
     public function __construct(){
         $this->id_compte=(int)$this->id_compte;
-        $this->actif=(bool)$this->actif;
     }
 }
 
@@ -100,7 +103,8 @@ class Commande
     
     public function __construct(){
         $this->id_commande=(int)$this->id_commande;
-        $this->id_compte=(int)$this->id_compte;
+        
+        $this->id_compte=isset($this->id_compte)?(int)$this->id_compte:null;
     }
 }
 
@@ -148,13 +152,13 @@ class VariationStock
      * @var int
      */
     public $id_variation_stock;
-    /**
+    /** 
      * @var int
      */
     public $id_produit;
     /**
      * @var string
-     */
+     */ 
     public $date_variation;
     /**
      * @var double
@@ -175,4 +179,3 @@ class VariationStock
         $this->variation=(double)$this->variation;
     }
 }
-?>

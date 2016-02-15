@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html>
+<html> 
+<head>
+    <title>Test API</title>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
+    <script src="client.js.php" type="text/javascript"></script>
+    <script>
+        var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+        var ARGUMENT_NAMES = /([^\s,]+)/g;
+        function getParamNames(func) { 
+            var fnStr = func.toString().replace(STRIP_COMMENTS, '');
+            var result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+            if (result === null)
+                result = [];
+            return result;
+        }
+
+            $(function () {
+                var param_nametemplate = $("#param_name");
+                var param_valuestemplate = $("#param_value");
+                var resulttemplate = $("#result");
+                var warningstemplate = $("#warnings");
+                var queryresulttemplate = $("#queryresult");
+                var querydetailstemplate = $("#querydetails");
+
+
+                var resultsPan = $("#results");
+                var actions = $("#actions");
+                var client = Client();
+                var count_request = 0;
+
+                var curentParams = [];
+
+                function loadparams() {
+
+                    var action = actions.val();
+
+					curentParams = [];
+					$("#paramsdesc").empty();
+
+					$.each(getParamNames(client[action]), function (key, value) {
+					    var curparam_nametemplate = param_nametemplate.clone();
+					    curparam_nametemplate.attr("id", "name_" + value);
+					    curparam_nametemplate.text(value+" : ");
+					    var curparam_valuestemplate = param_valuestemplate.clone();
+					    curparam_valuestemplate.attr("id", "param_" + value);
+					    curentParams.push(curparam_valuestemplate)
+					    $("#paramsdesc").append(curparam_nametemplate);
+					    $("#paramsdesc").append(curparam_valuestemplate);
+					    $("#paramsdesc").append('<br/>');
+					});
+				}
+
+                
+				actions.empty();
+				for (method in client) {
+				    actions.append("<option value=\"" + method + "\">" + method + "</option>")
+				}
+				loadparams();
+
+				actions.change(loadparams);
+
+				$("#form").submit(function (event) {
+				    var cur_request = ++count_request;
+				    var action = actions.val();
+				    var curwarnings = warningstemplate.clone();
+				    var curresult = resulttemplate.clone();
+				    var curqueryresulttemplate = queryresulttemplate.clone();
+				    var curquerydetailstemplate = querydetailstemplate.clone();
+
+					event.preventDefault();
+
+					var params = curentParams.map(function (it) {
+					    return JSON.parse(it.val());
+					});
+
+					var startdate = Date.now();
+
+					var paratext = JSON.stringify(params);
+					curqueryresulttemplate.prepend(curresult);
+					curqueryresulttemplate.prepend(curwarnings);
+					curqueryresulttemplate.prepend(curquerydetailstemplate);
+					curqueryresulttemplate.prepend(cur_request + " - " + action + " ( " + paratext + " ) : ");
+					resultsPan.prepend(curqueryresulttemplate);
+
+					curqueryresulttemplate.css('background-color', 'lightgrey');
+
+				    client[action].apply(this, params)
+					.done(function (result, warnings) {
+					    curqueryresulttemplate.css('background-color', 'lightgreen');
+					})
+					.fail(function (result, warnings) {
+					    curqueryresulttemplate.css('background-color', 'orangered');
+					})
+					.always(function (result, warnings) {
+					    curquerydetailstemplate.text("duration : " + (Date.now() - startdate).toString() + "ms");
+					    curresult.text(JSON.stringify(result, null, "  "));
+					    if (warnings && warnings.length > 0) {
+					        curwarnings.text(JSON.stringify(warnings, null, "\t"));
+					    }
+					});
+				  });
+			});
+    </script>
+</head>
+<body>
+    <form id="form" action="#" style="margin: 1em; border: 1px solid grey; border-radius: 3px; padding: 1em">
+        <label for="actions">action : <select name="actions" id="actions"></select></label>
+        <div style="padding: 1em;" id="paramsdesc"> </div>
+        <input type="submit" value="Submit" />
+    </form>
+    <div id="results"></div>
+    <div style="display:none;">
+        <span id="param_name"></span>
+        <div id="querydetails"></div>
+        <input type="text" id="param_value" />
+        <div style="margin: 1em; border: 1px dotted grey; border-radius: 3px; padding: 1em" id="queryresult"></div>
+        <pre id="result" style="overflow-x: auto;"></pre>
+        <pre id="warnings" style="background-color:orange; border-radius: 3px; overflow-x: auto;"></pre>
+    </div>
+</body>
+</html>

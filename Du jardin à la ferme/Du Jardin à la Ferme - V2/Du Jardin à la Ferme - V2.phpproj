@@ -25,7 +25,10 @@
     <IncludeDebugInformation>false</IncludeDebugInformation>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="index.php" />
+    <Compile Include="endpoint.php" />
+    <Compile Include="private\api.php" />
+    <Compile Include="private\unittest.php" />
+    <Compile Include="testbdd.php" />
     <Compile Include="private\bdd.php" />
     <Compile Include="private\config.php" />
     <Compile Include="private\entities.php" />
@@ -33,5 +36,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="private\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="client.js.php" />
+    <Content Include="testClient.html" />
   </ItemGroup>
 </Project>

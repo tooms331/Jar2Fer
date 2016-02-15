@@ -12,7 +12,6 @@ require_once 'entities.php';
  * @version 1.0
  * @author Romain
  */
-
 class BDD
 {
     /**
@@ -40,9 +39,16 @@ class BDD
     }
     
     
-    
+    /**
+     * Indique le niveau d'imbrication des transaction
+     * @var int
+     */
     private $transactionCounter = 0;
 
+    /**
+     * Démarre une transaction ou créer un point de sauvegarde dans la transaction courante
+     * @return bool
+     */
     public function beginTransaction()
     {
         if (!$this->transactionCounter++) {
@@ -52,6 +58,10 @@ class BDD
         return true;
     }
 
+    /**
+     * Valide la transaction ou bien libére le point de sauvegarde courant
+     * @return bool
+     */
     public function commit()
     {
         if (!--$this->transactionCounter) {
@@ -63,6 +73,10 @@ class BDD
         }
     }
 
+    /**
+     * Annule la transaction ou bien revient au point de sauvegarde courant
+     * @return bool
+     */
     public function rollback()
     {
         if (--$this->transactionCounter) {
@@ -72,6 +86,13 @@ class BDD
         return $this->pdolink->rollback();
     }
     
+    /**
+     * Encapsule l'execution de $function dans une transaction ou un point de sauvegarde.
+     * La transaction ou le point de sauvegarde sont validé automatiquement si la $function arrive a sont terme.
+     * La transaction est annulé en cas d'exception (l'exception est ensuite relancé)
+     * @param callable $function 
+     * @return mixed
+     */
     public function InTransaction(callable $function)
     {   
         $this->beginTransaction();
@@ -87,8 +108,12 @@ class BDD
         return $result;
     }
     
+    
+    
+    
+    
     /**
-     * bind les paramettres d'une requettes.
+     * Bind les paramettres d'une requettes.
      * Le type de bind est automatiquement définie en fonction du type de valeur.
      * @param PDOStatement $statement
      * La requettes préparé
@@ -248,21 +273,32 @@ class BDD
         return $lastId;
     }
     
+    
+    
+    
+    
     /**
      * Supprime toutes les données dans la Base de donnée
      * (la structure est conservé)
      */
     public function CLEAR_ALL()
     {
-        $this->InTransaction(function(){
+        $this->InTransaction(function(){; 
+
+            $this->pdolink->exec('SET FOREIGN_KEY_CHECKS = 0');
             $this->pdolink->exec('TRUNCATE TABLE variations_stock');
             $this->pdolink->exec('TRUNCATE TABLE elements_commande');
             $this->pdolink->exec('TRUNCATE TABLE variations_stock');
             $this->pdolink->exec('TRUNCATE TABLE commandes');
             $this->pdolink->exec('TRUNCATE TABLE produits');
             $this->pdolink->exec('TRUNCATE TABLE comptes');
+            $this->pdolink->exec('SET FOREIGN_KEY_CHECKS = 1');
         });
     }
+    
+    
+    
+    
     
     /**
      * Récupere un compte spécifique
@@ -281,7 +317,7 @@ class BDD
                     id_compte, 
                     email, 
                     date_creation, 
-                    actif 
+                    etat 
                 FROM comptes 
                 WHERE id_compte = :id_compte',
                 [
@@ -304,6 +340,9 @@ class BDD
         $email=mb_strimwidth((string)$email,0,255);
         $password=(string)$password;
         
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL))
+            throw new ErrorException('Adresse email invalide');
+        
         //on hash le mot de passe pour la sécurité
         $password = password_hash($password,PASSWORD_DEFAULT);
         
@@ -321,7 +360,7 @@ class BDD
             );
         
             if($compte_exists > 0)
-                return null;
+                throw new ErrorException('Erreur de connexion, veuillez vérifier votre email et votre mots de passe.');
         
             //on insert le nouveau compte
             $id_compte = (int)$this->execInsert(
@@ -339,7 +378,7 @@ class BDD
                     ':hash'=>$password
                 )
             );
-        
+                
             return $this->Compte_Recuperer($id_compte);
         });
     }
@@ -366,7 +405,7 @@ class BDD
                     id_compte, 
                     hash 
                 FROM comptes 
-                WHERE actif = 1 
+                WHERE etat != \'Désactivé\'
                 AND email = :email',
                 [
                     ':email'=>$email
@@ -390,7 +429,7 @@ class BDD
                     WHERE id_compte = :id_compte',
                     [
                         ':id_compte'=>$id_compte,
-                        ':hash'=>$password
+                        ':hash'=>$hash
                     ]
                 );
             }
@@ -408,25 +447,78 @@ class BDD
      * @throws ErrorException 
      * @return Compte
      */
-    public function Compte_Modifier_Actif($id_compte, $actif)
+    public function Compte_Modifier_MotDePasse($id_compte, $ancien_mot_de_passe,$nouveau_mot_de_passe)
     {
         $id_compte=(int)$id_compte;
-        $actif=(bool)$actif;
+        $ancien_mot_de_passe=(string)$ancien_mot_de_passe;
+        $nouveau_mot_de_passe=(string)$nouveau_mot_de_passe;
         
-        return $this->InTransaction(function()use($id_compte, $actif){
+        return $this->InTransaction(function()use($id_compte, $ancien_mot_de_passe, $nouveau_mot_de_passe){
+            
+            // on récupére le hash et l'id du compte
+            $hash = (string)$this->getScalar(
+                'SELECT hash 
+                FROM comptes 
+                WHERE actif = 1 
+                AND id_compte = :id_compte',
+                [
+                    ':id_compte'=>$id_compte
+                ]
+            );
+        
+            // on vérifie le hash
+            if(!password_verify($ancien_mot_de_passe, $hash))
+                return null;
+            
+            //On met à jour le Motdepasse
+            $hash = password_hash($nouveau_mot_de_passe, PASSWORD_DEFAULT);
+            
             $this->exec(
                 'UPDATE Comptes 
-                SET actif = :actif 
+                SET hash = :hash 
                 WHERE id_compte = :id_compte',
                 [
                     ':id_compte'=>$id_compte,
-                    ':actif'=>$actif
+                    ':hash'=>$hash
                 ]
             );
         
             return $this->Compte_Recuperer($id_compte);
         });
     }
+    
+    /**
+     * Modifie l'état du compte
+     * @param int $id_compte 
+     * ID du compte à modifier
+     * @param bool $actif 
+     * Nouvel état du compte
+     * @throws ErrorException 
+     * @return Compte
+     */
+    public function Compte_Modifier_Etat($id_compte, $etat)
+    {
+        $id_compte=(int)$id_compte;
+        $etat=(string)$etat;
+        
+        return $this->InTransaction(function()use($id_compte, $etat){
+            $this->exec(
+                'UPDATE Comptes 
+                SET etat = :etat 
+                WHERE id_compte = :id_compte',
+                [
+                    ':id_compte'=>$id_compte,
+                    ':etat'=>$etat
+                ]
+            );
+        
+            return $this->Compte_Recuperer($id_compte);
+        });
+    }
+    
+    
+    
+    
     
     /**
      * Récupére un produit spécifique
@@ -528,6 +620,10 @@ class BDD
         });
     }
     
+    
+    
+    
+    
     /**
      * Liste tous les produits dont le stock prévisionnel est positif
      * @throws ErrorException 
@@ -577,6 +673,10 @@ class BDD
             return $stocks ?: [];
         });
     }
+    
+    
+    
+    
     
     /**
      * Récupère le détail d'une variation de stock spécifique
@@ -656,6 +756,10 @@ class BDD
         });
     }
     
+    
+    
+    
+    
     /**
      * Récupère une commande spécifique
      * @param int $id_commande 
@@ -663,7 +767,7 @@ class BDD
      * @throws ErrorException 
      * @return Commande
      */
-    public function Commande_Récupere($id_commande)
+    public function Commande_Recupere($id_commande)
     {
         $id_commande=(int)$id_commande;
         
@@ -684,6 +788,31 @@ class BDD
                 ]
             );
             return $commande;
+        });
+    }
+    
+    /**
+     * Lister les commandes Validé
+     * @throws ErrorException 
+     * @return Commande
+     */
+    public function Commande_Lister_Valide()
+    {   
+        return $this->InTransaction(function(){
+            //On cherche la commande
+            $commandes = $this->getAllObjects(
+                'Commande',
+                'SELECT 
+                    id_commande, 
+                    id_compte, 
+                    date_creation, 
+                    remarque, 
+                    etat 
+                FROM commandes 
+                WHERE etat = \'Validé\'',
+                []
+            );
+            return $commandes;
         });
     }
     
@@ -717,69 +846,6 @@ class BDD
     }
     
     /**
-     * récupére l'ID du panier d'un compte, si le panier n'éxiste pas il est créer.
-     * @param int $id_compte 
-     * ID du compte dont veux veux récupéré l'ID de panier
-     * @return int
-     */
-    private function PanierID_RecupererOuCreer($id_compte)
-    {
-        $id_compte=(int)$id_compte;
-        
-        return $this->InTransaction(function()use($id_compte){
-            
-            //On cherche une commande existante en création
-            $id_commande = (int)$this->getScalar(
-                'SELECT 
-                    id_commande
-                FROM commandes 
-                WHERE id_compte = :id_compte 
-                AND etat = \'Création\' 
-                LIMIT 1',
-                [
-                    ':id_compte'=>$id_compte
-                ]
-            );
-            if($id_commande)
-                return $id_commande;
-            
-            $id_commande = (int)$this->execInsert(
-                'INSERT INTO commandes 
-                (
-                    id_compte
-                )
-                VALUES
-                (
-                    :id_compte
-                )',
-                [
-                    ':id_compte'=>$id_compte
-                ]
-            );
-                
-            return $id_commande;
-        });
-    }
-    
-    /**
-     * Récupére le panier d'un compte.
-     * @param int $id_compte 
-     * ID du compte dont on veux obtenir la commande
-     * @return Commande
-     */
-    public function Panier_Récuperer($id_compte)
-    {   
-        $id_compte=(int)$id_compte;
-        
-        return $this->InTransaction(function()use($id_compte){
-            
-            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
-        
-            return $this->Commande_Récupere($id_commande);
-        });
-    }
-    
-    /**
      * Ajoute, modifie ou supprime un élément dans le panier d'un compte'
      * @param int $id_compte
      * ID du compte dont on modifie le panier
@@ -789,16 +855,14 @@ class BDD
      * Quantité commandé (si = 0, l'élément est supprimé de la commande)
      * @return ElementCommande
      */
-    public function Panier_Modifier_Element($id_compte,$id_produit,$quantite)
+    public function Commande_Modifier_Element($id_commande,$id_produit,$quantite)
     {
         $quantite=(double)$quantite;
-        $id_compte=(int)$id_compte;
+        $id_commande=(int)$id_commande;
         $id_produit=(int)$id_produit;
         
-        return $this->InTransaction(function()use($id_compte,$id_produit,$quantite){
+        return $this->InTransaction(function()use($id_commande,$id_produit,$quantite){
         
-            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
-            
             if($quantite==0)
             {
                 //On supprime l'élément de commande
@@ -859,50 +923,45 @@ class BDD
     }
     
     /**
-     * Liste les elements du panier d'un compte'
-     * @param int $id_compte 
-     * ID du compte dont on veux lister les éléments
-     * @return ElementCommande[]
-     */
-    public function Panier_lister_Elements($id_compte)
-    {
-        $id_compte=(int)$id_compte;
-        
-        return $this->InTransaction(function()use($id_compte){
-            
-            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
-            
-            $elements = $this->getAllObjects(
-                'ElementCommande',
-                'SELECT 
-                    id_element_commande, 
-                    id_commande, 
-                    id_produit, 
-                    quantite_commande, 
-                    quantite_reel 
-                FROM elements_commande 
-                WHERE id_commande = :id_commande',
-                [
-                    ':id_commande'=>$id_commande
-                ]
-            );
-            return $elements ?: [];
-        });
-    }
-    
-    /**
      * Valide le panier d'un compte.
      * @param int $id_compte 
      * ID du compte dont on veux valider le panier
      * @return Commande
      */
-    public function Panier_Valider($id_compte)
+    public function Commande_Valider($id_commande)
     {   
-        $id_compte=(int)$id_compte;
+        $id_commande=(int)$id_commande;
         
-        return $this->InTransaction(function()use($id_compte){
-        
-            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
+        return $this->InTransaction(function()use($id_commande){
+            
+            $nbElements=(int)$this->getScalar(
+                'SELECT COUNT(*)
+                FROM elements_commande
+                WHERE elements_commande.id_commande = :id_commande',
+                [
+                    ':id_commande'=>$id_commande
+                ]
+            );
+            if($nbElements==0)
+                throw new ErrorException("Le panier est vide.");
+            
+            $StockInsufisant=(int)$this->getScalar(
+                'SELECT COUNT(*)
+                FROM elements_commande
+                LEFT OUTER JOIN stocks_previsionnel
+	                ON elements_commande.id_produit = stocks_previsionnel.id_produit
+                WHERE elements_commande.id_commande = :id_commande
+                AND elements_commande.quantite_commande>COALESCE(stocks_previsionnel.stock,0)',
+                [
+                    ':id_commande'=>$id_commande
+                ]
+            );
+            
+            if($StockInsufisant>1)
+                throw new ErrorException("Il y'as $StockInsufisant produits dont le stock est insufisant.");
+            if($StockInsufisant>0)
+                throw new ErrorException("Il y'as $StockInsufisant produit dont le stock est insufisant.");
+            
             
             //On valide la commande
             $this->exec(
@@ -915,34 +974,124 @@ class BDD
                 ]
             );
             
-            return $this->Commande_Récupere($id_commande);
+            return $this->Commande_Recupere($id_commande);
         });
     }
-    
-    /**
+     
+    /** 
      * Vide le pannier d'un compte.
      * @param int $id_compte 
      * ID du compte dont on veux vider le panier
      * @return Commande
      */
-    public function Panier_Vider($id_compte)
+    public function Commande_Vider($id_commande)
     {   
-        $id_compte=(int)$id_compte;
+        $id_commande=(int)$id_commande;
         
-        return $this->InTransaction(function()use($id_compte){
-        
-            $id_commande = $this->PanierID_RecupererOuCreer($id_compte);
-            
-            //On valide la commande
+        return $this->InTransaction(function()use($id_commande){
+            //On vide la commande
             $this->exec(
-                'DELETE elements_commande
+                'DELETE FROM elements_commande
                 WHERE id_commande = :id_commande',
                 [
                     ':id_commande'=>$id_commande
                 ]
             );
             
-            return $this->Commande_Récupere($id_commande);
+            return $this->Commande_lister_Elements($id_commande);
         });
     }
+    public function Commande_Supprimer($id_commande)
+    {   
+        $id_commande=(int)$id_commande;
+        
+        return $this->InTransaction(function()use($id_commande){
+        
+            $this->Commande_Vider($id_commande);
+            
+            //On supprime la commande
+            $this->exec(
+                'DELETE FROM commandes
+                WHERE id_commande = :id_commande',
+                [
+                    ':id_commande'=>$id_commande
+                ]
+            );
+            
+            return $this->Commande_Recupere($id_commande);
+        });
+    }
+    
+    public function PanierAnonyme_Transferer($id_commande,$id_compte)
+    {
+        $id_commande= (int)$id_commande;
+        $id_compte= (int)$id_compte;
+        
+        return $this->InTransaction(function()use($id_commande,$id_compte){
+            
+            $panierCompte = $this->Panier_RecupererOuCreer($id_compte);
+            
+            $elementpanieranonyme = $this->Commande_lister_Elements($id_commande);
+            if(count($elementpanieranonyme))
+            {
+                $this->Commande_Vider($panierCompte->id_commande);
+            
+                foreach($elementpanieranonyme as $element)
+                {
+                    $this->Commande_Modifier_Element($panierCompte->id_commande,$element->id_produit,$element->quantite_commande);
+                }
+                $this->Commande_Supprimer($id_commande);
+            }
+            return $this->Commande_Recupere($panierCompte->id_commande);
+        });
+    }
+    /**
+     * récupére l'ID du panier d'un compte, si le panier n'éxiste pas il est créer.
+     * @param int|null $id_compte 
+     * ID du compte dont veux récupéré l'ID de panier.
+     * Si $id_compte est null, on créer un panier anonyme.
+     * @return Commande
+     */
+    public function Panier_RecupererOuCreer($id_compte)
+    {
+        $id_compte= isset($id_compte)?(int)$id_compte:null;
+        
+        return $this->InTransaction(function()use($id_compte){
+            
+            if($id_compte)
+            {
+                //On cherche une commande existante en création
+                $id_commande = (int)$this->getScalar(
+                    'SELECT 
+                        id_commande
+                    FROM commandes 
+                    WHERE id_compte = :id_compte 
+                    AND etat = \'Création\' 
+                    LIMIT 1',
+                    [
+                        ':id_compte'=>$id_compte
+                    ]
+                );
+                if($id_commande)
+                    return $this->Commande_Recupere($id_commande);
+            }
+            
+            $id_commande = (int)$this->execInsert(
+                'INSERT INTO commandes 
+                (
+                    id_compte
+                )
+                VALUES
+                (
+                    :id_compte
+                )',
+                [
+                    ':id_compte'=>$id_compte
+                ]
+            );
+                
+            return $this->Commande_Recupere($id_commande);
+        });
+    }
+    
 }
