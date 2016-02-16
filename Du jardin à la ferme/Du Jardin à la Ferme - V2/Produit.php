@@ -20,17 +20,38 @@ API::useAPI(function(API $api){
     else
     {
         LAYOUT::writeHeader("Produit : ".$element->nom, $api);
-        ?>
-            <div class="produitPanel">
-                <img src="imgs/produit.jpg" />
-                <div class="infosdetail">
-                    <div><div>unitée : </div><div><?php LAYOUT::safeWrite($element->unite);?></div></div>
-                    <div><div>stock : </div><div><?php LAYOUT::safeWrite($element->quantite_max);?></div></div>
-                    <div><div>commande : </div><div><input type="number" data-inputtype="panier_qte_selector" data-idproduit="<?php LAYOUT::safeWrite($element->id_produit);?>" value="<?php LAYOUT::safeWrite($element->quantite_commande);?>" data-max="<?php LAYOUT::safeWrite($element->quantite_max);?>"/></div></div>
-                </div>
-                <p><?php LAYOUT::safeWrite($element->description);?></p>
+?>
+<div class="whitePanel produitInfoPanel">
+    <img src="imgs/produit.jpg" />
+    <div>
+        <div class="infosdetail">
+            <div>
+                <div>unitée : </div>
+                <div><?php LAYOUT::safeWrite($element->unite);?></div>
             </div>
-        <?php 
+            <div>
+                <div>stock : </div>
+                <div><?php LAYOUT::safeWrite($element->stocks_previsionnel);?></div>
+            </div>
+            <div>
+                <div>commande : </div>
+                <div>
+                    <input type="number" data-inputtype="panier_qte_selector" data-idproduit="<?php LAYOUT::safeWrite($element->id_produit);?>" value="<?php LAYOUT::safeWrite($element->quantite_commande);?>" data-max="<?php LAYOUT::safeWrite($element->quantite_max);?>"/></div>
+            </div>
+        </div>
+    </div>
+</div>
+    <?php if($api->estAdmin()) { ?>
+        <article data-inputtype="Produit-Description-Editor" contenteditable="true" class="whitePanel produitDescriptionPanel" data-idproduit="<?php LAYOUT::safeWrite($element->id_produit);?>">
+            <?php echo $element->description;?>
+        </article>
+    <?php } else {?>
+        <article class="whitePanel produitDescriptionPanel">
+            <?php echo $element->description;?>
+        </article>
+    <?php }?>
+
+<?php 
     }
     
     LAYOUT::writeFooter($api);

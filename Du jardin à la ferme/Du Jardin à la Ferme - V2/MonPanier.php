@@ -11,12 +11,22 @@ API::useAPI(function(API $api){
     
     if(count($elements)==0)
     {
-        ?><p>Votre panier est actuelement vide. Consulté la <a href="Produits.php">boutique</a> pour faire vos emplettes!</p>
+        ?><p>
+            Votre panier est actuelement vide. 
+            Consulté la <a href="Produits.php">boutique</a> pour faire vos emplettes!
+            Ou bien connectez-vous pour retouver votre panier.
+          </p>
         <?php
     }
     else
     {
         ?>
+    <div class="whitePanel">
+        <p>Votre paniers doit être validè jeudi au plus tards pour être livrer cette semaine.</p>
+        <p>Les paniers non validez ne sont pas pris en compte, c'est pour vous comme pour nous l'assurance d'évité un malentendus.</p>
+        <p>Les livraisons sont effectué le vendredi et le samedi selon nos capacitées.</p>
+    </div>
+
         <table class="tablepanier">
             <thead>
                 <tr>

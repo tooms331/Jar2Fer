@@ -2,6 +2,9 @@
 class Compte
 {
     const ETAT_Nouveau='Nouveau';
+    const ETAT_Panier='Panier';
+    const ETAT_Premium='Premium';
+    const ETAT_LibreService='Libre Service';
     const ETAT_Compte='Compte';
     const ETAT_Admin='Admin';
     const ETAT_Désactivé='Désactivé';

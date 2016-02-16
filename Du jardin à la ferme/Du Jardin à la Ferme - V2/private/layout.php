@@ -4,6 +4,54 @@ require_once 'api.php';
 
 class LAYOUT{
     
+    
+    public static function CheckAuthentified(API $api, callable $callback)
+    {
+        if($api->estAuthentifier())
+        {
+            $callback($api);
+            return;
+        }
+        
+        $email = (string)$_REQUEST['email'];
+        $motdepasse = (string)$_REQUEST['motdepasse'];
+        $erreur="";
+        
+        if(!empty($email) && !empty($motdepasse))
+        {
+            try{
+                $api->API_compte_authentifier($email, $motdepasse);
+                $callback($api);
+                return;
+            }
+            catch(Exception $ex){
+                $erreur=$ex->getMessage();
+            }
+        }
+        self::writeHeader("Connection", $api);
+        
+?> 
+<?php if($erreur) {?>
+    <p><?php self::safeWrite($erreur); ?></p>
+<?php } ?>
+<form class="whitePanel center" action="<?php self::safeWrite($_SERVER["PHP_SELF"]); ?>" accept-charset="utf-8" enctype="application/x-www-form-urlencoded">
+    <div class="infosdetail">
+        <div>
+            <label for="email">Email :</label>
+            <input id="email" name="email" type="email" />
+        </div>
+        <div>
+            <label for="motdepasse">Mot de passe :</label>
+            <input id="motdepasse" name="motdepasse" type="password" />
+        </div>
+    </div>
+    <br /><br />
+    <input type="submit" value="Se connecter" />
+</form>
+<?php    
+        self::writeFooter($api);
+    }
+    
     public static function safeWrite($text)
     {
         echo htmlspecialchars($text);
@@ -23,6 +71,10 @@ class LAYOUT{
 
         <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
         <script src="http://benalman.com/code/projects/jquery-throttle-debounce/jquery.ba-throttle-debounce.js"></script>
+        
+        <script src="ckeditor/ckeditor.js"></script>
+        <script src="ckeditor/adapters/jquery.js"></script>
+
         <script src="client.js.php" type="text/javascript"></script>
         <script src="djalf.js" type="text/javascript"></script>
     </head>
@@ -37,9 +89,12 @@ class LAYOUT{
                 <li><a href="Produits.php">Boutique</a></li>
                 <li><a href="MonPanier.php">Mon Panier</a></li>
                 <?php if(!$api->estAuthentifier()) { ?>
-                    <li><a href="#">Connection</a></li>
-                <?php } elseif ($api->estAdmin()){ ?>
-                    <li><a href="#">Administration</a></li>
+                    <li><a href="Connection.php">Connection</a></li>
+                <?php } else{ ?>
+                    <li><a href="Deconnection.php">Déconection</a></li>
+                    <?php if ($api->estAdmin()){ ?>
+                        <li><a href="#">Administration</a></li>
+                    <?php } ?>
                 <?php } ?>
             </ul>
         </nav>

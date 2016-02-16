@@ -243,4 +243,12 @@ class API
         $panier=$this->panier_recuperer();
         return $this->bdd->Produits_Recuperer_DetailAvecPanier($panier->id_commande,$id_produit);
     }
+    public function API_produit_modifier_description($id_produit, $description)
+    {   
+        if(!$this->estAdmin())
+            throw new ErrorException("Cet opération n'est possible qu'aux administrateurs!");
+        return $this->bdd->Produits_Modifier_Description($id_produit,$description);
+    }
+    
+    
 }

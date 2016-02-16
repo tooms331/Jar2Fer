@@ -641,7 +641,7 @@ class BDD
     public function Produits_Creer($nom, $description, $unite)
     {
         $nom = mb_strimwidth((string)$nom,0,100);
-        $description = mb_strimwidth((string)$description,0,500);
+        $description = (string)$description;
         
         return $this->InTransaction(function()use($nom, $description, $unite){
         
@@ -682,6 +682,29 @@ class BDD
             return $this->Produits_Recuperer($id_produit);
         });
     }
+    
+    public function Produits_Modifier_Description($id_produit, $description)
+    {
+        $id_produit = (int)$id_produit;
+        $description = (string)$description;
+        
+        return $this->InTransaction(function()use($id_produit, $description){
+        
+            //On créer le produit
+            $this->exec(
+                'UPDATE produits 
+                SET description = :description
+                WHERE id_produit = :id_produit',
+                [
+                    ':id_produit'=>$id_produit,
+                    ':description'=>$description
+                ]
+            );
+        
+            return $this->Produits_Recuperer($id_produit);
+        });
+    }
+    
     
     /**
      * Créer une entrée de variation de stock
