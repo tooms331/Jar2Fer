@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>Du_Jardin_à_la_ferme___V1</Name>
+    <ProjectGuid>11fc249f-f220-45b4-b313-b77ba0ab6a6e</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Du_Jardin_à_la_ferme___V1</RootNamespace>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+    <AssemblyName>Du Jardin à la ferme - V1</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="administration.php" />
+    <Compile Include="calcul_panier.php" />
+    <Compile Include="correction_panier.php" />
+    <Compile Include="envoi_commande.php" />
+    <Compile Include="fonctions-panier.php" />
+    <Compile Include="identification_boutique.php" />
+    <Compile Include="modification_panier.php" />
+    <Compile Include="panier.php" />
+    <Compile Include="panier_v2.php" />
+    <Compile Include="produit_disponible.php" />
+    <Compile Include="selection_produit.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="djalf.sql" />
+    <Content Include="index.html" />
+    <Content Include="style.css" />
+  </ItemGroup>
+</Project>

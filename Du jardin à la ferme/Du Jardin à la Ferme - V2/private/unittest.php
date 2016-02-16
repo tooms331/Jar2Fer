@@ -61,7 +61,7 @@ class UnitTest
                                         }
                                     catch(Exception $ex)
                                     {
-                                        throw new ErrorException ("Dependence échoué : ".$depend->name);
+                                        throw new ErrorException ("Dependence Ã©chouÃ© : ".$depend->name);
                                     }
                                 }
                             $this->Result = call_user_func_array($this->test,$Params);

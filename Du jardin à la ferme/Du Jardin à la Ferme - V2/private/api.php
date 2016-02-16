@@ -4,6 +4,14 @@ require_once './private/bdd.php';
 
 class API
 { 
+    public static function useAPI(callable $callback)
+    {
+        session_start();
+        $endpoint=new static();
+        $callback($endpoint);
+        unset($endpoint);
+        session_commit();
+    }
     
     public static function execute($commande, $params)
     {
@@ -47,7 +55,7 @@ class API
      * @param Compte|null $compte 
      * @return Compte|null
      */
-    private function compteConnecte($compte=false)
+    public function compteConnecte($compte=false)
     {   
         static $CompteConnecte=false;
         if($compte===false)
@@ -78,17 +86,48 @@ class API
     }
     
     /**
-     * Indique l'utilisateur est authentifier
+     * Indique si l'utilisateur est authentifier
      * @return bool
      */
-    private function estAuthentifier(){
+    public function estAuthentifier(){
         return $this->compteConnecte()!==null;
     }
     
-    private function estAdmin()
+    /**
+     * Indique si l'utilisateur est administrateur
+     * @return bool
+     */
+    public function estAdmin()
     {
         $Compte=$this->compteConnecte();
         return $Compte!==null && $Compte->etat=='Admin';
+    }
+    
+    private function panier_recuperer()
+    {
+        $panier = null;
+        if($this->estAuthentifier())
+        {
+            $panier =  $this->bdd->Panier_RecupererOuCreer($this->compteConnecte()->id_compte);
+        }
+        else
+        {
+            $idPanierAnonyme = (int)$_SESSION['idPanierAnonyme'];
+            
+            if($idPanierAnonyme)
+            {
+                $panier =  $this->bdd->Commande_Recupere($idPanierAnonyme);
+            }
+            
+            if(!$panier)
+                $panier = $this->bdd->Panier_RecupererOuCreer(null);
+            
+            if($panier)
+            {
+                $_SESSION['idPanierAnonyme']=$panier->id_commande;
+            }
+        }
+        return $panier;
     }
     
     public function API_compte_authentifier($email, $mot_de_passe)
@@ -164,33 +203,6 @@ class API
         return $compte;
     }
     
-    private function panier_recuperer()
-    {
-        $panier = null;
-        if($this->estAuthentifier())
-        {
-            $panier =  $this->bdd->Panier_RecupererOuCreer($this->compteConnecte()->id_compte);
-        }
-        else
-        {
-            $idPanierAnonyme = (int)$_SESSION['idPanierAnonyme'];
-        
-            if($idPanierAnonyme)
-            {
-                $panier =  $this->bdd->Commande_Recupere($idPanierAnonyme);
-            }
-            
-            if(!$panier)
-                $panier = $this->bdd->Panier_RecupererOuCreer(null);
-            
-            if($panier)
-            {
-                $_SESSION['idPanierAnonyme']=$panier->id_commande;
-            }
-        }
-        return $panier;
-    }
-    
     public function API_panier_modifier_element($id_produit, $quantite)
     {
         $id_produit=(int)$id_produit;
@@ -221,8 +233,14 @@ class API
         return $this->bdd->Commande_Valider($panier->id_commande);
     }
     
-    public function API_stock_lister()
+    public function API_produits_lister()
     {   
-        return $this->bdd->StockPrevisionel_Lister();
+        $panier=$this->panier_recuperer();
+        return $this->bdd->Produits_Lister_DetailAvecPanier($panier->id_commande,true);
+    }
+    public function API_produit_recuperer($id_produit)
+    {   
+        $panier=$this->panier_recuperer();
+        return $this->bdd->Produits_Recuperer_DetailAvecPanier($panier->id_commande,$id_produit);
     }
 }

@@ -1,4 +1,4 @@
-﻿<?php 
+<?php 
 require_once './private/config.php';
 require_once './private/bdd.php';
 require_once './private/unittest.php';
@@ -21,10 +21,15 @@ $UT_CLEARBDD = new UnitTest('Vidage de la BDD',[$UT_BDD],function ($bdd){
 $UT_CLEARBDD->RunCheck();
 
 $UT_CreerCompteInvalidEmail = new UnitTest('Création d\'un compte (email invalide)',[$UT_CLEARBDD],function ($bdd){
-    $compte = $bdd->Compte_Creer("rom.laurenthotmail.fr","vlroro87*");
-    if($compte!==null)
+    $compte=null;
+    try{
+        $compte = $bdd->Compte_Creer("rom.laurenthotmail.fr","vlroro87*");
         throw new ErrorException ("la création ne doit pas réussir!");
-    return $compte;
+    }
+    catch(Exception $ex)
+    {
+        return $compte;
+    }
 });
 $UT_CreerCompteInvalidEmail->RunCheck();
 
@@ -34,17 +39,34 @@ $UT_CreerCompte = new UnitTest('Création d\'un compte',[$UT_CLEARBDD],function 
         throw new ErrorException ("L'id du compte est incorrect");
     if($compte->email!=='rom.laurent@hotmail.fr')
         throw new ErrorException ("L'email du compte est incorrect");
-    if($compte->actif!==true)
+    if($compte->etat!=='Nouveau')
         throw new ErrorException ("Le compte doit être activé");
     return $compte;
 });
 $UT_CreerCompte->RunCheck();
 
+$UT_CreerCompteExistant = new UnitTest('Création d\'un compte Existant',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd){
+    $compte=null;
+    try{
+        $compte = $bdd->Compte_Creer("rom.laurenthotmail.fr","vlroro");
+        throw new ErrorException ("la création ne doit pas réussir!");
+    }
+    catch(Exception $ex)
+    {
+        return $compte;
+    }
+});
+$UT_CreerCompteExistant->RunCheck();
+
 $UT_InvalidAuth = new UnitTest('Authentification d\'un compte (echec)',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd,$compte){
-    $compte = $bdd->Compte_Authentifier("rom.laurent@hotmail.fr","vlro87*");
-    if($compte!==null)
+    try{
+        $compte = $bdd->Compte_Authentifier("rom.laurent@hotmail.fr","vlro87*");
         throw new ErrorException ("L'authentification ne doit pas réussir");
-    return $compte;
+    }
+    catch(Exception $ex)
+    {
+        return $compte;
+    }
 });
 $UT_InvalidAuth->RunCheck();
 
@@ -62,22 +84,34 @@ $UT_ValidAuth = new UnitTest('Authentification d\'un compte (succes)',[$UT_CLEAR
 $UT_ValidAuth->RunCheck();
 
 
-$UT_DésactiveCompte = new UnitTest('Désactivation d\'un compte',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd,$compte){
-    $compte = $bdd->Compte_Modifier_Actif($compte->id_compte,false);
-    if($compte->actif!==false)
-        throw new ErrorException ("Le compte doit être désactivé");
+$UT_DésactiveCompte = new UnitTest('Modification de l\'état d\'un compte : Désactivé',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd,$compte){
+    $compte = $bdd->Compte_Modifier_Etat($compte->id_compte,'Désactivé');
+    if($compte->etat!=='Désactivé')
+        throw new ErrorException ("Le compte doit être Désactivé");
     return $compte;
 });
 $UT_DésactiveCompte->RunCheck();
 
-$UT_ActiveCompte = new UnitTest('Activation d\'un compte',[$UT_CLEARBDD,$UT_DésactiveCompte],function ($bdd,$compte){
-    $compte = $bdd->Compte_Modifier_Actif($compte->id_compte,true);
-    if($compte->actif!==true)
-        throw new ErrorException ("Le compte doit être sactivé");
+$UT_AdminCompte = new UnitTest('Modification de l\'état d\'un compte : Admin',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd,$compte){
+    $compte = $bdd->Compte_Modifier_Etat($compte->id_compte,'Admin');
+    if($compte->etat!=='Admin')
+        throw new ErrorException ("Le compte doit être Admin");
     return $compte;
 });
-$UT_ActiveCompte->RunCheck();
+$UT_AdminCompte->RunCheck();
 
+$UT_InvildEtatCompte = new UnitTest('Modification de l\'état d\'un compte : Admin',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd,$compte){
+    
+    try{
+        $compte = $bdd->Compte_Modifier_Etat($compte->id_compte,'BAD');
+        throw new ErrorException ("La modification ne doit pas réussir");
+    }
+    catch(Exception $ex)
+    {
+        return $compte;
+    }
+});
+$UT_InvildEtatCompte->RunCheck();
 
 $UT_CreerProduitTomates = new UnitTest('Création d\'un produit : Tomates cerise',[$UT_CLEARBDD],function ($bdd,$compte){
     $produit = $bdd->Produits_Creer("Tomate cerise","Des toute pitite tomat'");
@@ -122,14 +156,6 @@ $UT_ListerStock = new UnitTest('Liste du stock',[$UT_CLEARBDD,$UT_VariationStock
 $UT_ListerStock->RunCheck();
 
 /*
-
-echo "\n\nVariation de stock du premier produit\n";
-$variation = $bdd->VariationStock_Ajouter($tomate_cerise->id_produit, -2, 'PERTE','un rongeur est passé par la :-(');
-echoJSON($variation);
-
-echo "\n\nRécupération des stocks\n";
-$StockPrevisionel = $bdd->Stock_Lister();
-echoJSON($StockPrevisionel);
 
 echo "\n\nRécupération/Création de la commande en création du compte\n";
 $commande = $bdd->Panier_Récuperer($compte->id_compte);

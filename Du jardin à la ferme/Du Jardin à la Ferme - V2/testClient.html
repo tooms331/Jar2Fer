@@ -28,7 +28,6 @@
 
                 var resultsPan = $("#results");
                 var actions = $("#actions");
-                var client = Client();
                 var count_request = 0;
 
                 var curentParams = [];
@@ -40,7 +39,7 @@
 					curentParams = [];
 					$("#paramsdesc").empty();
 
-					$.each(getParamNames(client[action]), function (key, value) {
+					$.each(getParamNames(apiClient[action]), function (key, value) {
 					    var curparam_nametemplate = param_nametemplate.clone();
 					    curparam_nametemplate.attr("id", "name_" + value);
 					    curparam_nametemplate.text(value+" : ");
@@ -55,7 +54,7 @@
 
                 
 				actions.empty();
-				for (method in client) {
+				for (method in apiClient) {
 				    actions.append("<option value=\"" + method + "\">" + method + "</option>")
 				}
 				loadparams();
@@ -87,7 +86,7 @@
 
 					curqueryresulttemplate.css('background-color', 'lightgrey');
 
-				    client[action].apply(this, params)
+				    apiClient[action].apply(this, params)
 					.done(function (result, warnings) {
 					    curqueryresulttemplate.css('background-color', 'lightgreen');
 					})

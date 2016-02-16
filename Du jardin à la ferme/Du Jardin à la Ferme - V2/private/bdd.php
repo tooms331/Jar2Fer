@@ -519,7 +519,6 @@ class BDD
     
     
     
-    
     /**
      * Récupére un produit spécifique
      * @param int $id_produit
@@ -534,11 +533,8 @@ class BDD
         return $this->InTransaction(function()use($id_produit){
             $produit = $this->getSingleObject(
                 'Produit',
-                'SELECT 
-                    id_produit, 
-                    nom, 
-                    description 
-                FROM produits 
+                'SELECT *
+                FROM view_produits 
                 WHERE id_produit = :id_produit',
                 array(
                     ':id_produit'=>$id_produit
@@ -558,14 +554,78 @@ class BDD
         return $this->InTransaction(function(){
             $produits = $this->getAllObjects(
                 'Produit',
-                'SELECT 
-                    id_produit, 
-                    nom, 
-                    description 
-                FROM produits',
+                'SELECT *
+                FROM view_produits',
                 []
             );
             return $produits ?: [];
+        });
+    }
+    public function Produits_Recuperer_DetailAvecPanier($id_commande,$id_produit)
+    {
+        $id_commande = (int)$id_commande;
+        $id_produit = (int)$id_produit;
+        
+        return $this->InTransaction(function()use($id_commande,$id_produit){
+            
+            $produit = $this->getSingleObject(
+                'ProduitAvecPanier',
+                'SELECT 
+	            view_produits.*,
+                COALESCE(elements_commande.quantite_commande,0) AS quantite_commande
+            FROM view_produits
+            LEFT OUTER JOIN elements_commande
+	            ON view_produits.id_produit=elements_commande.id_produit
+	            AND elements_commande.id_commande = :id_commande
+            WHERE view_produits.id_produit = :id_produit',
+                array(
+                    ':id_commande'=>$id_commande,
+                    ':id_produit'=>$id_produit
+                )
+            );
+            return $produit;
+        });
+    }
+    
+    public function Produits_Lister_DetailAvecPanier($id_commande,$dispoUniquement)
+    {
+        $id_commande = (int)$id_commande;
+        
+        return $this->InTransaction(function()use($id_commande,$dispoUniquement){
+            if($dispoUniquement)
+            {
+                $produits = $this->getAllObjects(
+                   'ProduitAvecPanier',
+                   'SELECT 
+	                view_produits.*,
+                    COALESCE(elements_commande.quantite_commande,0) AS quantite_commande
+                FROM view_produits
+                LEFT OUTER JOIN elements_commande
+	                ON view_produits.id_produit=elements_commande.id_produit
+	                AND elements_commande.id_commande = :id_commande
+                WHERE view_produits.stocks_previsionnel > 0',
+                   array(
+                       ':id_commande'=>$id_commande
+                   )
+               );
+            }
+            else
+            {
+                $produits = $this->getAllObjects(
+                   'ProduitAvecPanier',
+                   'SELECT 
+	                view_produits.*,
+                    COALESCE(elements_commande.quantite_commande,0) AS quantite_commande
+                FROM view_produits
+                LEFT OUTER JOIN elements_commande
+	                ON view_produits.id_produit=elements_commande.id_produit
+	                AND elements_commande.id_commande = :id_commande',
+                   array(
+                       ':id_commande'=>$id_commande
+                   )
+               );
+            }
+            return $produits;
         });
     }
     
@@ -578,12 +638,12 @@ class BDD
      * @throws ErrorException 
      * @return Produit
      */
-    public function Produits_Creer($nom, $description)
+    public function Produits_Creer($nom, $description, $unite)
     {
         $nom = mb_strimwidth((string)$nom,0,100);
         $description = mb_strimwidth((string)$description,0,500);
         
-        return $this->InTransaction(function()use($nom, $description){
+        return $this->InTransaction(function()use($nom, $description, $unite){
         
             // on vérifie si l'identifiant éxiste déjà
             $count = $this->getScalar(
@@ -596,7 +656,7 @@ class BDD
             );
         
             if($count>0)
-                return null;
+                throw new ErrorException("Le produit existe déjà.");
         
             //On créer le produit
             $id_produit = (int)$this->execInsert(
@@ -608,103 +668,18 @@ class BDD
                 VALUES
                 (
                     :nom,
-                    :description
+                    :description,
+                    :unite
                 )',
                 [
                     ':nom'=>$nom,
-                    ':description'=>$description
+                    ':description'=>$description,
+                    ':unite'=>$unite
+                    
                 ]
             );
         
             return $this->Produits_Recuperer($id_produit);
-        });
-    }
-    
-    
-    
-    
-    
-    /**
-     * Liste tous les produits dont le stock prévisionnel est positif
-     * @throws ErrorException 
-     * @return Stock[]
-     */
-    public function StockPrevisionel_Lister()
-    {
-        return $this->InTransaction(function(){
-            $stocks = $this->getAllObjects(
-                'Stock',
-                'SELECT 
-                    prod.id_produit, 
-                    prod.nom, 
-                    prod.description, 
-                    stocks.stock
-                FROM produits as prod
-                INNER JOIN stocks_previsionnel as stocks
-                    ON prod.id_produit = stocks.id_produit
-                WHERE stocks.stock > 0',
-                []
-            );
-            return $stocks ?: [];
-        });
-    }
-    
-    /**
-     * Liste tous les produits dont le stock est positif
-     * @throws ErrorException 
-     * @return Stock[]
-     */
-    public function Stock_Lister()
-    {
-        return $this->InTransaction(function(){
-            $stocks = $this->getAllObjects(
-                'Stock',
-                'SELECT 
-                    prod.id_produit, 
-                    prod.nom, 
-                    prod.description, 
-                    stocks.stock
-                FROM produits as prod
-                INNER JOIN stocks as stocks
-                    ON prod.id_produit = stocks.id_produit
-                WHERE stocks.stock > 0',
-                []
-            );
-            return $stocks ?: [];
-        });
-    }
-    
-    
-    
-    
-    
-    /**
-     * Récupère le détail d'une variation de stock spécifique
-     * @param int $id_variation_stock 
-     * ID de la variation de stock à récupérer
-     * @return VariationStock
-     */
-    public function VariationStock_Recuperer($id_variation_stock)
-    {
-        $id_variation_stock=(int)$id_variation_stock;
-        
-        return $this->InTransaction(function()use($id_variation_stock){
-            $variation = $this->getSingleObject(
-                'VariationStock',
-                'SELECT 
-                    id_variation_stock, 
-                    id_produit, 
-                    date_variation, 
-                    variation, 
-                    type_variation, 
-                    remarque
-                FROM variations_stock 
-                WHERE id_variation_stock = :id_variation_stock',
-                [
-                    ':id_variation_stock'=>$id_variation_stock
-                ]
-            );
-            return $variation;
         });
     }
     
@@ -719,7 +694,7 @@ class BDD
      * @param string $remarque 
      * Informations complémentaires sur la variation
      * @throws ErrorException 
-     * @return VariationStock
+     * @return Produit
      */
     public function VariationStock_Ajouter($id_produit,$variation,$type,$remarque)
     {
@@ -752,13 +727,9 @@ class BDD
                     ':remarque'=>$remarque
                 ]
             );
-            return $this->VariationStock_Recuperer($id_variation_stock);
+            return $this->Produits_Recuperer($id_produit);
         });
     }
-    
-    
-    
-    
     
     /**
      * Récupère une commande spécifique
@@ -792,31 +763,6 @@ class BDD
     }
     
     /**
-     * Lister les commandes Validé
-     * @throws ErrorException 
-     * @return Commande
-     */
-    public function Commande_Lister_Valide()
-    {   
-        return $this->InTransaction(function(){
-            //On cherche la commande
-            $commandes = $this->getAllObjects(
-                'Commande',
-                'SELECT 
-                    id_commande, 
-                    id_compte, 
-                    date_creation, 
-                    remarque, 
-                    etat 
-                FROM commandes 
-                WHERE etat = \'Validé\'',
-                []
-            );
-            return $commandes;
-        });
-    }
-    
-    /**
      * Liste les elements d'une commande'
      * @param int $id_commande 
      * ID de la commande à rècupérer
@@ -829,13 +775,8 @@ class BDD
         return $this->InTransaction(function()use($id_commande){
             $elements = $this->getAllObjects(
                 'ElementCommande',
-                'SELECT 
-                    id_element_commande, 
-                    id_commande, 
-                    id_produit, 
-                    quantite_commande, 
-                    quantite_reel 
-                FROM elements_commande 
+                'SELECT *
+                FROM view_elements_commande 
                 WHERE id_commande = :id_commande',
                 [
                     ':id_commande'=>$id_commande
@@ -903,13 +844,8 @@ class BDD
         
             $element = $this->getSingleObject(
                 'ElementCommande',
-                'SELECT 
-                    id_element_commande, 
-                    id_commande, 
-                    id_produit, 
-                    quantite_commande, 
-                    quantite_reel 
-                FROM elements_commande 
+                'SELECT *
+                FROM view_elements_commande 
                 WHERE id_commande = :id_commande
                 AND id_produit = :id_produit',
                 [
@@ -1001,6 +937,7 @@ class BDD
             return $this->Commande_lister_Elements($id_commande);
         });
     }
+    
     public function Commande_Supprimer($id_commande)
     {   
         $id_commande=(int)$id_commande;
@@ -1045,6 +982,7 @@ class BDD
             return $this->Commande_Recupere($panierCompte->id_commande);
         });
     }
+    
     /**
      * récupére l'ID du panier d'un compte, si le panier n'éxiste pas il est créer.
      * @param int|null $id_compte 

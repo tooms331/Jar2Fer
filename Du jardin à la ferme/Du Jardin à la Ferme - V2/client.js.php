@@ -1,4 +1,4 @@
-﻿<?php 
+<?php 
 require_once './private/api.php';
 header('Content-Type: application/javascript; charset:utf-8');
 header('Cache-Control: no-cache, no-store, must-revalidate');
@@ -7,7 +7,7 @@ header('Pragma: no-cache');
 header('Access-Control-Allow-Origin: *');
 ?>
 
-function Client() { 
+var apiClient =(function createApiClient() { 
     function call_core(commande,params)
     {
         var defered = $.Deferred();
@@ -68,4 +68,4 @@ foreach($APIMethods as $APIMethod)
 ?>
 
     };
-}
+})();
