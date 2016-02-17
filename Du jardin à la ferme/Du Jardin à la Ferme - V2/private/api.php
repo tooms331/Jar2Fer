@@ -94,13 +94,86 @@ class API
     }
     
     /**
-     * Indique si l'utilisateur est administrateur
+     * Indique si l'utilisateur est Admin
      * @return bool
      */
     public function estAdmin()
     {
         $Compte=$this->compteConnecte();
-        return $Compte!==null && $Compte->etat=='Admin';
+        return $Compte!==null && $Compte->etat==Compte::ETAT_Admin;
+    }
+    
+    /**
+     * Indique si l'utilisateur est Nouveau
+     * @return bool
+     */
+    public function estNouveau()
+    {
+        $Compte=$this->compteConnecte();
+        return $Compte!==null && $Compte->etat==Compte::ETAT_Nouveau;
+    }
+    
+    /**
+     * Indique si l'utilisateur est Panier
+     * @return bool
+     */
+    public function estPanier()
+    {
+        $Compte=$this->compteConnecte();
+        return $Compte!==null && $Compte->etat==Compte::ETAT_Panier;
+    }
+    
+    /**
+     * Indique si l'utilisateur est Désactivé
+     * @return bool
+     */
+    public function estDésactivé()
+    {
+        $Compte=$this->compteConnecte();
+        return $Compte!==null && $Compte->etat==Compte::ETAT_Désactivé;
+    }
+    
+    /**
+     * Indique si l'utilisateur est LibreService
+     * @return bool
+     */
+    public function estLibreService()
+    {
+        $Compte=$this->compteConnecte();
+        return $Compte!==null && $Compte->etat==Compte::ETAT_LibreService;
+    }
+    
+    /**
+     * Indique si l'utilisateur est Premium
+     * @return bool
+     */
+    public function estPremium()
+    {
+        $Compte=$this->compteConnecte();
+        return $Compte!==null && $Compte->etat==Compte::ETAT_Premium;
+    }
+    
+    public function peutCommander()
+    {
+        $Compte=$this->compteConnecte();
+        if(!$Compte) return false;
+        switch($Compte->etat)
+        {
+            case Compte::ETAT_Admin:
+                return true;
+            case Compte::ETAT_LibreService:
+                $jour = date('N');
+                return ($jour>2) && ($jour< 6);
+            case Compte::ETAT_Premium:
+                $jour = date('N');
+                return ($jour>0) && ($jour< 6);
+            case Compte::ETAT_Désactivé:
+            case Compte::ETAT_Nouveau:
+            case Compte::ETAT_Panier:
+            case Compte::ETAT_Compte:
+            default:
+                return false;
+        }
     }
     
     private function panier_recuperer()
@@ -233,10 +306,10 @@ class API
         return $this->bdd->Commande_Valider($panier->id_commande);
     }
     
-    public function API_produits_lister()
+    public function API_produits_lister($rechercheProduit)
     {   
         $panier=$this->panier_recuperer();
-        return $this->bdd->Produits_Lister_DetailAvecPanier($panier->id_commande,true);
+        return $this->bdd->Produits_Lister_DetailAvecPanier($rechercheProduit,$panier->id_commande,true);
     }
     public function API_produit_recuperer($id_produit)
     {   

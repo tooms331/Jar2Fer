@@ -120,6 +120,9 @@
     <Folder Include="ckeditor\plugins\specialchar\" />
     <Folder Include="ckeditor\plugins\specialchar\dialogs\" />
     <Folder Include="ckeditor\plugins\specialchar\dialogs\lang\" />
+    <Folder Include="ckeditor\plugins\stylesheetparser\" />
+    <Folder Include="ckeditor\plugins\stylesheetparser\samples\" />
+    <Folder Include="ckeditor\plugins\stylesheetparser\samples\assets\" />
     <Folder Include="ckeditor\plugins\tabletools\" />
     <Folder Include="ckeditor\plugins\tabletools\dialogs\" />
     <Folder Include="ckeditor\plugins\table\" />
@@ -466,6 +469,9 @@
     <Content Include="ckeditor\plugins\specialchar\dialogs\lang\zh.js" />
     <Content Include="ckeditor\plugins\specialchar\dialogs\lang\_translationstatus.txt" />
     <Content Include="ckeditor\plugins\specialchar\dialogs\specialchar.js" />
+    <Content Include="ckeditor\plugins\stylesheetparser\plugin.js" />
+    <Content Include="ckeditor\plugins\stylesheetparser\samples\assets\sample.css" />
+    <Content Include="ckeditor\plugins\stylesheetparser\samples\stylesheetparser.html" />
     <Content Include="ckeditor\plugins\tabletools\dialogs\tableCell.js" />
     <Content Include="ckeditor\plugins\table\dialogs\table.js" />
     <Content Include="ckeditor\plugins\templates\dialogs\templates.css" />
@@ -570,6 +576,7 @@
     <Content Include="ckeditor\skins\moono\readme.md" />
     <Content Include="ckeditor\styles.js" />
     <Content Include="client.js.php" />
+    <Content Include="content.css" />
     <Content Include="djalf.css" />
     <Content Include="djalf.js" />
     <Content Include="imgs\produit.jpg" />

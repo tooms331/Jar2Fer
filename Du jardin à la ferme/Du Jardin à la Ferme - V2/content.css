@@ -1,0 +1,64 @@
+﻿
+
+.contentPanel {
+}
+
+    .contentPanel p {
+        padding: 0.1em 1em;
+        text-indent: 1em;
+        text-align: justify;
+    }
+
+    .contentPanel h5 {
+        margin: 0.5em 0em;
+        color: #1A7505;
+        font-size: 1.2em;
+        border-bottom: 1px solid #1A7505;
+        padding-left: 1em;
+    }
+
+    .contentPanel h6 {
+        margin: 0.5em 0em;
+        padding-left: 1.5em;
+        font-size: 1.1em;
+        font-weight: bold;
+        text-decoration: underline;
+        color: #1A7505;
+    }
+
+    .contentPanel p.citation {
+        text-indent: 0em;
+        text-align: center;
+        font-weight: bold;
+        margin: 1em 4em;
+        padding: 1em;
+        border-left: 5px solid #1A7505;
+        background-color: #ACCAA7;
+    }
+
+    .contentPanel p.signature {
+        text-indent: 1em;
+        text-align: end;
+        font-weight: bold;
+    }
+
+    .contentPanel ul,
+    .contentPanel ol {
+        margin-left: 4em;
+        margin-top: 0.2em;
+        margin-bottom: 0.2em;
+        border-left: 2em solid #ACCAA7;
+    }
+
+        .contentPanel ol > li {
+            list-style: decimal;
+        }
+
+        .contentPanel ul > li {
+            list-style: disc;
+        }
+
+    .contentPanel li {
+        padding: .2em;
+        display: list-item;
+    }

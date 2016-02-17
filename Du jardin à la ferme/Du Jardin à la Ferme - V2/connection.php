@@ -4,11 +4,13 @@ require_once './private/layout.php';
 require_once './private/api.php';
 
 API::useAPI(function(API $api){
-    LAYOUT::CheckAuthentified($api, function(API $api){
-        LAYOUT::writeHeader("Connection", $api);
+    $layout=new LAYOUT($api);
     
-?> Vous êtes maintenant authentifier.<?php
+    $layout->CheckAuthentified(function(API $api,LAYOUT $layout){
+        $layout->writeHeader("Connection");
+    
+        ?> Vous êtes maintenant authentifier.<?php
         
-        LAYOUT::writeFooter($api);
+        $layout->writeFooter();
     });
 });

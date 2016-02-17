@@ -30,20 +30,33 @@ class Compte
     }
 }
 
+
 class Produit
 {
     /**
      * @var int
      */
     public $id_produit;
+    /**
+     * @var int
+     */
+    public $id_categorie;
     /** 
      * @var string
      */
-    public $nom;
+    public $produit;
+    /** 
+     * @var string
+     */
+    public $categorie;
     /**
      * @var string
      */
     public $description;
+    /**
+     * @var double
+     */
+    public $tarif;
     /**
      * @var string
      */
@@ -56,8 +69,9 @@ class Produit
      * @var double
      */
     public $stocks_courant;
-    
+
     public function __construct(){
+        $this->id_categorie=(int)$this->id_categorie;
         $this->id_produit=(int)$this->id_produit;
         $this->stocks_previsionnel=(double)$this->stocks_previsionnel;
         $this->stocks_courant=(double)$this->stocks_courant;
@@ -142,23 +156,47 @@ class ElementCommande
     /**
      * @var int
      */
+    public $id_produit;
+    /**
+     * @var int
+     */
+    public $id_categorie;
+    /** 
+     * @var string
+     */
+    public $produit;
+    /** 
+     * @var string
+     */
+    public $categorie;
+    /**
+     * @var string
+     */
+    public $description;
+    /**
+     * @var double
+     */
+    public $tarif;
+    /**
+     * @var string
+     */
+    public $unite;
+    /**
+     * @var double
+     */
+    public $stocks_previsionnel;
+    /**
+     * @var double
+     */
+    public $stocks_courant;
+    /**
+     * @var int
+     */
     public $id_element_commande;
     /**
      * @var int
      */
     public $id_commande;
-    /**
-     * @var int
-     */
-    public $id_produit;
-    /**
-     * @var string
-     */
-    public $produit;
-    /**
-     * @var string
-     */
-    public $unite;
     /**
      * @var double
      */
@@ -168,19 +206,16 @@ class ElementCommande
      */
     public $quantite_reel;
     
-    /**
-     * @var double
-     */
-    public $quantite_max;
-    
-    
     public function __construct(){
+        $this->id_produit=(int)$this->id_produit;
+        $this->id_categorie=(int)$this->id_categorie;
+        $this->tarif=(double)$this->tarif;
+        $this->stocks_previsionnel= (double)$this->stocks_previsionnel;
+        $this->stocks_courant= (double)$this->stocks_courant;
         $this->id_element_commande=(int)$this->id_element_commande;
         $this->id_commande=(int)$this->id_commande;
-        $this->id_produit=(int)$this->id_produit;
         $this->quantite_commande=(double)$this->quantite_commande;
         $this->quantite_reel= isset($this->quantite_reel)?(double)$this->quantite_reel:null;
-        $this->quantite_max= (double)$this->quantite_max;
     }
 }
 

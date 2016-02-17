@@ -6,53 +6,77 @@ require_once './private/api.php';
 
 
 API::useAPI(function(API $api){
-    
+    $layout=new LAYOUT($api);
     
     $id_produit = (int)$_REQUEST['id_produit'];
+    $produit = $api->API_produit_recuperer($id_produit);
     
-    $element = $api->API_produit_recuperer($id_produit);
     
-    if(!$element)
+    if(!$produit)
     {
-        LAYOUT::writeHeader("Produit", $api);
+        $layout->writeHeader("Produit");
         ?> Ce produit n'éxiste pas.<?php
     }
     else
     {
-        LAYOUT::writeHeader("Produit : ".$element->nom, $api);
-?>
-<div class="whitePanel produitInfoPanel">
-    <img src="imgs/produit.jpg" />
-    <div>
-        <div class="infosdetail">
-            <div>
-                <div>unitée : </div>
-                <div><?php LAYOUT::safeWrite($element->unite);?></div>
+        $layout->writeHeader($produit->categorie." / ".$produit->produit);
+        ?>
+            <div class="produitInfoPanel">
+                <div class="whitePanel">
+                    <img src="imgs/produit.jpg" />
+                </div>
+                <div class="spacer">&nbsp;</div>
+                <div class="whitePanel">
+                    <ul class="infosdetail">
+                        <li>
+                            <span>catégorie : </span>
+                            <span><?php $layout->safeWrite($produit->categorie);?></span>
+                        </li>
+                        <li>
+                            <span>produit : </span>
+                            <span><?php $layout->safeWrite($produit->produit);?></span>
+                        </li>
+                        <?php if($api->peutCommander()) {?> 
+                            <li>
+                                <span>unitée : </span>
+                                <span><?php $layout->safeWrite($produit->unite);?></span>
+                            </li>
+                            <li>
+                                <span>tarif : </span>
+                                <span><?php $layout->writePrix($produit->tarif);?></span>
+                            </li>
+                            <li>
+                                <span>stock : </span>
+                                <span><?php $layout->safeWrite($produit->stocks_previsionnel);?></span>
+                            </li>
+                            <li>
+                                <span>commande : </span>
+                                <span><input type="number" data-inputtype="panier_qte_selector" data-idproduit="<?php $layout->safeWrite($produit->id_produit);?>" value="<?php $layout->safeWrite($produit->quantite_commande);?>" data-max="<?php $layout->safeWrite($produit->quantite_max);?>"/></span>
+                            </li>
+                        <?php }?>
+                    </ul>
+                </div>
             </div>
-            <div>
-                <div>stock : </div>
-                <div><?php LAYOUT::safeWrite($element->stocks_previsionnel);?></div>
-            </div>
-            <div>
-                <div>commande : </div>
-                <div>
-                    <input type="number" data-inputtype="panier_qte_selector" data-idproduit="<?php LAYOUT::safeWrite($element->id_produit);?>" value="<?php LAYOUT::safeWrite($element->quantite_commande);?>" data-max="<?php LAYOUT::safeWrite($element->quantite_max);?>"/></div>
-            </div>
-        </div>
-    </div>
-</div>
-    <?php if($api->estAdmin()) { ?>
-        <article data-inputtype="Produit-Description-Editor" contenteditable="true" class="whitePanel produitDescriptionPanel" data-idproduit="<?php LAYOUT::safeWrite($element->id_produit);?>">
-            <?php echo $element->description;?>
-        </article>
-    <?php } else {?>
-        <article class="whitePanel produitDescriptionPanel">
-            <?php echo $element->description;?>
-        </article>
-    <?php }?>
-
-<?php 
+            <?php
+                if($api->estAdmin()) 
+                { 
+                    ?>
+                        <article class="whitePanel contentPanel" data-inputtype="Produit-Description-Editor" contenteditable="true" data-idproduit="<?php $layout->safeWrite($produit->id_produit);?>">
+                            <?php echo $produit->description;?>
+                        </article>
+                    <?php
+                } 
+                elseif(!empty($produit->description))
+                {
+                    ?>
+                        <article class="whitePanel contentPanel">
+                            <?php echo $produit->description;?>
+                        </article>
+                    <?php 
+                }
+            ?>
+        <?php 
     }
     
-    LAYOUT::writeFooter($api);
+    $layout->writeFooter();
 });

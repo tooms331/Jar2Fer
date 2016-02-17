@@ -4,14 +4,16 @@ require_once './private/layout.php';
 require_once './private/api.php';
 
 API::useAPI(function(API $api){
+    $layout=new LAYOUT($api);
+    
     if($api->estAuthentifier())
     {
         $api->API_compte_deconnecter();
     }
         
-    LAYOUT::writeHeader("Déconnection", $api);
+    $layout->writeHeader("Déconnection");
     
-?> Vous êtes maintenant déconnecter, à bientôt.<?php
+    ?> Vous êtes maintenant déconnecter, à bientôt.<?php
         
-    LAYOUT::writeFooter($api);
+    $layout->writeFooter();
 });

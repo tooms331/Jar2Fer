@@ -6,7 +6,9 @@ require_once './private/api.php';
 
 
 API::useAPI(function(API $api){
-    LAYOUT::writeHeader("Accueil", $api);
+    $layout=new LAYOUT($api);
     
-    LAYOUT::writeFooter($api);
+    $layout->writeHeader("Accueil");
+    
+    $layout->writeFooter();
 });

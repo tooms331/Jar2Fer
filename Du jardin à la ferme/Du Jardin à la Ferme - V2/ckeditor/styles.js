@@ -15,7 +15,11 @@
 
 CKEDITOR.stylesSet.add('Main', [
     { name: 'Titre', element: 'h5' },
+    { name: 'Sous-titre', element: 'h6' },
     { name: 'Paragraphe', element: 'p' },
+    { name: 'Signature', element: 'p', attributes: { 'class': 'signature' } },
+    { name: 'Citation', element: 'p', attributes: { 'class': 'citation' } },
+    
 ]);
 
 CKEDITOR.stylesSet.add( 'default', [

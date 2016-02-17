@@ -2,6 +2,8 @@
 require_once 'config.php';
 require_once 'password.php';
 require_once 'entities.php';
+require_once '/libs/HTMLPurifier.standalone.php';
+
 
 /**
  * Couche de liaison à la BDD.
@@ -20,11 +22,17 @@ class BDD
      */
     private $pdolink;
     
+    private $HTMLPurifier_config;
+    private $purifier;
+    
     /**
      * Ouverture de la base de donnée
      */
     public function __construct()
     {
+        $this->HTMLPurifier_config = HTMLPurifier_Config::createDefault();
+        $this->purifier = new HTMLPurifier($config);
+        
         $this->pdolink = new \PDO(
 			"mysql:host=".BDD_SERVER.";dbname=".BDD_SCHEMA.";charset=utf8",
 			BDD_USER ,  
@@ -272,9 +280,6 @@ class BDD
         $lastId=($rowCount>0)?$this->pdolink->lastInsertId():null;
         return $lastId;
     }
-    
-    
-    
     
     
     /**
@@ -555,12 +560,14 @@ class BDD
             $produits = $this->getAllObjects(
                 'Produit',
                 'SELECT *
-                FROM view_produits',
+                FROM view_produits
+                ORDER BY view_produits.categorie, view_produits.produit',
                 []
             );
             return $produits ?: [];
         });
     }
+    
     public function Produits_Recuperer_DetailAvecPanier($id_commande,$id_produit)
     {
         $id_commande = (int)$id_commande;
@@ -587,44 +594,45 @@ class BDD
         });
     }
     
-    public function Produits_Lister_DetailAvecPanier($id_commande,$dispoUniquement)
+    public function Produits_Lister_DetailAvecPanier($rechercheProduit,$id_commande,$dispoUniquement=true)
     {
         $id_commande = (int)$id_commande;
+        $dispoUniquement = (bool)$dispoUniquement;
+        $rechercheProduit=(string)$rechercheProduit;
         
-        return $this->InTransaction(function()use($id_commande,$dispoUniquement){
-            if($dispoUniquement)
+        return $this->InTransaction(function()use($rechercheProduit,$id_commande,$dispoUniquement){
+            $WHERE = '';
+            $params=array(
+                    ':id_commande'=>$id_commande,
+                );
+            if($dispoUniquement || !empty($rechercheProduit))
             {
-                $produits = $this->getAllObjects(
-                   'ProduitAvecPanier',
-                   'SELECT 
+                $WHERE.='WHERE';
+                if($dispoUniquement)
+                    $WHERE.=' view_produits.stocks_previsionnel > 0 ';
+                if($dispoUniquement && !empty($rechercheProduit))
+                    $WHERE.='AND';
+                if(!empty($rechercheProduit))
+                {
+                    $WHERE.=' (view_produits.categorie LIKE :rechercheProduit OR view_produits.produit LIKE :rechercheProduit) ';
+                    $params[':rechercheProduit'] = '%'.$rechercheProduit.'%';
+                }
+            }
+            
+            $produits = $this->getAllObjects(
+                'ProduitAvecPanier',
+                'SELECT 
 	                view_produits.*,
                     COALESCE(elements_commande.quantite_commande,0) AS quantite_commande
                 FROM view_produits
                 LEFT OUTER JOIN elements_commande
 	                ON view_produits.id_produit=elements_commande.id_produit
 	                AND elements_commande.id_commande = :id_commande
-                WHERE view_produits.stocks_previsionnel > 0',
-                   array(
-                       ':id_commande'=>$id_commande
-                   )
-               );
-            }
-            else
-            {
-                $produits = $this->getAllObjects(
-                   'ProduitAvecPanier',
-                   'SELECT 
-	                view_produits.*,
-                    COALESCE(elements_commande.quantite_commande,0) AS quantite_commande
-                FROM view_produits
-                LEFT OUTER JOIN elements_commande
-	                ON view_produits.id_produit=elements_commande.id_produit
-	                AND elements_commande.id_commande = :id_commande',
-                   array(
-                       ':id_commande'=>$id_commande
-                   )
-               );
-            }
+                '.$WHERE.'
+                ORDER BY view_produits.categorie,view_produits.produit',
+                $params
+            );
+            
             return $produits;
         });
     }
@@ -638,20 +646,24 @@ class BDD
      * @throws ErrorException 
      * @return Produit
      */
-    public function Produits_Creer($nom, $description, $unite)
+    public function Produits_Creer($id_categorie,$produit, $description,$tarif, $unite)
     {
-        $nom = mb_strimwidth((string)$nom,0,100);
-        $description = (string)$description;
+        $id_categorie = (int)$id_categorie;
+        $produit = mb_strimwidth((string)$produit,0,100);
+        $description = $this->purifier->purify((string)$description);
+        $tarif = (int)$tarif;
         
-        return $this->InTransaction(function()use($nom, $description, $unite){
+        return $this->InTransaction(function()use($id_categorie, $produit, $description,$tarif, $unite){
         
             // on vérifie si l'identifiant éxiste déjà
             $count = $this->getScalar(
                 'SELECT COUNT(*) 
                 FROM produits 
-                WHERE nom = :nom',
+                WHERE produit = :produit
+                AND id_categorie = :id_categorie',
                 [
-                    ':nom'=>$nom
+                    ':produit'=>$produit,
+                    ':id_categorie'=>$id_categorie
                 ]
             );
         
@@ -662,18 +674,25 @@ class BDD
             $id_produit = (int)$this->execInsert(
                 'INSERT INTO produits 
                 (
-                    nom, 
-                    description
+                    produit, 
+                    id_categorie, 
+                    description, 
+                    tarif, 
+                    unite
                 )
                 VALUES
                 (
                     :nom,
+                    :id_categorie,
                     :description,
+                    :tarif,
                     :unite
                 )',
                 [
-                    ':nom'=>$nom,
+                    ':produit'=>$produit,
+                    ':id_categorie'=>$id_categorie,
                     ':description'=>$description,
+                    ':tarif'=>$tarif,
                     ':unite'=>$unite
                     
                 ]
@@ -686,7 +705,7 @@ class BDD
     public function Produits_Modifier_Description($id_produit, $description)
     {
         $id_produit = (int)$id_produit;
-        $description = (string)$description;
+        $description = $this->purifier->purify((string)$description);
         
         return $this->InTransaction(function()use($id_produit, $description){
         
