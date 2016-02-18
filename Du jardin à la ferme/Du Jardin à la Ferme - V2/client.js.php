@@ -7,7 +7,7 @@ header('Pragma: no-cache');
 header('Access-Control-Allow-Origin: *');
 ?>
 
-var apiClient =(function createApiClient() { 
+function createApiClient(onerrorcb) { 
     function call_core(commande,params)
     {
         var defered = $.Deferred();
@@ -46,8 +46,10 @@ var apiClient =(function createApiClient() {
                 defered.reject('erreur non gérée');
             }
         });
-	
-        return defered.promise();
+	    var prom = defered.promise();
+        if(onerrorcb)
+            prom.fail(onerrorcb);
+        return prom;
     }
     return {<?php 
 $APIRFLX = new ReflectionClass("API");
@@ -68,4 +70,4 @@ foreach($APIMethods as $APIMethod)
 ?>
 
     };
-})();
+};

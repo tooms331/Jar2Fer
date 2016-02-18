@@ -15,13 +15,17 @@ API::useAPI(function(API $api){
     if(!$produit)
     {
         $layout->writeHeader("Produit");
-        ?> Ce produit n'éxiste pas.<?php
+        ?> 
+            <p class="whitePanel center">
+                Ce produit n'éxiste pas.
+            </p>
+        <?php
     }
     else
     {
         $layout->writeHeader($produit->categorie." / ".$produit->produit);
         ?>
-            <div class="produitInfoPanel">
+            <section class="produitInfoPanel">
                 <div class="whitePanel">
                     <img src="imgs/produit.jpg" />
                 </div>
@@ -51,27 +55,35 @@ API::useAPI(function(API $api){
                             </li>
                             <li>
                                 <span>commande : </span>
-                                <span><input type="number" data-inputtype="panier_qte_selector" data-idproduit="<?php $layout->safeWrite($produit->id_produit);?>" value="<?php $layout->safeWrite($produit->quantite_commande);?>" data-max="<?php $layout->safeWrite($produit->quantite_max);?>"/></span>
+                                <span>
+                                    <input 
+                                        type="number" 
+                                        data-djalf="ProduitCommande-quantite_commande" 
+                                            data-id_element_commande="<?php $layout->safeWrite($produit->id_element_commande);?>" 
+                                            data-id_commande="<?php $layout->safeWrite($produit->id_commande);?>" 
+                                            data-id_produit="<?php $layout->safeWrite($produit->id_produit);?>" 
+                                        value="<?php $layout->safeWrite($produit->quantite_commande);?>"/>
+                                </span>
                             </li>
                         <?php }?>
                     </ul>
                 </div>
-            </div>
+            </section>
             <?php
                 if($api->estAdmin()) 
                 { 
                     ?>
-                        <article class="whitePanel contentPanel" data-inputtype="Produit-Description-Editor" contenteditable="true" data-idproduit="<?php $layout->safeWrite($produit->id_produit);?>">
+                        <section class="whitePanel contentPanel" data-djalf="Produit-description" contenteditable="true" data-id_produit="<?php $layout->safeWrite($produit->id_produit);?>">
                             <?php echo $produit->description;?>
-                        </article>
+                        </section>
                     <?php
                 } 
                 elseif(!empty($produit->description))
                 {
                     ?>
-                        <article class="whitePanel contentPanel">
+                        <section class="whitePanel contentPanel" data-djalf="Produit-description">
                             <?php echo $produit->description;?>
-                        </article>
+                        </section>
                     <?php 
                 }
             ?>

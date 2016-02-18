@@ -8,17 +8,12 @@ class LAYOUT{
      */
     private $api;
     
+    
+    
     public function __construct(API $api)
     {
         $this->api = $api;
     }
-    
-    public function WriteDescriptionProduit(Produit $produit, $modifiable = false)
-    {
-    }
-    
-    
-    
     
     public function safeWrite($text)
     {

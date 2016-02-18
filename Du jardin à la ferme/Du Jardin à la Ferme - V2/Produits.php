@@ -16,9 +16,9 @@ API::useAPI(function(API $api){
         if(count($produits)==0)
         {
             ?>
-                <div class="whitePanel"> 
-                    <p>Il n'y as aucun produit pour le moment.</p>
-                </div>
+                <p class="whitePanel"> 
+                    Il n'y as aucun produit pour le moment.
+                </p>
             <?php
         }
         else
@@ -74,8 +74,8 @@ API::useAPI(function(API $api){
         if(count($produits)==0)
         {
             ?>
-                <div class="whitePanel">
-                    <p>Il n'y as aucun produit correspondant à votre recherche.</p>
+                <div class="whitePanel center">
+                    Il n'y as aucun produit correspondant à votre recherche.
                 </div>
             <?php
         }
@@ -144,7 +144,15 @@ API::useAPI(function(API $api){
                                 </li>
                                 <li>
                                     <span>commande : </span>
-                                    <span><input type="number" data-inputtype="panier_qte_selector" data-idproduit="<?php $layout->safeWrite($produit->id_produit);?>" value="<?php $layout->safeWrite($produit->quantite_commande);?>" data-max="<?php $layout->safeWrite($produit->stocks_previsionnel);?>"/></span>
+                                    <span>
+                                        <input 
+                                            type="number" 
+                                            data-djalf="ProduitCommande-quantite_commande" 
+                                            data-id_element_commande="<?php $layout->safeWrite($produit->id_element_commande);?>" 
+                                            data-id_commande="<?php $layout->safeWrite($produit->id_commande);?>" 
+                                            data-id_produit="<?php $layout->safeWrite($produit->id_produit);?>" 
+                                            value="<?php $layout->safeWrite($produit->quantite_commande);?>"/>
+                                    </span>
                                 </li>
                             </ul>
                         </td>

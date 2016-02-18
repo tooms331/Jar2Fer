@@ -78,40 +78,31 @@ class Produit
     }
 }
 
-class ProduitAvecPanier extends Produit{
-    /**
-     * @var double
-     */
-    public $quantite_commande;
-    
-    public function __construct(){
-        parent::__construct();
-        $this->quantite_commande=(double)$this->quantite_commande;
-    }
-}
-
-class Stock
+class ProduitCommande extends Produit
 {
     /**
      * @var int
      */
-    public $id_produit;
+    public $id_element_commande;
     /**
-     * @var string
+     * @var int
      */
-    public $nom;
-    /**
-     * @var string
-     */
-    public $description;
+    public $id_commande;
     /**
      * @var double
      */
-    public $stock;
+    public $quantite_commande;
+    /**
+     * @var double
+     */
+    public $quantite_reel;
     
     public function __construct(){
-        $this->id_produit=(int)$this->id_produit;
-        $this->stock=(double)$this->stock;
+        parent::__construct();
+        $this->quantite_commande=(double)$this->quantite_commande;
+        $this->id_element_commande=(int)$this->id_element_commande;
+        $this->id_commande=(int)$this->id_commande;
+        $this->quantite_reel= isset($this->quantite_reel)?(double)$this->quantite_reel:null;
     }
 }
 
@@ -148,74 +139,6 @@ class Commande
         $this->id_commande=(int)$this->id_commande;
         
         $this->id_compte=isset($this->id_compte)?(int)$this->id_compte:null;
-    }
-}
-
-class ElementCommande
-{
-    /**
-     * @var int
-     */
-    public $id_produit;
-    /**
-     * @var int
-     */
-    public $id_categorie;
-    /** 
-     * @var string
-     */
-    public $produit;
-    /** 
-     * @var string
-     */
-    public $categorie;
-    /**
-     * @var string
-     */
-    public $description;
-    /**
-     * @var double
-     */
-    public $tarif;
-    /**
-     * @var string
-     */
-    public $unite;
-    /**
-     * @var double
-     */
-    public $stocks_previsionnel;
-    /**
-     * @var double
-     */
-    public $stocks_courant;
-    /**
-     * @var int
-     */
-    public $id_element_commande;
-    /**
-     * @var int
-     */
-    public $id_commande;
-    /**
-     * @var double
-     */
-    public $quantite_commande;
-    /**
-     * @var double
-     */
-    public $quantite_reel;
-    
-    public function __construct(){
-        $this->id_produit=(int)$this->id_produit;
-        $this->id_categorie=(int)$this->id_categorie;
-        $this->tarif=(double)$this->tarif;
-        $this->stocks_previsionnel= (double)$this->stocks_previsionnel;
-        $this->stocks_courant= (double)$this->stocks_courant;
-        $this->id_element_commande=(int)$this->id_element_commande;
-        $this->id_commande=(int)$this->id_commande;
-        $this->quantite_commande=(double)$this->quantite_commande;
-        $this->quantite_reel= isset($this->quantite_reel)?(double)$this->quantite_reel:null;
     }
 }
 

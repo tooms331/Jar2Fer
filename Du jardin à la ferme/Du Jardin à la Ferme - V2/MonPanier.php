@@ -8,27 +8,27 @@ API::useAPI(function(API $api){
     
     $layout->writeHeader("Mon Panier");
     
-    $elements = $api->API_panier_lister_elements();
+    $panier = $api->API_panier_recuperer();
+    
+    $elements = $api->API_commande_lister_elements($panier->id_commande);
     
     if(count($elements)==0)
     {
         ?>
-            <div class="whitePanel">
-                <p>
+            <p class="whitePanel center">
                     Votre panier est actuelement vide. 
                     Consulté la <a href="Produits.php">Nos produits</a> pour faire vos emplettes!
-                </p>
-            </div>
+            </p>
         <?php
     }
     else
     {
         ?>
-            <div class="whitePanel">
+            <section class="whitePanel center">
                 <p>Votre paniers doit être validè jeudi au plus tards pour être livrer cette semaine.</p>
                 <p>Les paniers non validez ne sont pas pris en compte, c'est pour vous comme pour nous l'assurance d'évité un malentendus.</p>
                 <p>Les livraisons sont effectué le vendredi et le samedi selon nos capacitées.</p>
-            </div>
+            </section>
         <?php
         $categorie="";
         $FirstProduit=true;
@@ -80,11 +80,19 @@ API::useAPI(function(API $api){
                             </li>
                             <li>
                                 <span>stock : </span>
-                                <span><?php $layout->safeWrite($element->stocks_previsionnel);?></span>
+                                <span data-djalf="Produit_stocks_previsionnel" ><?php $layout->safeWrite($element->stocks_previsionnel);?></span>
                             </li>
                             <li>
                                 <span>commande : </span>
-                                <span><input type="number" data-inputtype="panier_qte_selector" data-idproduit="<?php $layout->safeWrite($element->id_produit);?>" value="<?php $layout->safeWrite($element->quantite_commande);?>" data-max="<?php $layout->safeWrite($element->quantite_max);?>"/></span>
+                                <span>
+                                    <input 
+                                        type="number" 
+                                        data-djalf="ProduitCommande-quantite_commande" 
+                                        data-id_element_commande="<?php $layout->safeWrite($element->id_element_commande);?>" 
+                                        data-id_commande="<?php $layout->safeWrite($element->id_commande);?>" 
+                                        data-id_produit="<?php $layout->safeWrite($element->id_produit);?>" 
+                                        value="<?php $layout->safeWrite($element->quantite_commande);?>"/>
+                                </span>
                             </li>
                         </ul>
                     </td>
