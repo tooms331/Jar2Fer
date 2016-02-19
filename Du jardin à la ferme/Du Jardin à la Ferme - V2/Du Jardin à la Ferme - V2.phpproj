@@ -27,6 +27,7 @@
   <ItemGroup>
     <Compile Include="ckeditor\samples\old\assets\posteddata.php" />
     <Compile Include="ckeditor\samples\old\sample_posteddata.php" />
+    <Compile Include="MonCompte.php" />
     <Compile Include="Deconnection.php" />
     <Compile Include="endpoint.php" />
     <Compile Include="Connection.php" />

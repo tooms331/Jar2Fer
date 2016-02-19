@@ -280,7 +280,6 @@ h5 {
 .produitDescriptionPanel {
 }
 
-[data-inputtype="panier_qte_selector"] {
+/*input[data-djalf="ProduitCommande-quantite_commande"] {
     width: 4em;
-    text-align: right;
-}
+}*/

@@ -3,26 +3,160 @@ require_once 'config.php';
 require_once 'api.php';
 
 class LAYOUT{
+    
     /**
      * @var API
      */
     private $api;
-    
-    
     
     public function __construct(API $api)
     {
         $this->api = $api;
     }
     
+    
+    
+    /**
+     * Summary of writeProduit_nom
+     * @param _Produit $produit 
+     * @param bool $modifiable 
+     */
+    public function writeProduit_nom($produit, $modifiable=true)
+    {
+        $modifiable=(bool)$modifiable;
+        if($modifiable && $this->api->estAdmin($produit->id_commande))
+        {
+            echo '<span><input';
+            echo ' type="text"';
+            echo ' data-djalf="Produit-produit"';
+            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';
+            echo ' value="';$this->safeWrite($produit->produit);echo '"';
+            echo '/></span>';
+        }
+        else
+        {
+            echo '<span';
+            echo ' data-djalf="Produit-produit"';
+            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
+            $this->safeWrite($produit->produit);
+            echo '</span>';
+        }
+    }
+    /**
+     * Summary of writeProduit_tarif
+     * @param _Produit $produit 
+     * @param bool $modifiable 
+     */
+    public function writeProduit_tarif($produit, $modifiable=true)
+    {
+        $modifiable=(bool)$modifiable;
+        if($modifiable && $this->api->estAdmin($produit->id_commande))
+        {
+            echo '<span><input';
+            echo ' type="number"';
+            echo ' step="0.1"';
+            echo ' min="0"';
+            echo ' data-djalf="Produit-tarif"';
+            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';
+            echo ' value="';$this->writeDecimal($produit->tarif,2,'.');echo '"';
+            echo ' /> €</span>';
+
+        }
+        else
+        {
+            echo '<span';
+            echo ' data-djalf="Produit-tarif"';
+            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
+            $this->writeDecimal($produit->tarif,2,',');
+            echo ' </span> €';
+        }
+    }
+    /**
+     * Summary of writeProduit_description
+     * @param _Produit $produit 
+     * @param bool $modifiable 
+     */
+    public function writeProduit_description( $produit, $modifiable=true)
+    {
+        $modifiable=(bool)$modifiable;
+        echo '<div class="contentPanel"';
+        echo ' data-djalf="Produit-description"';
+        if($modifiable && $this->api->estAdmin()){
+            echo ' contenteditable="true"'; 
+        }
+        echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
+        echo $produit->description;
+        echo '</div>';
+    }
+    
+    
+    
+    
+    /**
+     * Summary of writeProduitCommande_quantite_commande
+     * @param _ElementCommande|_Produit $produit 
+     * @param bool $modifiable 
+     */
+    public function writeProduitCommande_quantite_commande($produit, $modifiable=true)
+    {
+        $modifiable=(bool)$modifiable;
+        switch($produit->unite)
+        {
+            case Produit::UNITE_KILOGRAMME:
+                $decimals=3;
+                $step=0.1;
+                break;
+            default:
+                $decimals=0;
+                $step=1;
+                break;
+        }
+        if($modifiable && $this->api->peutModifierCommande($produit->id_commande))
+        {
+            echo '<span><input';
+            echo ' type="number"';
+            echo ' data-djalf="ProduitCommande-quantite_commande"';
+            echo ' min="0"';
+            echo ' step="';$this->safeWrite($step);echo '"';
+            echo ' max="';$this->safeWrite($produit->stocks_previsionnel);echo '"';
+            echo ' data-decimals="';$this->safeWrite($decimals);echo '"';
+            echo ' data-id_element_commande="';$this->safeWrite($produit->id_element_commande);echo '"';
+            echo ' data-id_commande="';$this->safeWrite($produit->id_commande);echo '"';
+            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';
+            echo ' value="';$this->writeDecimal($produit->quantite_commande,$decimals,'.');echo '"';
+            echo '/></span>';
+
+        }
+        else
+        {
+            echo '<span';
+            echo ' data-djalf="ProduitCommande-quantite_commande"';
+            echo ' data-id_element_commande="';$this->safeWrite($produit->id_element_commande);echo '"';
+            echo ' data-id_commande="';$this->safeWrite($produit->id_commande);echo '"';
+            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
+            $this->writeDecimal($produit->quantite_commande,$decimals,',');
+            echo '</span>';
+        }
+    }
+    
+    
+    
+    
+    
     public function safeWrite($text)
     {
         echo htmlspecialchars($text);
     }
     
-    public function writePrix($prix)
+    public function writeDecimal($prix,$decimal =2,$decimalsep=".")
     {
-        $this->safeWrite(number_format ( $prix, 2, "," , " " )." €");
+        $this->safeWrite(number_format ( $prix, $decimal, $decimalsep , ""));
+    }
+    
+    public function writePrix($prix,$decimalsep=".")
+    {
+        $this->writeDecimal($prix,2,$decimalsep);
+        $this->safeWrite(" €");
     }
     
     public function writeHeader($title)
@@ -63,6 +197,7 @@ class LAYOUT{
                             <?php if(!$this->api->estAuthentifier()) { ?>
                                 <li><a href="Connection.php">Connection</a></li>
                             <?php } else{ ?>
+                                <li><a href="MonCompte.php">Mon Compte</a></li>
                                 <li><a href="Deconnection.php">Déconnection</a></li>
                             <?php } ?>
                         </ul>
@@ -72,58 +207,6 @@ class LAYOUT{
         <?php 
     }
     
-    
-    public function CheckAuthentified(callable $callback)
-    {
-        if($this->api->estAuthentifier())
-        {
-            $callback($this->api, $this);
-            return;
-        }
-        
-        $email = (string)$_REQUEST['email'];
-        $motdepasse = (string)$_REQUEST['motdepasse'];
-        $erreur="";
-        
-        if(!empty($email) && !empty($motdepasse))
-        {
-            try
-            {
-                $this->api->API_compte_authentifier($email, $motdepasse);
-                $callback($this->api, $this);
-                return;
-            }
-            catch(Exception $ex)
-            {
-                $erreur= $ex->getMessage();
-            }
-        }
-        
-        $this->writeHeader("Connection");
-        
-        if($erreur) {
-            ?>
-                <p><?php $this->safeWrite($erreur); ?></p>
-            <?php 
-        } 
-        ?>
-            <form class="whitePanel center" action="<?php $this->safeWrite($_SERVER["PHP_SELF"]); ?>" accept-charset="utf-8" enctype="multipart/form-data">
-                <ul class="infosdetail">
-                    <li>
-                        <label for="email">Email :</label>
-                        <input id="email" name="email" type="email" />
-                    </li>
-                    <li>
-                        <label for="motdepasse">Mot de passe :</label>
-                        <input id="motdepasse" name="motdepasse" type="password" />
-                    </li>
-                </ul>
-                <br /><br />
-                <input type="submit" value="Se connecter" />
-            </form>
-        <?php    
-        $this->writeFooter();
-    }
     
     public function writeFooter()
     {

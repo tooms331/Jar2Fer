@@ -39,7 +39,7 @@ $UT_CreerCompte = new UnitTest('Création d\'un compte',[$UT_CLEARBDD],function 
         throw new ErrorException ("L'id du compte est incorrect");
     if($compte->email!=='rom.laurent@hotmail.fr')
         throw new ErrorException ("L'email du compte est incorrect");
-    if($compte->etat!=='Nouveau')
+    if($compte->statut!==Compte::STATUT_Nouveau)
         throw new ErrorException ("Le compte doit être activé");
     return $compte;
 });
@@ -84,34 +84,6 @@ $UT_ValidAuth = new UnitTest('Authentification d\'un compte (succes)',[$UT_CLEAR
 $UT_ValidAuth->RunCheck();
 
 
-$UT_DésactiveCompte = new UnitTest('Modification de l\'état d\'un compte : Désactivé',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd,$compte){
-    $compte = $bdd->Compte_Modifier_Etat($compte->id_compte,'Désactivé');
-    if($compte->etat!=='Désactivé')
-        throw new ErrorException ("Le compte doit être Désactivé");
-    return $compte;
-});
-$UT_DésactiveCompte->RunCheck();
-
-$UT_AdminCompte = new UnitTest('Modification de l\'état d\'un compte : Admin',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd,$compte){
-    $compte = $bdd->Compte_Modifier_Etat($compte->id_compte,'Admin');
-    if($compte->etat!=='Admin')
-        throw new ErrorException ("Le compte doit être Admin");
-    return $compte;
-});
-$UT_AdminCompte->RunCheck();
-
-$UT_InvildEtatCompte = new UnitTest('Modification de l\'état d\'un compte : Admin',[$UT_CLEARBDD,$UT_CreerCompte],function ($bdd,$compte){
-    
-    try{
-        $compte = $bdd->Compte_Modifier_Etat($compte->id_compte,'BAD');
-        throw new ErrorException ("La modification ne doit pas réussir");
-    }
-    catch(Exception $ex)
-    {
-        return $compte;
-    }
-});
-$UT_InvildEtatCompte->RunCheck();
 
 $UT_CreerProduitTomates = new UnitTest('Création d\'un produit : Tomates cerise',[$UT_CLEARBDD],function ($bdd,$compte){
     $produit = $bdd->Produits_Creer("Tomate cerise","Des toute pitite tomat'");

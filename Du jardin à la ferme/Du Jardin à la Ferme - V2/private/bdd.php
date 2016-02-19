@@ -316,11 +316,7 @@ class BDD
         return $this->InTransaction(function()use($id_compte){
             $compte = $this->getSingleObject(
                 'Compte',
-                'SELECT 
-                    id_compte, 
-                    email, 
-                    date_creation, 
-                    etat 
+                'SELECT * 
                 FROM comptes 
                 WHERE id_compte = :id_compte',
                 [
@@ -409,10 +405,9 @@ class BDD
             // on récupére le hash et l'id du compte
             $compte_infos = $this->getSingle(
                 'SELECT 
-                    id_compte, 
-                    hash 
+                    id_compte, hash 
                 FROM comptes 
-                WHERE etat != \'Désactivé\'
+                WHERE statut != \'Désactivé\'
                 AND email = :email',
                 [
                     ':email'=>$email
@@ -503,19 +498,19 @@ class BDD
      * @throws ErrorException 
      * @return Compte
      */
-    public function Compte_Modifier_Etat($id_compte, $etat)
+    public function Compte_Modifier_Statut($id_compte, $statut)
     {
         $id_compte=(int)$id_compte;
-        $etat=(string)$etat;
+        $statut=(string)$statut;
         
-        return $this->InTransaction(function()use($id_compte, $etat){
+        return $this->InTransaction(function()use($id_compte, $statut){
             $this->exec(
                 'UPDATE Comptes 
-                SET etat = :etat 
+                SET statut = :statut 
                 WHERE id_compte = :id_compte',
                 [
                     ':id_compte'=>$id_compte,
-                    ':etat'=>$etat
+                    ':statut'=>$statut
                 ]
             );
         
@@ -592,7 +587,7 @@ class BDD
 	                view_produits.*,
                     elements_commande.id_element_commande,
                     :id_commande as id_commande,
-                    elements_commande.quantite_commande,
+                    COALESCE(elements_commande.quantite_commande,0) AS quantite_commande,
                     elements_commande.quantite_reel
                 FROM view_produits
                 LEFT OUTER JOIN elements_commande
@@ -649,7 +644,7 @@ class BDD
 	                view_produits.*,
                     elements_commande.id_element_commande,
                     :id_commande as id_commande,
-                    elements_commande.quantite_commande,
+                    COALESCE(elements_commande.quantite_commande,0) AS quantite_commande,
                     elements_commande.quantite_reel
                 FROM view_produits
                 LEFT OUTER JOIN elements_commande
@@ -680,18 +675,18 @@ class BDD
      * @throws ErrorException 
      * @return Produit
      */
-    public function Produits_Creer($id_categorie,$produit, $description, $tarif, $unite)
+    public function Produits_Creer($id_categorie,$nom, $description, $tarif, $unite)
     {
         $id_categorie=(int)$id_categorie;
-        $produit=(string)$produit;
+        $nom=(string)$nom;
         $tarif=(double)$tarif;
         $description=(string)$description;
         
         
-        $produit = mb_strimwidth($produit,0,100);
+        $nom = mb_strimwidth($nom,0,100);
         $description = $this->purifier->purify($description);
         
-        return $this->InTransaction(function()use($id_categorie, $produit, $description,$tarif, $unite){
+        return $this->InTransaction(function()use($id_categorie, $nom, $description,$tarif, $unite){
         
             // on vérifie si l'identifiant éxiste déjà
             $count = $this->getScalar(
@@ -700,7 +695,7 @@ class BDD
                 WHERE produit = :produit
                 AND id_categorie = :id_categorie',
                 [
-                    ':produit'=>$produit,
+                    ':produit'=>$nom,
                     ':id_categorie'=>$id_categorie
                 ]
             );
@@ -727,7 +722,7 @@ class BDD
                     :unite
                 )',
                 [
-                    ':produit'=>$produit,
+                    ':produit'=>$nom,
                     ':id_categorie'=>$id_categorie,
                     ':description'=>$description,
                     ':tarif'=>$tarif,
@@ -771,6 +766,64 @@ class BDD
     }
     
     /**
+     * Modifie le nom d'un produit
+     * @param int $id_produit 
+     * @param string $description 
+     * @return Produit
+     */
+    public function Produits_Modifier_Nom($id_produit, $nom)
+    {
+        $id_produit=(int)$id_produit;
+        $nom=(string)$nom;
+        
+        $nom = mb_strimwidth($nom,0,100);
+        
+        return $this->InTransaction(function()use($id_produit, $nom){
+        
+            //On créer le produit
+            $this->exec(
+                'UPDATE produits 
+                SET produit = :produit
+                WHERE id_produit = :id_produit',
+                [
+                    ':id_produit'=>$id_produit,
+                    ':produit'=>$nom
+                ]
+            );
+        
+            return $this->Produits_Recuperer($id_produit);
+        });
+    }
+    
+    /**
+     * Modifie le tarif d'un produit
+     * @param int $id_produit 
+     * @param string $description 
+     * @return Produit
+     */
+    public function Produits_Modifier_Tarif($id_produit, $tarif)
+    {
+        $id_produit=(int)$id_produit;
+        $tarif=(double)$tarif;
+        
+        return $this->InTransaction(function()use($id_produit, $tarif){
+        
+            //On créer le produit
+            $this->exec(
+                'UPDATE produits 
+                SET tarif = :tarif
+                WHERE id_produit = :id_produit',
+                [
+                    ':id_produit'=>$id_produit,
+                    ':tarif'=>$tarif
+                ]
+            );
+        
+            return $this->Produits_Recuperer($id_produit);
+        });
+    }
+    
+    /**
      * Récupère une commande spécifique
      * @param int $id_commande 
      * ID de la commande à récupérer
@@ -786,12 +839,11 @@ class BDD
             $commande = $this->getSingleObject(
                 'Commande',
                 'SELECT 
-                    id_commande, 
-                    id_compte, 
-                    date_creation, 
-                    remarque, 
-                    etat 
+                    commandes.*,
+                    comptes.*
                 FROM commandes 
+                INNER JOIN comptes
+                    ON comptes.id_compte = commandes.id_compte
                 WHERE id_commande = :id_commande',
                 [
                     ':id_commande'=>$id_commande

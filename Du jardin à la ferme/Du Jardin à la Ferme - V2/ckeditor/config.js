@@ -19,6 +19,7 @@ CKEDITOR.editorConfig = function( config ) {
     config.language = 'fr';
     config.stylesSet = 'Main';
 
+    //config.stylesSet = [];
     //config.extraPlugins = 'stylesheetparser';
-    //config.contentsCss = '../content.css';
+    //config.contentsCss = 'content.css';
 };

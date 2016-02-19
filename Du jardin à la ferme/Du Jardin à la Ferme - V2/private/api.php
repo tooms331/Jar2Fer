@@ -98,7 +98,7 @@ class API
     public function estAdmin()
     {
         $Compte=$this->compteConnecte();
-        return $Compte!==null && $Compte->etat==Compte::ETAT_Admin;
+        return $Compte!==null && $Compte->statut==Compte::STATUT_Admin;
     }
     
     /**
@@ -108,7 +108,7 @@ class API
     public function estNouveau()
     {
         $Compte=$this->compteConnecte();
-        return $Compte!==null && $Compte->etat==Compte::ETAT_Nouveau;
+        return $Compte!==null && $Compte->statut==Compte::STATUT_Nouveau;
     }
     
     /**
@@ -118,7 +118,7 @@ class API
     public function estPanier()
     {
         $Compte=$this->compteConnecte();
-        return $Compte!==null && $Compte->etat==Compte::ETAT_Panier;
+        return $Compte!==null && $Compte->statut==Compte::STATUT_Panier;
     }
     
     /**
@@ -128,7 +128,7 @@ class API
     public function estDésactivé()
     {
         $Compte=$this->compteConnecte();
-        return $Compte!==null && $Compte->etat==Compte::ETAT_Désactivé;
+        return $Compte!==null && $Compte->statut==Compte::STATUT_Desactive;
     }
     
     /**
@@ -138,7 +138,7 @@ class API
     public function estLibreService()
     {
         $Compte=$this->compteConnecte();
-        return $Compte!==null && $Compte->etat==Compte::ETAT_LibreService;
+        return $Compte!==null && $Compte->statut==Compte::STATUT_LibreService;
     }
     
     /**
@@ -148,7 +148,7 @@ class API
     public function estPremium()
     {
         $Compte=$this->compteConnecte();
-        return $Compte!==null && $Compte->etat==Compte::ETAT_Premium;
+        return $Compte!==null && $Compte->statut==Compte::STATUT_Premium;
     }
     
     /**
@@ -159,20 +159,19 @@ class API
     {
         $Compte=$this->compteConnecte();
         if(!$Compte) return false;
-        switch($Compte->etat)
+        switch($Compte->statut)
         {
-            case Compte::ETAT_Admin:
+            case Compte::STATUT_Admin:
                 return true;
-            case Compte::ETAT_LibreService:
+            case Compte::STATUT_LibreService:
                 $jour = date('N');
                 return ($jour>2) && ($jour< 6);
-            case Compte::ETAT_Premium:
+            case Compte::STATUT_Premium:
                 $jour = date('N');
                 return ($jour>0) && ($jour< 6);
-            case Compte::ETAT_Désactivé:
-            case Compte::ETAT_Nouveau:
-            case Compte::ETAT_Panier:
-            case Compte::ETAT_Compte:
+            case Compte::STATUT_Desactive:
+            case Compte::STATUT_Nouveau:
+            case Compte::STATUT_Panier:
             default:
                 return false;
         }
@@ -316,6 +315,19 @@ class API
             throw new ErrorException("Cet opération n'est possible qu'aux administrateurs!");
         return $this->bdd->Produits_Modifier_Description($id_produit,$description);
     }
+    public function API_produit_modifier_nom($id_produit, $nom)
+    {   
+        if(!$this->estAdmin())
+            throw new ErrorException("Cet opération n'est possible qu'aux administrateurs!");
+        return $this->bdd->Produits_Modifier_Nom($id_produit,$nom);
+    }
+    public function API_produit_modifier_tarif($id_produit, $tarif)
+    {   
+        if(!$this->estAdmin())
+            throw new ErrorException("Cet opération n'est possible qu'aux administrateurs!");
+        return $this->bdd->Produits_Modifier_tarif($id_produit,$tarif);
+    }
+    
     
     
     

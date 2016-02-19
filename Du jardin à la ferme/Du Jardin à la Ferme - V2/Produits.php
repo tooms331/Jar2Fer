@@ -145,13 +145,7 @@ API::useAPI(function(API $api){
                                 <li>
                                     <span>commande : </span>
                                     <span>
-                                        <input 
-                                            type="number" 
-                                            data-djalf="ProduitCommande-quantite_commande" 
-                                            data-id_element_commande="<?php $layout->safeWrite($produit->id_element_commande);?>" 
-                                            data-id_commande="<?php $layout->safeWrite($produit->id_commande);?>" 
-                                            data-id_produit="<?php $layout->safeWrite($produit->id_produit);?>" 
-                                            value="<?php $layout->safeWrite($produit->quantite_commande);?>"/>
+                                        <?php $layout->writeProduitCommande_quantite_commande($produit);?>
                                     </span>
                                 </li>
                             </ul>
