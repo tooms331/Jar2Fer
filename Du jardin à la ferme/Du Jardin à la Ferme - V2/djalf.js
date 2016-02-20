@@ -11,7 +11,7 @@ $(function () {
     
     function bindINPUT(type,mapper,operator,validator)
     {
-        $('input[data-djalf="' + type + '"]').each(function (index, elm) {
+        $(':not(:not(input) and :not(select))[data-djalf="' + type + '"]').each(function (index, elm) {
             elm = $(elm); 
 
             var applyChanges = $.debounce(1000, false, function () {
@@ -60,22 +60,23 @@ $(function () {
             elm = $(elm);
 
             if (elm.is("textarea")) {
-                if (!elm.data("isupdating"))
-                    if (elm.val() != value)
-                        elm.val(value);
+                if (elm.val() != value)
+                    elm.val(value);
             }
             else if (elm.is("input")) {
-                if (!elm.data("isupdating"))
-                    if (elm.val() != value)
-                        elm.val(value);
+                if (elm.val() != value)
+                    elm.val(value);
+            }
+            else if (elm.is("select")) {
+                if (elm.val() != value)
+                    elm.val(value);
             }
             else if (elm.is(".contentPanel"))
             {
                 if (elm.is('[contenteditable="true"]'))
                 {
-                    if (!elm.data("isupdating"))
-                        if (elm.ckeditor().editor.getData() != value)
-                            elm.ckeditor().editor.setData(value);
+                    if (elm.ckeditor().editor.getData() != value)
+                        elm.ckeditor().editor.setData(value);
                 }   
                 else
                 {
@@ -114,7 +115,11 @@ $(function () {
     bindINPUT('Produit-produit', UPD_Produit, function (elm) {
         return apiClient.produit_modifier_nom(elm.data("id_produit"), elm.val())
     });
-    
+
+    bindINPUT('Produit-unite', UPD_Produit, function (elm) {
+        return apiClient.produit_modifier_unite(elm.data("id_produit"), elm.val())
+    });
+
     bindINPUT(
         'Produit-tarif',
         UPD_Produit,

@@ -44,7 +44,7 @@ API::useAPI(function(API $api){
                         <?php if($api->peutCommander()) {?> 
                             <li>
                                 <span>unitée : </span>
-                                <span><?php $layout->safeWrite($produit->unite);?></span>
+                                <span><?php $layout->writeProduit_unite($produit);?></span>
                             </li>
                             <li>
                                 <span>tarif : </span>

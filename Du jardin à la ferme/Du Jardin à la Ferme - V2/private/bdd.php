@@ -18,7 +18,7 @@ class BDD
 {
     /**
      * lien vers la base de donnée
-     * @var \PDO
+     * @var PDO
      */
     private $pdolink;
     
@@ -30,8 +30,8 @@ class BDD
     public function __construct()
     {
         $this->purifier = new HTMLPurifier(HTMLPurifier_Config::createDefault());
-        
-        $this->pdolink = new \PDO(
+
+        $this->pdolink = new PDO(
 			"mysql:host=".BDD_SERVER.";dbname=".BDD_SCHEMA.";charset=utf8",
 			BDD_USER ,  
 			BDD_PASSWORD,
@@ -306,12 +306,18 @@ class BDD
     /**
      * Récupere un compte spécifique
      * @param int $id_compte 
+     * ID du compte à récupéré
      * @throws ErrorException 
      * @return Compte
      */
     public function Compte_Recuperer($id_compte)
     {
         $id_compte=(int)$id_compte;
+        // ioyguioy
+        /*
+         *
+         * 
+         * */
         
         return $this->InTransaction(function()use($id_compte){
             $compte = $this->getSingleObject(
@@ -788,6 +794,36 @@ class BDD
                 [
                     ':id_produit'=>$id_produit,
                     ':produit'=>$nom
+                ]
+            );
+        
+            return $this->Produits_Recuperer($id_produit);
+        });
+    }
+    
+    /**
+     * Modifie le nom d'un produit
+     * @param int $id_produit 
+     * @param string $unite 
+     * @return Produit
+     */
+    public function Produits_Modifier_Unite($id_produit, $unite)
+    {
+        $id_produit=(int)$id_produit;
+        $unite=(string)$unite;
+        
+        $unite = mb_strimwidth($unite,0,100);
+        
+        return $this->InTransaction(function()use($id_produit, $unite){
+        
+            //On créer le produit
+            $this->exec(
+                'UPDATE produits 
+                SET unite = :unite
+                WHERE id_produit = :id_produit',
+                [
+                    ':id_produit'=>$id_produit,
+                    ':unite'=>$unite
                 ]
             );
         

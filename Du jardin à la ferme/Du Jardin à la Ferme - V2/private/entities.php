@@ -56,37 +56,13 @@ trait _Categorie{
 
 trait _Produit
 {   
-    /**
-     * @var int
-     */
     public $id_produit;
-    /**
-     * @var int
-     */
     public $id_categorie;
-    /** 
-     * @var string
-     */
     public $produit;
-    /**
-     * @var string
-     */
     public $description;
-    /**
-     * @var double
-     */
     public $tarif;
-    /**
-     * @var string
-     */
     public $unite;
-    /**
-     * @var double
-     */
     public $stocks_previsionnel;
-    /**
-     * @var double
-     */
     public $stocks_courant;
 
     public function _ProduitInit(){

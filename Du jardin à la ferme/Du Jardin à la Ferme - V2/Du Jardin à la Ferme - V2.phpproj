@@ -53,6 +53,7 @@
     <Compile Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.php" />
     <Compile Include="libs\standalone\HTMLPurifier\Printer\CSSDefinition.php" />
     <Compile Include="libs\standalone\HTMLPurifier\Printer\HTMLDefinition.php" />
+    <Compile Include="private\mustache.php" />
     <Compile Include="Produit.php" />
     <Compile Include="Produits.php" />
     <Compile Include="MonPanier.php" />
@@ -179,7 +180,9 @@
     <Folder Include="libs\standalone\HTMLPurifier\Language\messages\" />
     <Folder Include="libs\standalone\HTMLPurifier\Lexer\" />
     <Folder Include="libs\standalone\HTMLPurifier\Printer\" />
+    <Folder Include="tmplt\" />
     <Folder Include="private\" />
+    <Folder Include="tmplt\partials\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ckeditor\adapters\jquery.js" />
@@ -706,6 +709,9 @@
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.css" />
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.js" />
     <Content Include="testClient.html" />
+    <Content Include="tmplt\accueil.mustache" />
+    <Content Include="tmplt\footer.mustache" />
+    <Content Include="tmplt\header.mustache" />
     <Content Include="web.config" />
   </ItemGroup>
 </Project>

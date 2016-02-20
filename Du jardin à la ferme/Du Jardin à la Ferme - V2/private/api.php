@@ -1,6 +1,7 @@
 <?php 
 require_once './private/config.php';
 require_once './private/bdd.php';
+require_once('./private/mustache.php');
 
 class API
 { 
@@ -44,13 +45,10 @@ class API
      * @var BDD
      */
     private $bdd;
-    
     private function __construct()
     {
         $this->bdd = new BDD();
     }
-    
-    
     
     
     /**
@@ -320,6 +318,12 @@ class API
         if(!$this->estAdmin())
             throw new ErrorException("Cet opération n'est possible qu'aux administrateurs!");
         return $this->bdd->Produits_Modifier_Nom($id_produit,$nom);
+    }
+    public function API_produit_modifier_unite($id_produit, $unite)
+    {   
+        if(!$this->estAdmin())
+            throw new ErrorException("Cet opération n'est possible qu'aux administrateurs!");
+        return $this->bdd->Produits_Modifier_Unite($id_produit,$unite);
     }
     public function API_produit_modifier_tarif($id_produit, $tarif)
     {   
