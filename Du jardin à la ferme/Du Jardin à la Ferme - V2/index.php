@@ -7,11 +7,9 @@ API::useAPI(function(API $api){
     
     $layout=new LAYOUT($api);
     
-    echo $layout->render('header','Accueil');
+    echo $layout->renderHeader('Accueil');
     
-    echo $layout->render('accueil',[
-        'dernierBillet'=>'On as tout niquez!'
-    ]);
+    echo $layout->render('{{> accueil}}',true);
     
-    echo $layout->render('footer');
+    echo $layout->renderFooter();
 });

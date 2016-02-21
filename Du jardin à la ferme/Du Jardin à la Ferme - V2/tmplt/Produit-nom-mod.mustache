@@ -1,0 +1,7 @@
+{{# session.estAdministrateur}}
+<span><input type="text"
+             data-djalf="Produit-produit"
+             data-id_produit="{{id_produit}}"
+             value="{{produit}}"/></span>
+{{/ session.estAdministrateur}}
+{{^ session.estAdministrateur}}{{> Produit-nom}}{{/ session.estAdministrateur}}

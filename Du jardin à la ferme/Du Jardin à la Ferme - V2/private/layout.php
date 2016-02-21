@@ -18,15 +18,25 @@ class LAYOUT
         $this->api = $api;
         
         $this->m = new Mustache_Engine(array(
-            'loader'          => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt'),
-            'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt/partials'),
+            'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt')
         ));
     }
 
     public function render($template, $data)
     {   
-        return $this->m->render($template,
+        return $this->m->render('{{# datas}}'.$template.'{{/ datas}}',
             [
+                'helpers'=>[
+                    'inParents'=>function($template,Mustache_LambdaHelper $helper){
+                        $mContext=$helper->getContext();
+                        $lastContext = $mContext->last();
+                        $valueExists = $mContext->findValueInParents($lastContext);
+                        return $valueExists?$template:"";
+                    }
+                ],
+                'globals'=>[
+                    'unites' => array(Produit::UNITE_BOUQUET,Produit::UNITE_PIECE,Produit::UNITE_KILOGRAMME)
+                ],
                 'session'=>[
                     'compte'=>$this->api->compteConnecte(),
                     'estAuthentifier'=>$this->api->estAuthentifier(),
@@ -38,12 +48,12 @@ class LAYOUT
                     'estPremium'=>$this->api->estPremium(),
                     'peutCommander'=>$this->api->peutCommander(),
                     'peutModifierCommande'=>function($template,$helper){
-                        $id_commande = $helper->context.last()->id_commande;
+                        $id_commande = (int)$helper->getContext()->find('id_commande');
                         $res = $this->api->peutModifierCommande($id_commande);
                         return $res?$template:"";
                      },
                     'nePeutModifierCommande'=>function($template,$helper){
-                        $id_commande = $helper->context.last()->id_commande;
+                        $id_commande = (int)$helper->getContext()->find('id_commande');
                         $res = $this->api->peutModifierCommande($id_commande);
                         return $res?"":$template;
                      }
@@ -57,12 +67,72 @@ class LAYOUT
     
     public function renderHeader($pageTitle)
     {   
-        return $this->render('header', $pageTitle);
+        return $this->render('{{>header}}', $pageTitle);
     }
     
     public function renderFooter()
     {   
-        return $this->m->render('footer', true);
+        return $this->render('{{>footer}}', true);
+    }
+    
+    public function renderProduit_nom($produit,$modifiable=true)
+    {   
+        if($modifiable)
+        {
+            return $this->render('{{>Produit-nom-mod}}', $produit);
+        }
+        else
+        {
+            return $this->render('{{>Produit-nom}}', $produit);
+        }
+    }
+    
+    public function renderProduit_tarif($produit,$modifiable=true)
+    {   
+        if($modifiable)
+        {
+            return $this->render('{{>Produit-tarif-mod}}', $produit);
+        }
+        else
+        {
+            return $this->render('{{>Produit-tarif}}', $produit);
+        }
+    }
+    
+    public function renderProduit_unite($produit,$modifiable=true)
+    {   
+        if($modifiable)
+        {
+            return $this->render('{{>Produit-unite-mod}}', $produit);
+        }
+        else
+        {
+            return $this->render('{{>Produit-unite}}', $produit);
+        }
+    }
+    
+    public function renderProduit_description($produit,$modifiable=true)
+    {   
+        if($modifiable)
+        {
+            return $this->render('{{>Produit-description-mod}}', $produit);
+        }
+        else
+        {
+            return $this->render('{{>Produit-description}}', $produit);
+        }
+    }
+    
+    public function renderElementCommande_quantite_commande($elementCommande,$modifiable=true)
+    {   
+        if($modifiable)
+        {
+            return $this->render('{{>ElementCommande-quantite_commande-mod}}', $elementCommande);
+        }
+        else
+        {
+            return $this->render('{{>ElementCommande-quantite_commande}}', $elementCommande);
+        }
     }
     
     /**
@@ -168,8 +238,6 @@ class LAYOUT
     }
     
     
-    
-    
     /**
      * Summary of writeProduitCommande_quantite_commande
      * @param _ElementCommande|_Produit $produit 
@@ -177,27 +245,15 @@ class LAYOUT
      */
     public function writeProduitCommande_quantite_commande($produit, $modifiable=true)
     {
-        $modifiable=(bool)$modifiable;
-        switch($produit->unite)
-        {
-            case Produit::UNITE_KILOGRAMME:
-                $decimals=3;
-                $step=0.1;
-                break;
-            default:
-                $decimals=0;
-                $step=1;
-                break;
-        }
         if($modifiable && $this->api->peutModifierCommande($produit->id_commande))
         {
             echo '<span><input';
             echo ' type="number"';
             echo ' data-djalf="ProduitCommande-quantite_commande"';
             echo ' min="0"';
-            echo ' step="';$this->safeWrite($step);echo '"';
+            echo ' step="';$this->safeWrite($produit->unite_step);echo '"';
             echo ' max="';$this->safeWrite($produit->stocks_previsionnel);echo '"';
-            echo ' data-decimals="';$this->safeWrite($decimals);echo '"';
+            echo ' data-decimals="';$this->safeWrite($produit->unite_decimals);echo '"';
             echo ' data-id_element_commande="';$this->safeWrite($produit->id_element_commande);echo '"';
             echo ' data-id_commande="';$this->safeWrite($produit->id_commande);echo '"';
             echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';

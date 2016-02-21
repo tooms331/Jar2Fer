@@ -1,26 +1,15 @@
-﻿{{# datas}}
-    
-    {{# session.estAuthentifier}}
-        <p class="whitePanel contentPanel center">
-            Bienvenue {{session.compte.email}}
-        </p>
-    {{/ session.estAuthentifier}}
+{{# session.estAuthentifier}}
+    <p class="whitePanel contentPanel center">
+        Bienvenue {{session.compte.email}}
+    </p>
+{{/ session.estAuthentifier}}
 
-    {{# session.estAdministrateur}}
-        <h4>Tâche d'administration</h4>
-        <div class="whitePanel contentPanel">
-            <ul>
-                <li>consulter les demandes de changement de statut</li>
-                <li>consulter les commandes validées</li>
-            </ul>
-        </div>
-    {{/ session.estAdministrateur}}
-
-    {{# dernierBillet}}
-        <h4>Dernier billet :</h4>
-        <div class="whitePanel contentPanel">
-            {{.}}
-        </div>
-    {{/ dernierBillet}}
-
-{{/ datas}}
+{{# session.estAdministrateur}}
+    <h4>Tâche d'administration</h4>
+    <div class="whitePanel contentPanel">
+        <ul>
+            <li>consulter les demandes de changement de statut</li>
+            <li>consulter les commandes validées</li>
+        </ul>
+    </div>
+{{/ session.estAdministrateur}}

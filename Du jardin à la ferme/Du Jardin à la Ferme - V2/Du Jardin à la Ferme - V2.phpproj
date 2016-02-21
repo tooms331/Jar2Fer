@@ -182,7 +182,6 @@
     <Folder Include="libs\standalone\HTMLPurifier\Printer\" />
     <Folder Include="tmplt\" />
     <Folder Include="private\" />
-    <Folder Include="tmplt\partials\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ckeditor\adapters\jquery.js" />
@@ -584,6 +583,8 @@
     <Content Include="djalf.css" />
     <Content Include="djalf.js" />
     <Content Include="imgs\produit.jpg" />
+    <Content Include="jquery-1.11.3.js" />
+    <Content Include="jquery.ba-throttle-debounce.js" />
     <Content Include="libs\standalone\HTMLPurifier\ConfigSchema\schema.ser" />
     <Content Include="libs\standalone\HTMLPurifier\ConfigSchema\schema\Attr.AllowedClasses.txt" />
     <Content Include="libs\standalone\HTMLPurifier\ConfigSchema\schema\Attr.AllowedFrameTargets.txt" />
@@ -709,9 +710,21 @@
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.css" />
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.js" />
     <Content Include="testClient.html" />
+    <Content Include="tmplt\Produit-description.mustache" />
+    <Content Include="tmplt\Produit-description-mod.mustache" />
+    <Content Include="tmplt\ElementCommande-quantite_commande.mustache" />
+    <Content Include="tmplt\ElementCommande-quantite_commande-mod.mustache" />
+    <Content Include="tmplt\Produit-stocks_previsionnel.mustache" />
+    <Content Include="tmplt\Produit-unite.mustache" />
+    <Content Include="tmplt\Produit-unite-mod.mustache" />
+    <Content Include="tmplt\Produit-tarif.mustache" />
+    <Content Include="tmplt\Produit-nom.mustache" />
+    <Content Include="tmplt\Produit-tarif-mod.mustache" />
+    <Content Include="tmplt\Produit-nom-mod.mustache" />
     <Content Include="tmplt\accueil.mustache" />
     <Content Include="tmplt\footer.mustache" />
     <Content Include="tmplt\header.mustache" />
+    <Content Include="tmplt\ProduitDetails.mustache" />
     <Content Include="web.config" />
   </ItemGroup>
 </Project>

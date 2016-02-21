@@ -1,0 +1,45 @@
+{{# .}}
+    <h4>{{categorie}} / {{> Produit-nom}}</h4>
+    <section class="produitInfoPanel">
+    <div class="whitePanel">
+        <img src="imgs/produit.jpg" />
+    </div>
+    <div class="spacer">&nbsp;</div>
+    <div class="whitePanel">
+        <ul class="infosdetail">
+            <li>
+                <span>catégorie : </span>
+                <span>{{categorie}}</span>
+            </li>
+            <li>
+                <span>produit : </span>
+                {{> Produit-nom-mod}}
+            </li>
+            {{# session.peutCommander}}
+                <li>
+                    <span>unitée : </span>
+                    {{> Produit-unite-mod}}
+                </li>
+                <li>
+                    <span>tarif : </span>
+                    {{> Produit-tarif-mod}}
+                </li>
+                <li>
+                    <span>stock : </span>
+                    <span>{{> Produit-stocks_previsionnel}}</span>
+                </li>
+                <li>
+                    <span>commande : </span>
+                    {{> ElementCommande-quantite_commande-mod}}
+                </li>
+            {{/ session.peutCommander}}
+        </ul>
+    </div>
+</section>
+<section class="whitePanel">
+    {{> Produit-description-mod}}
+</section>
+{{/ .}}
+{{^ .}}
+    <p class="whitePanel center">Ce produit n'éxiste pas.</p>
+{{/ .}}

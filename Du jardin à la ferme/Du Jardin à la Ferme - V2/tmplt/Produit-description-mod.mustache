@@ -1,0 +1,9 @@
+{{# session.estAdministrateur}}
+    <div class="contentPanel"
+         data-djalf="Produit-description"
+         contenteditable="true"
+         data-id_produit="{{id_produit}}">{{&description}}</div>
+{{/ session.estAdministrateur}}
+{{^ session.estAdministrateur}}
+    {{> Produit-description}}
+{{/ session.estAdministrateur}}

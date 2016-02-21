@@ -1,8 +1,7 @@
-﻿
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Du jardin à la ferme - {{ datas }}</title>
+    <title>Du jardin à la ferme - {{ . }}</title>
 
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,8 +9,8 @@
     <link rel="stylesheet" type="text/css" href="content.css" />
     <link rel="stylesheet" type="text/css" href="djalf.css" />
 
-    <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
-    <script src="http://benalman.com/code/projects/jquery-throttle-debounce/jquery.ba-throttle-debounce.js"></script>
+    <script src="jquery-1.11.3.js"></script>
+    <script src="jquery.ba-throttle-debounce.js"></script>
 
     <script src="ckeditor/ckeditor.js"></script>
     <script src="ckeditor/adapters/jquery.js"></script>
@@ -25,22 +24,20 @@
         <h2>Projet de ferme durable</h2>
     </header>
     <nav>
-        {{# session}}
         <ul>
             <li><a href="index.php">Accueil</a></li>
             <li><a href="Produits.php">Nos Produits</a></li>
-            {{# peutCommander}}
+            {{# session.peutCommander}}
                 <li><a href="MonPanier.php">Mon Panier</a></li>
-            {{/ peutCommander}}
-            {{^ estAuthentifier}}
+            {{/ session.peutCommander}}
+            {{^ session.estAuthentifier}}
                 <li><a href="Connection.php">Connection</a></li>
-            {{/ estAuthentifier}}
-            {{# estAuthentifier}}
+            {{/ session.estAuthentifier}}
+            {{# session.estAuthentifier}}
                 <li><a href="MonCompte.php">Mon Compte</a></li>
                 <li><a href="Deconnection.php">Déconnection</a></li>
-            {{/ estAuthentifier}}
+            {{/ session.estAuthentifier}}
         </ul>
-        {{/ session}}
     </nav>
-    <h3>{{ datas }}</h3>
+    <h3>{{ . }}</h3>
     <div class="Main">

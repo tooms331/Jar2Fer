@@ -4,6 +4,72 @@ $(function () {
         alert(err);
     });
 
+    
+    function DOM_GET(jelm) {
+
+        if (jelm.is("textarea")) {
+            return jelm.val();
+        }
+        else if (jelm.is("input")) {
+            return jelm.val();
+        }
+        else if (jelm.is("select")) {
+            return jelm.val();
+        }
+        else if (jelm.is(".contentPanel")) {
+            if (jelm.is('[contenteditable="true"]')) {
+                return jelm.ckeditor().editor.getData();
+            }
+            else {
+                return jelm.html();
+            }
+        }
+        else {
+            return jelm.text();
+        }
+    };
+
+    function DOM_SET(jelm, value) {
+        if (jelm.is("textarea")) {
+            if (jelm.val() != value)
+                jelm.val(value);
+        }
+        else if (jelm.is("input")) {
+            if (jelm.val() != value)
+                jelm.val(value);
+        }
+        else if (jelm.is("select")) {
+            if (jelm.val() != value)
+                jelm.val(value);
+        }
+        else if (jelm.is(".contentPanel")) {
+            if (jelm.is('[contenteditable="true"]')) {
+                if (jelm.ckeditor().editor.getData() != value)
+                    jelm.ckeditor().editor.setData(value);
+            }
+            else {
+                if (jelm.html() != value)
+                    jelm.html(value);
+            }
+        }
+        else {
+            if (jelm.text() != value)
+                jelm.text(value);
+        }
+    };
+
+
+    function checkDecimals(elm) {
+        var val = DOM_GET(elm);
+        var decimals = elm.data("decimals");
+        fval = parseFloat(val).toFixed(decimals).toString();
+        DOM_SET(elm, fval);
+        return true;
+    }
+    $('[data-decimals]').each(function (idx, elm) { return checkDecimals($(elm)); });
+    $('[data-decimals]').on('change',function (evt) { return checkDecimals($(elm.target)); });
+    
+
     $('[contenteditable="true"]').each(function (index, elm) {
         elm = $(elm);
         elm.ckeditor();
@@ -59,36 +125,7 @@ $(function () {
         $(q).each(function(idx,elm){
             elm = $(elm);
 
-            if (elm.is("textarea")) {
-                if (elm.val() != value)
-                    elm.val(value);
-            }
-            else if (elm.is("input")) {
-                if (elm.val() != value)
-                    elm.val(value);
-            }
-            else if (elm.is("select")) {
-                if (elm.val() != value)
-                    elm.val(value);
-            }
-            else if (elm.is(".contentPanel"))
-            {
-                if (elm.is('[contenteditable="true"]'))
-                {
-                    if (elm.ckeditor().editor.getData() != value)
-                        elm.ckeditor().editor.setData(value);
-                }   
-                else
-                {
-                    if (elm.html() != value)
-                        elm.html(value);
-                }
-            }
-            else
-            {
-                if (elm.text() != value)
-                    elm.text(value);
-            }
+            DOM_SET(elm, value);
         });
     }
 

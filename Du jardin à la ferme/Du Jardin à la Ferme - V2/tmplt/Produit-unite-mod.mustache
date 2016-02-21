@@ -1,0 +1,13 @@
+{{# session.estAdministrateur}}
+     <span><select data-djalf="Produit-unite" 
+                   data-id_produit="{{id_produit}}">
+        {{# unite }}
+            {{# globals.unites }}
+                <option value="{{.}}"{{# helpers.inParents}} selected="selected"{{/ helpers.inParents}}>{{.}}</option>
+            {{/ globals.unites}}
+        {{/ unite }}
+    </select></span>
+{{/ session.estAdministrateur}}
+{{^ session.estAdministrateur}}
+    {{> Produit-unite}}
+{{/ session.estAdministrateur}}

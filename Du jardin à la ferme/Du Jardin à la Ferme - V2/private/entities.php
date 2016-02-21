@@ -64,6 +64,14 @@ trait _Produit
     public $unite;
     public $stocks_previsionnel;
     public $stocks_courant;
+    /**
+     * @var int
+     */
+    public $unite_decimals=0;
+    /**
+     * @var int
+     */
+    public $unite_step=1;
 
     public function _ProduitInit(){
         setNtype($this->id_produit,'int');
@@ -74,6 +82,13 @@ trait _Produit
         setNtype($this->unite,'string');
         setNtype($this->stocks_previsionnel,'double');
         setNtype($this->stocks_courant,'double');
+        switch($this->unite)
+        {
+            case Produit::UNITE_KILOGRAMME:
+                $this->unite_decimals=3;
+                $this->unite_step=0.1;
+                break;
+        }
     }
 }
 

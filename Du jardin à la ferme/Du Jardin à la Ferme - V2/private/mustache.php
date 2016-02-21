@@ -875,6 +875,15 @@ class Mustache_Context
     {
         return array_pop($this->blockStack);
     }
+    public function findValueInParents($value)
+    {
+        for ($i = count($this->stack) - 2; $i >= 0; $i--) {
+            $frame = &$this->stack[$i];
+            if($frame===$value)
+                return true;
+        }
+        return false;
+    }
     public function last()
     {
         return end($this->stack);
@@ -1083,6 +1092,10 @@ class Mustache_LambdaHelper
     {
         $this->mustache = $mustache;
         $this->context  = $context;
+    }
+    public function getContext()
+    {
+        return $this->context;
     }
     public function render($string)
     {
