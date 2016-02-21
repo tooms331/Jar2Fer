@@ -13,7 +13,7 @@ API::useAPI(function(API $api){
     
     echo $layout->renderHeader('Produit');
     
-    echo $layout->render('{{> PageProduit}}', $produit);
+    echo $layout->render('{{> ProduitDetails}}', $produit);
     
     echo $layout->renderFooter();
 });
