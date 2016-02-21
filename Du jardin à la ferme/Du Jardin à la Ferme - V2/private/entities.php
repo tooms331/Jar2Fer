@@ -5,13 +5,26 @@ function setNtype(&$ref,$type)
     if($ref!==null)
         settype($ref,$type);
 }
-
-trait _Compte
+trait _CompteBase
 {
     /**
      * @var int
      */
     public $id_compte;
+    /**
+     * @var string
+     */
+    public $email;
+    
+    protected function _CompteBaseInit(){
+        setNtype($this->id_compte,'int');
+        setNtype($this->email,'string');
+    }
+}
+
+trait _CompteDetail
+{
+    use _CompteBase;
     /**
      * @var string
      */
@@ -23,18 +36,15 @@ trait _Compte
     /**
      * @var string
      */
-    public $email;
-    /**
-     * @var string
-     */
-    public $date_creation;
+    public $date_creation_compte;
     
     protected function _CompteInit(){
+        $this->_CompteBaseInit();
         setNtype($this->id_compte,'int');
         setNtype($this->statut,'string');
         setNtype($this->demande_statut,'string');
         setNtype($this->email,'string');
-        setNtype($this->date_creation,'string');
+        setNtype($this->date_creation_compte,'string');
     }
 }
 
@@ -48,7 +58,7 @@ trait _Categorie{
      */
     public $categorie;
 
-    public function _CategorieInit(){
+    protected function _CategorieInit(){
         setNtype($this->id_categorie,'int');
         setNtype($this->categorie,'string');
     }
@@ -60,7 +70,8 @@ trait _Produit
     public $id_categorie;
     public $produit;
     public $description;
-    public $tarif;
+    public $tva;
+    public $prix_unitaire_ttc;
     public $unite;
     public $stocks_previsionnel;
     public $stocks_courant;
@@ -73,15 +84,17 @@ trait _Produit
      */
     public $unite_step=1;
 
-    public function _ProduitInit(){
+    protected function _ProduitInit(){
         setNtype($this->id_produit,'int');
         setNtype($this->id_categorie,'int');
         setNtype($this->produit,'string');
         setNtype($this->description,'string');
-        setNtype($this->tarif,'double');
+        setNtype($this->prix_unitaire_ttc,'double');
         setNtype($this->unite,'string');
         setNtype($this->stocks_previsionnel,'double');
         setNtype($this->stocks_courant,'double');
+        setNtype($this->tva,'double');
+        
         switch($this->unite)
         {
             case Produit::UNITE_KILOGRAMME:
@@ -114,30 +127,42 @@ trait _ElementCommande
      * @var double
      */
     public $quantite_reel;
+    /**
+     * @var double
+     */
+    public $prix_total_element_ttc;
+    /**
+     * @var double
+     */
+    public $prix_total_element_ht;
+    /**
+     * @var double
+     */
+    public $tva_total_element;
     
-    public function _ElementCommandeInit(){
+    protected function _ElementCommandeInit(){
         setNtype($this->id_element_commande,'int');
         setNtype($this->id_produit,'int');
         setNtype($this->id_commande,'int');
         setNtype($this->quantite_commande,'double');
         setNtype($this->quantite_reel,'double');
+        setNtype($this->prix_total_element_ttc,'double');
+        setNtype($this->prix_total_element_ht,'double');
+        setNtype($this->tva_total_element,'double');
     }
 }
 
 trait _Commande
 {
+    use _CompteBase;
     /**
      * @var int
      */
     public $id_commande;
     /**
-     * @var int
-     */
-    public $id_compte;
-    /**
      * @var string
      */
-    public $date_creation;
+    public $date_creation_commande;
     /**
      * @var string
      */
@@ -146,13 +171,34 @@ trait _Commande
      * @var string
      */
     public $etat;
+    /**
+     * @var int
+     */
+    public $nb_elements;
+    /**
+     * @var double
+     */
+    public $prix_total_commande_ttc;
+    /**
+     * @var double
+     */
+    public $prix_total_commande_ht;
+    /**
+     * @var double
+     */
+    public $tva_total_commande;
     
-    public function _CommandeInit(){
+    protected function _CommandeInit(){
+        $this->_CompteBaseInit();
         setNtype($this->id_commande,'int');
         setNtype($this->id_compte,'int');
-        setNtype($this->date_creation,'string');
+        setNtype($this->date_creation_commande,'string');
         setNtype($this->remarque,'string');
         setNtype($this->etat,'string');
+        setNtype($this->nb_elements,'int');
+        setNtype($this->prix_total_commande_ttc,'double');
+        setNtype($this->prix_total_commande_ht,'double');
+        setNtype($this->tva_total_commande,'double');
     }
 }
 
@@ -183,7 +229,7 @@ trait _VariationStock
      */
     public $remarque;
     
-    public function _VariationStockInit(){
+    protected function _VariationStockInit(){
         setNtype($this->id_variation_stock,'int');
         setNtype($this->id_produit,'int');
         setNtype($this->date_variation,'string');
@@ -195,7 +241,7 @@ trait _VariationStock
 
 class Compte
 {
-    use _Compte;
+    use _CompteDetail;
     
     const STATUT_Nouveau='Nouveau';
     const STATUT_Panier='Panier';
@@ -243,9 +289,21 @@ class ProduitCommande
     }
 }
 
+class ProduitCommandeDetail
+{
+    use _Categorie, _Produit, _ElementCommande, _Commande;
+    
+    public function __construct(){
+        $this->_CategorieInit();
+        $this->_ProduitInit();
+        $this->_ElementCommandeInit();
+        $this->_CommandeInit();
+    }
+}
+
 class Commande
 {
-    use _Compte, _Commande;
+    use _Commande;
     
     const ETAT_CREATION = 'Création';
     const ETAT_VALIDE = 'Validé';
@@ -254,7 +312,7 @@ class Commande
     const ETAT_TERMINE = 'Terminé';
     
     public function __construct(){
-        $this->_CompteInit();
+        $this->_CompteBaseInit();
         $this->_CommandeInit();
     }
 }

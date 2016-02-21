@@ -87,15 +87,15 @@ class LAYOUT
         }
     }
     
-    public function renderProduit_tarif($produit,$modifiable=true)
+    public function renderProduit_prix_unitaire_ttc($produit,$modifiable=true)
     {   
         if($modifiable)
         {
-            return $this->render('{{>Produit-tarif-mod}}', $produit);
+            return $this->render('{{>Produit-prix_unitaire_ttc-mod}}', $produit);
         }
         else
         {
-            return $this->render('{{>Produit-tarif}}', $produit);
+            return $this->render('{{>Produit-prix_unitaire_ttc}}', $produit);
         }
     }
     
@@ -162,11 +162,11 @@ class LAYOUT
         }
     }
     /**
-     * Summary of writeProduit_tarif
+     * Summary of writeProduit_prix_unitaire_ttc
      * @param _Produit $produit 
      * @param bool $modifiable 
      */
-    public function writeProduit_tarif($produit, $modifiable=true)
+    public function writeProduit_prix_unitaire_ttc($produit, $modifiable=true)
     {
         $modifiable=(bool)$modifiable;
         if($modifiable && $this->api->estAdmin($produit->id_commande))
@@ -175,18 +175,18 @@ class LAYOUT
             echo ' type="number"';
             echo ' step="0.1"';
             echo ' min="0"';
-            echo ' data-djalf="Produit-tarif"';
+            echo ' data-djalf="Produit-prix_unitaire_ttc"';
             echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';
-            echo ' value="';$this->safeWrite($produit->tarif);echo '"/>';
+            echo ' value="';$this->safeWrite($produit->prix_unitaire_ttc);echo '"/>';
             echo ' €</span>';
 
         }
         else
         {
             echo '<span';
-            echo ' data-djalf="Produit-tarif"';
+            echo ' data-djalf="Produit-prix_unitaire_ttc"';
             echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
-            $this->safeWrite($produit->tarif);
+            $this->safeWrite($produit->prix_unitaire_ttc);
             echo ' </span> €';
         }
     }

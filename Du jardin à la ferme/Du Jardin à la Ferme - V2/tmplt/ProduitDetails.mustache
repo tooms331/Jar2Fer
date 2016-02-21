@@ -15,14 +15,10 @@
                 <span>produit : </span>
                 {{> Produit-nom-mod}}
             </li>
-            {{# session.peutCommander}}
+            {{# session.peutModifierCommande}}
                 <li>
                     <span>unitée : </span>
                     {{> Produit-unite-mod}}
-                </li>
-                <li>
-                    <span>tarif : </span>
-                    {{> Produit-tarif-mod}}
                 </li>
                 <li>
                     <span>stock : </span>
@@ -32,7 +28,15 @@
                     <span>commande : </span>
                     {{> ElementCommande-quantite_commande-mod}}
                 </li>
-            {{/ session.peutCommander}}
+                <li>
+                    <span>prix unitaire : </span>
+                    {{> Produit-prix_unitaire_ttc-mod}}
+                </li>
+                <li>
+                    <span>prix total : </span>
+                    {{> ElementCommande-prix_total_element_ttc}}
+                </li>
+            {{/ session.peutModifierCommande}}
         </ul>
     </div>
 </section>

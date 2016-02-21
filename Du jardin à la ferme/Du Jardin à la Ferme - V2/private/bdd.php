@@ -9,7 +9,7 @@ require_once '/libs/HTMLPurifier.standalone.php';
  * Couche de liaison à la BDD.
  *
  * permet l'acces à la base de donnée et fournis 
- * les principale fonctionnalité
+ * les principales fonctionnalité
  *
  * @version 1.0
  * @author Romain
@@ -591,14 +591,15 @@ class BDD
                 'ProduitCommande',
                 'SELECT 
 	                view_produits.*,
-                    elements_commande.id_element_commande,
+                    view_elements_commande.id_element_commande,
                     :id_commande as id_commande,
-                    COALESCE(elements_commande.quantite_commande,0) AS quantite_commande,
-                    elements_commande.quantite_reel
+                    COALESCE(view_elements_commande.quantite_commande,0) AS quantite_commande,
+                    view_elements_commande.quantite_reel,
+                    view_elements_commande.prix_total_element_ttc
                 FROM view_produits
-                LEFT OUTER JOIN elements_commande
-	                ON view_produits.id_produit=elements_commande.id_produit
-	                AND elements_commande.id_commande = :id_commande
+                LEFT OUTER JOIN view_elements_commande
+	                ON view_produits.id_produit=view_elements_commande.id_produit
+	                AND view_elements_commande.id_commande = :id_commande
                 WHERE view_produits.id_produit = :id_produit',
                 array(
                     ':id_commande'=>$id_commande,
@@ -648,14 +649,15 @@ class BDD
                 'ProduitCommande',
                 'SELECT 
 	                view_produits.*,
-                    elements_commande.id_element_commande,
+                    view_elements_commande.id_element_commande,
                     :id_commande as id_commande,
-                    COALESCE(elements_commande.quantite_commande,0) AS quantite_commande,
-                    elements_commande.quantite_reel
+                    COALESCE(view_elements_commande.quantite_commande,0) AS quantite_commande,
+                    view_elements_commande.quantite_reel,
+                    view_elements_commande.prix_total_element_ttc
                 FROM view_produits
-                LEFT OUTER JOIN elements_commande
-	                ON view_produits.id_produit=elements_commande.id_produit
-	                AND elements_commande.id_commande = :id_commande
+                LEFT OUTER JOIN view_elements_commande
+	                ON view_produits.id_produit=view_elements_commande.id_produit
+	                AND view_elements_commande.id_commande = :id_commande
                 '.$WHERE.'
                 ORDER BY view_produits.categorie,view_produits.produit',
                 $params
@@ -674,25 +676,25 @@ class BDD
      * Nom du produit à créer
      * @param string $description 
      * Description du produit
-     * @param string $tarif 
+     * @param string $prix_unitaire_ttc 
      * prix du produit
      * @param string $unite 
      * unité de vente du produit
      * @throws ErrorException 
      * @return Produit
      */
-    public function Produits_Creer($id_categorie,$nom, $description, $tarif, $unite)
+    public function Produits_Creer($id_categorie,$nom, $description, $prix_unitaire_ttc, $unite)
     {
         $id_categorie=(int)$id_categorie;
         $nom=(string)$nom;
-        $tarif=(double)$tarif;
+        $prix_unitaire_ttc=(double)$prix_unitaire_ttc;
         $description=(string)$description;
         
         
         $nom = mb_strimwidth($nom,0,100);
         $description = $this->purifier->purify($description);
         
-        return $this->InTransaction(function()use($id_categorie, $nom, $description,$tarif, $unite){
+        return $this->InTransaction(function()use($id_categorie, $nom, $description,$prix_unitaire_ttc, $unite){
         
             // on vérifie si l'identifiant éxiste déjà
             $count = $this->getScalar(
@@ -716,7 +718,7 @@ class BDD
                     produit, 
                     id_categorie, 
                     description, 
-                    tarif, 
+                    prix_unitaire_ttc, 
                     unite
                 )
                 VALUES
@@ -724,14 +726,14 @@ class BDD
                     :nom,
                     :id_categorie,
                     :description,
-                    :tarif,
+                    :prix_unitaire_ttc,
                     :unite
                 )',
                 [
                     ':produit'=>$nom,
                     ':id_categorie'=>$id_categorie,
                     ':description'=>$description,
-                    ':tarif'=>$tarif,
+                    ':prix_unitaire_ttc'=>$prix_unitaire_ttc,
                     ':unite'=>$unite
                     
                 ]
@@ -832,26 +834,26 @@ class BDD
     }
     
     /**
-     * Modifie le tarif d'un produit
+     * Modifie le prix_unitaire_ttc d'un produit
      * @param int $id_produit 
      * @param string $description 
      * @return Produit
      */
-    public function Produits_Modifier_Tarif($id_produit, $tarif)
+    public function Produits_Modifier_prix_unitaire_ttc($id_produit, $prix_unitaire_ttc)
     {
         $id_produit=(int)$id_produit;
-        $tarif=(double)$tarif;
+        $prix_unitaire_ttc=(double)$prix_unitaire_ttc;
         
-        return $this->InTransaction(function()use($id_produit, $tarif){
+        return $this->InTransaction(function()use($id_produit, $prix_unitaire_ttc){
         
             //On créer le produit
             $this->exec(
                 'UPDATE produits 
-                SET tarif = :tarif
+                SET prix_unitaire_ttc = :prix_unitaire_ttc
                 WHERE id_produit = :id_produit',
                 [
                     ':id_produit'=>$id_produit,
-                    ':tarif'=>$tarif
+                    ':prix_unitaire_ttc'=>$prix_unitaire_ttc
                 ]
             );
         
@@ -875,11 +877,8 @@ class BDD
             $commande = $this->getSingleObject(
                 'Commande',
                 'SELECT 
-                    commandes.*,
-                    comptes.*
-                FROM commandes 
-                INNER JOIN comptes
-                    ON comptes.id_compte = commandes.id_compte
+                    view_commande_detail.*
+                FROM view_commande_detail 
                 WHERE id_commande = :id_commande',
                 [
                     ':id_commande'=>$id_commande
@@ -905,6 +904,11 @@ class BDD
                 'SELECT *
                 FROM view_elements_commande 
                 WHERE id_commande = :id_commande
+                AND (
+                    view_elements_commande.quantite_reel > 0
+                    OR
+                    view_elements_commande.quantite_commande > 0
+                )
                 ORDER BY view_elements_commande.categorie, view_elements_commande.produit',
                 [
                     ':id_commande'=>$id_commande
@@ -921,8 +925,8 @@ class BDD
      * @param int $id_produit 
      * ID du produit commandé
      * @param double $quantite 
-     * Quantité commandé (si = 0, l'élément est supprimé de la commande)
-     * @return ProduitCommande
+     * Quantité commandé
+     * @return ProduitCommandeDetail
      */
     public function Commande_Modifier_Element($id_commande,$id_produit,$quantite)
     {
@@ -932,50 +936,36 @@ class BDD
         
         return $this->InTransaction(function()use($id_commande,$id_produit,$quantite){
         
-            if($quantite==0)
-            {
-                //On supprime l'élément de commande
-                $this->exec(
-                    'DELETE FROM elements_commande
-                    WHERE id_commande = :id_commande
-                    AND  id_produit = :id_produit',
-                    [
-                        ':id_commande'=>$id_commande,
-                        ':id_produit'=>$id_produit
-                    ]
-                );
-            }
-            else
-            {
-                //On créer/modifie l'élément de commande
-                $this->execInsert(
-                    'INSERT INTO elements_commande
-                    (
-                        id_commande, 
-                        id_produit, 
-                        quantite_commande
-                    )
-                    VALUES(
-                        :id_commande, 
-                        :id_produit, 
-                        :quantite_commande
-                    )
-                    ON DUPLICATE KEY UPDATE
-                        quantite_commande = :quantite_commande',
-                    [
-                        ':id_commande'=>$id_commande,
-                        ':id_produit'=>$id_produit,
-                        ':quantite_commande'=>$quantite
-                    ]
-                );
-            }
+            //On créer/modifie l'élément de commande
+            $this->execInsert(
+                'INSERT INTO elements_commande
+                (
+                    id_commande, 
+                    id_produit, 
+                    quantite_commande
+                )
+                VALUES(
+                    :id_commande, 
+                    :id_produit, 
+                    :quantite_commande
+                )
+                ON DUPLICATE KEY UPDATE
+                    quantite_commande = :quantite_commande',
+                [
+                    ':id_commande'=>$id_commande,
+                    ':id_produit'=>$id_produit,
+                    ':quantite_commande'=>$quantite
+                ]
+            );
         
             $element = $this->getSingleObject(
-                'ProduitCommande',
+                'ProduitCommandeDetail',
                 'SELECT *
                 FROM view_elements_commande 
-                WHERE id_commande = :id_commande
-                AND id_produit = :id_produit',
+                INNER JOIN view_commande_detail
+                    ON view_elements_commande.id_commande = view_commande_detail.id_commande
+                WHERE view_elements_commande.id_commande = :id_commande
+                AND view_elements_commande.id_produit = :id_produit',
                 [
                     ':id_commande'=>$id_commande,
                     ':id_produit'=>$id_produit

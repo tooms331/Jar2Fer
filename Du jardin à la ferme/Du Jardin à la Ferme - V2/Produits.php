@@ -136,8 +136,8 @@ API::useAPI(function(API $api){
                                     <span><?php $layout->safeWrite($produit->unite);?></span>
                                 </li>
                                 <li>
-                                    <span>tarif : </span>
-                                    <span><?php $layout->writePrix($produit->tarif);?></span>
+                                    <span>prix unitaire : </span>
+                                    <span><?php $layout->writePrix($produit->prix_unitaire_ttc);?></span>
                                 </li>
                                 <li><span>stock : </span>
                                     <span><?php $layout->safeWrite($produit->stocks_previsionnel);?></span>

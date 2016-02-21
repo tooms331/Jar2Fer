@@ -3,8 +3,10 @@ $(function () {
     var apiClient = createApiClient(function(err){
         alert(err);
     });
+    $.fn.changeVal = function (v) {
+        return $(this).val(v).trigger("change");
+    }
 
-    
     function DOM_GET(jelm) {
 
         if (jelm.is("textarea")) {
@@ -30,17 +32,22 @@ $(function () {
     };
 
     function DOM_SET(jelm, value) {
+        if (jelm.data("decimals")) {
+            var decimals = jelm.data("decimals");
+            value = parseFloat(value).toFixed(decimals).toString();
+        }
+
         if (jelm.is("textarea")) {
             if (jelm.val() != value)
-                jelm.val(value);
+                jelm.changeVal(value);
         }
         else if (jelm.is("input")) {
             if (jelm.val() != value)
-                jelm.val(value);
+                jelm.changeVal(value);
         }
         else if (jelm.is("select")) {
             if (jelm.val() != value)
-                jelm.val(value);
+                jelm.changeVal(value);
         }
         else if (jelm.is(".contentPanel")) {
             if (jelm.is('[contenteditable="true"]')) {
@@ -58,53 +65,60 @@ $(function () {
         }
     };
 
-
-    function checkDecimals(elm) {
+    function checkDecimals() {
+        var elm = $(this);
         var val = DOM_GET(elm);
         var decimals = elm.data("decimals");
         fval = parseFloat(val).toFixed(decimals).toString();
         DOM_SET(elm, fval);
         return true;
     }
-    $('[data-decimals]').each(function (idx, elm) { return checkDecimals($(elm)); });
-    $('[data-decimals]').on('change',function (evt) { return checkDecimals($(elm.target)); });
-    
 
-    $('[contenteditable="true"]').each(function (index, elm) {
-        elm = $(elm);
+    function resizeInput() {
+        var elm = $(this);
+        elm.attr('size', elm.val().length);
+    }
+
+    $('input[type="text"]')
+        .keyup(resizeInput)
+        .change(resizeInput)
+        .each(resizeInput);
+    $('input[type="number"]')
+        .keyup(resizeInput)
+        .change(resizeInput)
+        .each(resizeInput);
+
+    $('[data-decimals]')
+        .change(checkDecimals)
+        .each(checkDecimals);
+    
+    $('[contenteditable="true"]').each(function () {
+        elm = $(this);
         elm.ckeditor();
     });
     
-    function bindINPUT(type,mapper,operator,validator)
+    function bindINPUT(type,operator)
     {
         $(':not(:not(input) and :not(select))[data-djalf="' + type + '"]').each(function (index, elm) {
             elm = $(elm); 
 
             var applyChanges = $.debounce(1000, false, function () {
-                operator(elm)
-                .done(mapper);
+                operator(elm);
             });
-            function validateAndApply()
-            {
-                if (!validator || validator(elm))
-                {
-                    applyChanges();
-                }
-            }
             
-            $(elm).on('change', validateAndApply);
-            $(elm).on('keyup', validateAndApply);
+            elm
+                .change(applyChanges)
+                .keyup(applyChanges);
         });
     }
 
-    function bindEDITOR(type,mapper,operator)
+    function bindEDITOR(type,operator)
     {
         $('[data-djalf="' + type + '"][contenteditable="true"]').each(function (index, elm) {
             elm = $(elm);
 
             var applyChanges = $.debounce(1000, false, function () {
-                operator(elm,elm.ckeditor().editor)
-                .done(mapper);
+                operator(elm,elm.ckeditor().editor);
             });
 
             elm.ckeditor().editor.on('change', applyChanges);
@@ -143,76 +157,67 @@ $(function () {
         UPD_DOM_VAL('Produit-id_categorie', { 'id_produit': id_produit }, produit.id_categorie);
         UPD_DOM_VAL('Produit-produit', { 'id_produit': id_produit }, produit.produit);
         UPD_DOM_VAL('Produit-categorie', { 'id_produit': id_produit }, produit.categorie);
-        UPD_DOM_VAL('Produit-tarif', { 'id_produit': id_produit }, parseFloat(produit.tarif).toFixed(2).toString());
+        UPD_DOM_VAL('Produit-prix_unitaire_ttc', { 'id_produit': id_produit }, produit.prix_unitaire_ttc);
         UPD_DOM_VAL('Produit-unite', { 'id_produit': id_produit }, produit.unite);
+        UPD_DOM_VAL('Produit-tva', { 'id_produit': id_produit }, produit.tva);
         UPD_DOM_VAL('Produit-stocks_previsionnel', { 'id_produit': id_produit }, produit.stocks_previsionnel);
         UPD_DOM_VAL('Produit-stocks_courant', { 'id_produit': id_produit }, produit.stocks_courant);
     }
 
-    bindINPUT('Produit-produit', UPD_Produit, function (elm) {
-        return apiClient.produit_modifier_nom(elm.data("id_produit"), elm.val())
-    });
-
-    bindINPUT('Produit-unite', UPD_Produit, function (elm) {
-        return apiClient.produit_modifier_unite(elm.data("id_produit"), elm.val())
-    });
-
-    bindINPUT(
-        'Produit-tarif',
-        UPD_Produit,
-        function (elm) {
-            return apiClient.produit_modifier_tarif(elm.data("id_produit"), elm.val())
-        },
-        function (elm) {
-            var val = elm.val();
-            fval = parseFloat(val).toFixed(2).toString();
-            if (val !== fval) {
-                elm.val(fval);
-            }
-            return true;
-        }
-    );
-    
-    bindEDITOR('Produit-description', UPD_Produit, function (elm, editor) {
-        return apiClient.produit_modifier_description(elm.data("id_produit"), editor.getData())
-    });
-
-
     function UPD_ProduitCommande(produitCommande) {
         UPD_Produit(produitCommande);
-        
-        var decimals=0;
-        switch(produitCommande.unite)
-        {
-            case 'Kilogramme':
-                decimals=3;
-                break;
-            default:
-                decimals=0;
-                break;
-        }
-        var id_element_commande = produitCommande.id_element_commande;
-        UPD_DOM_VAL('ProduitCommande-id_commande', { 'id_element_commande': id_element_commande }, produitCommande.id_commande);
-        UPD_DOM_VAL('ProduitCommande-quantite_commande', { 'id_element_commande': id_element_commande }, parseFloat(produitCommande.quantite_commande).toFixed(decimals).toString());
-        UPD_DOM_VAL('ProduitCommande-quantite_reel', { 'id_element_commande': id_element_commande }, produitCommande.quantite_reel);
+        var id_commande = produitCommande.id_commande;
+        var id_produit = produitCommande.id_produit;
+
+        UPD_DOM_VAL('ElementCommande-id_commande', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.id_commande);
+        UPD_DOM_VAL('ElementCommande-quantite_commande', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.quantite_commande);
+        UPD_DOM_VAL('ElementCommande-quantite_reel', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.quantite_reel);
+        UPD_DOM_VAL('ElementCommande-prix_total_element_ttc', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.prix_total_element_ttc);
+        UPD_DOM_VAL('ElementCommande-prix_total_element_ht', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.prix_total_element_ht);
+        UPD_DOM_VAL('ElementCommande-tva_total_element', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.tva_total_element);
     }
 
-    bindINPUT(
-        'ProduitCommande-quantite_commande',
-        UPD_ProduitCommande,
-        function (elm) {
-            return apiClient.produitcommande_modifier_quantite_commande(elm.data("id_commande"), elm.data("id_produit"), elm.val())
-        },
-        function (elm) {
-            var val = elm.val();
-            fval = parseFloat(val).toFixed(elm.data('decimals')).toString();
-            if (val !== fval) {
-                elm.val(fval);
-            }
-            return true;
-        }
-    );
+    function UPD_Commande(commande) {
+        var id_commande = commande.id_commande;
+        UPD_DOM_VAL('Commande-prix_total_commande_ttc', { 'id_commande': id_commande }, commande.prix_total_commande_ttc);
+        UPD_DOM_VAL('Commande-prix_total_commande_ht', { 'id_commande': id_commande }, commande.prix_total_commande_ht);
+        UPD_DOM_VAL('Commande-tva_total_commande', { 'id_commande': id_commande }, commande.tva_total_commande);
+    }
 
+    function UPD_ProduitCommandeDetail(produitCommandeDetail) {
+        UPD_ProduitCommande(produitCommandeDetail);
+        UPD_Commande(produitCommandeDetail);
+    }
+
+    bindINPUT('Produit-produit', function (elm) {
+        apiClient
+            .produit_modifier_nom(elm.data("id_produit"), elm.val())
+            .done(UPD_Produit);
+    });
+
+    bindINPUT('Produit-unite', function (elm) {
+        apiClient
+            .produit_modifier_unite(elm.data("id_produit"), elm.val())
+            .done(UPD_Produit);
+    });
+
+    bindINPUT('Produit-prix_unitaire_ttc', function (elm) {
+        apiClient
+            .produit_modifier_prix_unitaire_ttc(elm.data("id_produit"), elm.val())
+            .done(UPD_Produit);
+    });
+    
+    bindEDITOR('Produit-description', UPD_Produit, function (elm, editor) {
+        apiClient
+            .produit_modifier_description(elm.data("id_produit"), editor.getData())
+            .done(UPD_Produit);
+    });
+
+    bindINPUT('ElementCommande-quantite_commande', function (elm) {
+        apiClient
+            .produitcommande_modifier_quantite_commande(elm.data("id_commande"), elm.data("id_produit"), elm.val())
+            .done(UPD_ProduitCommandeDetail);
+    });
 
 });
 

@@ -325,11 +325,11 @@ class API
             throw new ErrorException("Cet opération n'est possible qu'aux administrateurs!");
         return $this->bdd->Produits_Modifier_Unite($id_produit,$unite);
     }
-    public function API_produit_modifier_tarif($id_produit, $tarif)
+    public function API_produit_modifier_prix_unitaire_ttc($id_produit, $prix_unitaire_ttc)
     {   
         if(!$this->estAdmin())
             throw new ErrorException("Cet opération n'est possible qu'aux administrateurs!");
-        return $this->bdd->Produits_Modifier_tarif($id_produit,$tarif);
+        return $this->bdd->Produits_Modifier_prix_unitaire_ttc($id_produit,$prix_unitaire_ttc);
     }
     
     

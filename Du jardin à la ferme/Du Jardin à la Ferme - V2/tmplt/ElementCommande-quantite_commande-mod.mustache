@@ -1,14 +1,13 @@
 {{# session.estAdministrateur}}
 <span><input type="number"
-                data-djalf="ProduitCommande-quantite_commande"
-                min="0"
-                step="{{unite_step}}"
-                max="{{stocks_previsionnel}}"
-                data-decimals="{{unite_decimals}}"
-                data-id_element_commande="{{id_element_commande}}"
-                data-id_commande="{{id_commande}}"
-                data-id_produit="{{id_produit}}"
-                value="{{quantite_commande}}"
+             data-djalf="ElementCommande-quantite_commande"
+             min="0"
+             step="{{unite_step}}"
+             max="{{stocks_previsionnel}}"
+             data-decimals="{{unite_decimals}}"
+             data-id_commande="{{id_commande}}"
+             data-id_produit="{{id_produit}}"
+             value="{{quantite_commande}}"
 /></span>
 {{/ session.estAdministrateur}}
 {{^ session.estAdministrateur}}{{> ElementCommande-quantite_commande}}{{/ session.estAdministrateur}}
