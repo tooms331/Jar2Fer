@@ -250,7 +250,6 @@ class LAYOUT
             echo ' step="';$this->safeWrite($produit->unite_step);echo '"';
             echo ' max="';$this->safeWrite($produit->stocks_previsionnel);echo '"';
             echo ' data-decimals="';$this->safeWrite($produit->unite_decimals);echo '"';
-            echo ' data-id_element_commande="';$this->safeWrite($produit->id_element_commande);echo '"';
             echo ' data-id_commande="';$this->safeWrite($produit->id_commande);echo '"';
             echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';
             echo ' value="';$this->safeWrite($produit->quantite_commande);echo '"';
@@ -261,7 +260,6 @@ class LAYOUT
         {
             echo '<span';
             echo ' data-djalf="ProduitCommande-quantite_commande"';
-            echo ' data-id_element_commande="';$this->safeWrite($produit->id_element_commande);echo '"';
             echo ' data-id_commande="';$this->safeWrite($produit->id_commande);echo '"';
             echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
             $this->safeWrite($produit->quantite_commande);

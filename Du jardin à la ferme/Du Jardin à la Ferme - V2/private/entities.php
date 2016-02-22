@@ -110,10 +110,6 @@ trait _ElementCommande
     /**
      * @var int
      */
-    public $id_element_commande;
-    /**
-     * @var int
-     */
     public $id_commande;
     /**
      * @var int
@@ -141,7 +137,6 @@ trait _ElementCommande
     public $tva_total_element;
     
     protected function _ElementCommandeInit(){
-        setNtype($this->id_element_commande,'int');
         setNtype($this->id_produit,'int');
         setNtype($this->id_commande,'int');
         setNtype($this->quantite_commande,'double');
