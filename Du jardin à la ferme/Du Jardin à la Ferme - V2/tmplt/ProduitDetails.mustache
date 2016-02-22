@@ -15,7 +15,7 @@
                 <span>produit : </span>
                 {{> Produit-nom-mod}}
             </li>
-            {{# session.peutModifierCommande}}
+            {{# id_commande | session.peutModifierCommande}}
                 <li>
                     <span>unitée : </span>
                     {{> Produit-unite-mod}}
@@ -36,7 +36,7 @@
                     <span>prix total : </span>
                     {{> ElementCommande-prix_total_element_ttc}}
                 </li>
-            {{/ session.peutModifierCommande}}
+            {{/ id_commande | session.peutModifierCommande}}
         </ul>
     </div>
 </section>

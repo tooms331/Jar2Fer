@@ -591,11 +591,10 @@ class BDD
                 'ProduitCommande',
                 'SELECT 
 	                view_produits.*,
-                    view_elements_commande.id_element_commande,
                     :id_commande as id_commande,
                     COALESCE(view_elements_commande.quantite_commande,0) AS quantite_commande,
                     view_elements_commande.quantite_reel,
-                    view_elements_commande.prix_total_element_ttc
+                    COALESCE(view_elements_commande.prix_total_element_ttc,0) AS prix_total_element_ttc
                 FROM view_produits
                 LEFT OUTER JOIN view_elements_commande
 	                ON view_produits.id_produit=view_elements_commande.id_produit
@@ -653,7 +652,7 @@ class BDD
                     :id_commande as id_commande,
                     COALESCE(view_elements_commande.quantite_commande,0) AS quantite_commande,
                     view_elements_commande.quantite_reel,
-                    view_elements_commande.prix_total_element_ttc
+                    COALESCE(view_elements_commande.prix_total_element_ttc,0) AS prix_total_element_ttc
                 FROM view_produits
                 LEFT OUTER JOIN view_elements_commande
 	                ON view_produits.id_produit=view_elements_commande.id_produit

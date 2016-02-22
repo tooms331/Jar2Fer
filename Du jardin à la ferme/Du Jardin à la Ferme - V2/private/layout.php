@@ -18,25 +18,22 @@ class LAYOUT
         $this->api = $api;
         
         $this->m = new Mustache_Engine(array(
-            'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt')
-        ));
-    }
-
-    public function render($template, $data)
-    {   
-        return $this->m->render('{{# datas}}'.$template.'{{/ datas}}',
-            [
-                'helpers'=>[
-                    'inParents'=>function($template,Mustache_LambdaHelper $helper){
-                        $mContext=$helper->getContext();
-                        $lastContext = $mContext->last();
-                        $valueExists = $mContext->findValueInParents($lastContext);
-                        return $valueExists?$template:"";
-                    }
-                ],
-                'globals'=>[
-                    'unites' => array(Produit::UNITE_BOUQUET,Produit::UNITE_PIECE,Produit::UNITE_KILOGRAMME)
-                ],
+            'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt'),
+            'pragmas'=>[Mustache_Engine::PRAGMA_FILTERS],
+            'helpers'=>[
+                'equalParent'=>function($template, Mustache_LambdaHelper $lambdaHelper){
+                    $context = $lambdaHelper->getContext();
+                    $lastContext = $context->pop();
+                    $valueExists = $context->last()==$lastContext;
+                    $context->push($lastContext);
+                    return $valueExists?$template:"";
+                },
+                '?'=>function($value){
+                    return !!$value;
+                },
+                '!'=>function($value){
+                    return !$value;
+                },
                 'session'=>[
                     'compte'=>$this->api->compteConnecte(),
                     'estAuthentifier'=>$this->api->estAuthentifier(),
@@ -47,21 +44,20 @@ class LAYOUT
                     'estPanier'=>$this->api->estPanier(),
                     'estPremium'=>$this->api->estPremium(),
                     'peutCommander'=>$this->api->peutCommander(),
-                    'peutModifierCommande'=>function($template,$helper){
-                        $id_commande = (int)$helper->getContext()->find('id_commande');
-                        $res = $this->api->peutModifierCommande($id_commande);
-                        return $res?$template:"";
-                     },
-                    'nePeutModifierCommande'=>function($template,$helper){
-                        $id_commande = (int)$helper->getContext()->find('id_commande');
-                        $res = $this->api->peutModifierCommande($id_commande);
-                        return $res?"":$template;
+                    'peutModifierCommande'=>function($value){
+                        return $this->api->peutModifierCommande($value);
                      }
                 ],
-                'datas'=>$data
+                'globals'=>[
+                    'unites' => array(Produit::UNITE_BOUQUET,Produit::UNITE_PIECE,Produit::UNITE_KILOGRAMME)
+                ]
             ]
-            
-        );
+        ));
+    }
+
+    public function render($template, $data)
+    {   
+        return $this->m->render("{{^ session.estDesactive}}$template{{/ session.estDesactive}}",$data);
         
     }
     

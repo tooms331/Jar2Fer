@@ -3,7 +3,7 @@
                    data-id_produit="{{id_produit}}">
         {{# unite }}
             {{# globals.unites }}
-                <option value="{{.}}"{{# helpers.inParents}} selected="selected"{{/ helpers.inParents}}>{{.}}</option>
+                <option value="{{.}}"{{# equalParent}} selected="selected"{{/ equalParent}}>{{.}}</option>
             {{/ globals.unites}}
         {{/ unite }}
     </select></span>

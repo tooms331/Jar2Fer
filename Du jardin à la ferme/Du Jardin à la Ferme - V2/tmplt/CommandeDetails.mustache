@@ -1,4 +1,4 @@
-{{# elements.0}}
+{{# elements.0 | ?}}
 <section class="whitePanel">
     <p>Votre paniers doit être validé jeudi au plus tards pour être livré cette semaine.</p>
     <p>Les paniers non validés ne sont pas pris en compte, c'est pour vous comme pour nous l'assurance d'évité un malentendu.</p>
@@ -52,10 +52,10 @@
         la commande contient {{> Commande-nb_elements}} produits différents pour un montant de {{> Commande-prix_total_commande_ttc}} TTC ({{> Commande-prix_total_commande_HT}} HT + {{> Commande-tva_total_commande}} TVA).
     </section>
 {{/ commande}}
-{{/ elements.0}}
-{{^ elements.0}}
+{{/ elements.0 | ?}}
+{{^ elements.0 | !}}
     <p class="whitePanel center">
         Votre panier est actuelement vide.
         Consulté la <a href="Produits.php">Nos produits</a> pour faire vos emplettes!
     </p>
-{{/ elements.0}}
+{{/ elements.0 | !}}
