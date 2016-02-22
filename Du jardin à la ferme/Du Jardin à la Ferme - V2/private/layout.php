@@ -21,6 +21,11 @@ class LAYOUT
             'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt'),
             'pragmas'=>[Mustache_Engine::PRAGMA_FILTERS],
             'helpers'=>[
+                'render'=>function($template, Mustache_LambdaHelper $lambdaHelper){
+                    $context = $lambdaHelper->getContext();
+                    $context->push($context->last()['data']);
+                    return $template;
+                },
                 'equalParent'=>function($template, Mustache_LambdaHelper $lambdaHelper){
                     $context = $lambdaHelper->getContext();
                     $lastContext = $context->pop();
@@ -51,42 +56,44 @@ class LAYOUT
                 },
                 '!'=>function($value){
                     return !$value;
-                },
-                'session'=>[
-                    'compte'=>$this->api->compteConnecte(),
-                    'estAuthentifier'=>$this->api->estAuthentifier(),
-                    'estAdministrateur'=>$this->api->estAdmin(),
-                    'estDesactive'=>$this->api->estDésactivé(),
-                    'estLibreService'=>$this->api->estLibreService(),
-                    'estNouveau'=>$this->api->estNouveau(),
-                    'estPanier'=>$this->api->estPanier(),
-                    'estPremium'=>$this->api->estPremium(),
-                    'peutCommander'=>$this->api->peutCommander(),
-                    'peutModifierCommande'=>function($value){
-                        return $this->api->peutModifierCommande($value);
-                     }
-                ],
-                'globals'=>[
-                    'unites' => array(Produit::UNITE_BOUQUET,Produit::UNITE_PIECE,Produit::UNITE_KILOGRAMME)
-                ]
+                }
             ]
         ));
     }
 
-    public function render($template, $data)
+    public function render($template, $data=true)
     {   
-        return $this->m->render($template,$data);
+        return $this->m->render("{{# render}}$template{{/ render}}",[
+            'session'=>[
+                'compte'=>$this->api->compteConnecte(),
+                'estAuthentifier'=>$this->api->estAuthentifier(),
+                'estAdministrateur'=>$this->api->estAdmin(),
+                'estDesactive'=>$this->api->estDésactivé(),
+                'estLibreService'=>$this->api->estLibreService(),
+                'estNouveau'=>$this->api->estNouveau(),
+                'estPanier'=>$this->api->estPanier(),
+                'estPremium'=>$this->api->estPremium(),
+                'peutCommander'=>$this->api->peutCommander(),
+                'peutModifierCommande'=>function($value){
+                    return $this->api->peutModifierCommande($value);
+                }
+            ],
+            'globals'=>[
+                'unites' => array(Produit::UNITE_BOUQUET,Produit::UNITE_PIECE,Produit::UNITE_KILOGRAMME)
+            ],
+            'data'=>$data
+        ]);
         
     }
     
     public function renderHeader($pageTitle)
     {
-        return $this->m->render("{{>header}}",$pageTitle);
+        return $this->render("{{>header}}",$pageTitle);
     }
     
     public function renderFooter()
     {   
-        return $this->m->render('{{>footer}}');
+        return $this->render('{{>footer}}');
     }
     
     

@@ -59,8 +59,6 @@
     <Compile Include="MonPanier.php" />
     <Compile Include="private\layout.php" />
     <Compile Include="private\api.php" />
-    <Compile Include="private\unittest.php" />
-    <Compile Include="testbdd.php" />
     <Compile Include="private\bdd.php" />
     <Compile Include="private\config.php" />
     <Compile Include="private\entities.php" />
