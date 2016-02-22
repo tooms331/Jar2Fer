@@ -48,6 +48,7 @@ class API
     private function __construct()
     {
         $this->bdd = new BDD();
+		
     }
     
     
@@ -351,7 +352,7 @@ class API
         if(!$this->peutVoirCommande($id_commande))
             throw new ErrorException('vous ne pouvez pas voir la commande');
         
-        return $this->bdd->Panier_RecupererOuCreer($this->compteConnecte()->id_compte);
+        return $this->bdd->Commande_Recupere($id_commande);
     }
     
     public function API_commande_lister_elements($id_commande)

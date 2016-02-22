@@ -7,6 +7,8 @@ Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "Du Jardin à la Ferme - V2"
 EndProject
 Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "Du Jardin à la ferme - V1", "Du Jardin à la ferme - V1\Du Jardin à la ferme - V1.phpproj", "{11FC249F-F220-45B4-B313-B77BA0AB6A6E}"
 EndProject
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "Terrain de jeux", "Terrain de jeux\Terrain de jeux.phpproj", "{8B27CAAA-9322-4611-9EB5-ED6166907422}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{11FC249F-F220-45B4-B313-B77BA0AB6A6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11FC249F-F220-45B4-B313-B77BA0AB6A6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11FC249F-F220-45B4-B313-B77BA0AB6A6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B27CAAA-9322-4611-9EB5-ED6166907422}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B27CAAA-9322-4611-9EB5-ED6166907422}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B27CAAA-9322-4611-9EB5-ED6166907422}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B27CAAA-9322-4611-9EB5-ED6166907422}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

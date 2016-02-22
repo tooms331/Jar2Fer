@@ -23,6 +23,7 @@ class BDD
     private $pdolink;
     
     private $purifier;
+	
     
     /**
      * Ouverture de la base de donnée
@@ -302,24 +303,18 @@ class BDD
     
     
     
-    
+	  
     /**
-     * Récupere un compte spécifique
+     * Retourne un compte spécifique ou null
      * @param int $id_compte 
-     * ID du compte à récupéré
-     * @throws ErrorException 
-     * @return Compte
+     * @return Compte|null
      */
     public function Compte_Recuperer($id_compte)
-    {
+    {	
         $id_compte=(int)$id_compte;
-        // ioyguioy
-        /*
-         *
-         * 
-         * */
         
         return $this->InTransaction(function()use($id_compte){
+			
             $compte = $this->getSingleObject(
                 'Compte',
                 'SELECT * 
@@ -589,13 +584,13 @@ class BDD
         return $this->InTransaction(function()use($id_commande,$id_produit){
             $produit = $this->getSingleObject(
                 'ProduitCommande',
-                'SELECT 
+                'SELECT
 	                view_produits.*,
                     view_elements_commande.id_element_commande,
                     :id_commande as id_commande,
                     COALESCE(view_elements_commande.quantite_commande,0) AS quantite_commande,
                     view_elements_commande.quantite_reel,
-                    view_elements_commande.prix_total_element_ttc
+                     COALESCE(view_elements_commande.prix_total_element_ttc,0) AS prix_total_element_ttc
                 FROM view_produits
                 LEFT OUTER JOIN view_elements_commande
 	                ON view_produits.id_produit=view_elements_commande.id_produit
@@ -633,7 +628,7 @@ class BDD
                 );
             if($dispoUniquement || !empty($rechercheProduit))
             {
-                $WHERE.='WHERE';
+                $WHERE .='WHERE';
                 if($dispoUniquement)
                     $WHERE.=' view_produits.stocks_previsionnel > 0 ';
                 if($dispoUniquement && !empty($rechercheProduit))
@@ -641,6 +636,7 @@ class BDD
                 if(!empty($rechercheProduit))
                 {
                     $WHERE.=' (view_produits.categorie LIKE :rechercheProduit OR view_produits.produit LIKE :rechercheProduit) ';
+					
                     $params[':rechercheProduit'] = '%'.$rechercheProduit.'%';
                 }
             }
@@ -658,7 +654,7 @@ class BDD
                 LEFT OUTER JOIN view_elements_commande
 	                ON view_produits.id_produit=view_elements_commande.id_produit
 	                AND view_elements_commande.id_commande = :id_commande
-                '.$WHERE.'
+				'.$WHERE.'
                 ORDER BY view_produits.categorie,view_produits.produit',
                 $params
             );
@@ -951,11 +947,11 @@ class BDD
                 )
                 ON DUPLICATE KEY UPDATE
                     quantite_commande = :quantite_commande',
-                [
+                array(
                     ':id_commande'=>$id_commande,
                     ':id_produit'=>$id_produit,
                     ':quantite_commande'=>$quantite
-                ]
+                )
             );
         
             $element = $this->getSingleObject(
@@ -1052,14 +1048,14 @@ class BDD
                 ]
             );
             
-            return $this->Commande_lister_Elements($id_commande);
+            return $this->Commande_Recupere($id_commande);
         });
     }
     
     /**
      * supprime une commande
      * @param int $id_commande 
-     * @return Commande
+     * @return bool
      */
     public function Commande_Supprimer($id_commande)
     {   
@@ -1078,7 +1074,7 @@ class BDD
                 ]
             );
             
-            return $this->Commande_Recupere($id_commande);
+            return true;
         });
     }
     
