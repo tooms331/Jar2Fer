@@ -1,61 +1,69 @@
-{{# elements.0 | ?}}
-<section class="whitePanel">
-    <p>Votre paniers doit être validé jeudi au plus tards pour être livré cette semaine.</p>
-    <p>Les paniers non validés ne sont pas pris en compte, c'est pour vous comme pour nous l'assurance d'évité un malentendu.</p>
-    <p>Les livraisons sont effectuées le vendredi et le samedi selon nos capacitées.</p>
-</section>
-<table class="tablepanier">
-    <thead>
-        <tr>
-            <td>Photo</td>
-            <td>Produit</td>
-            <td>Commande</td>
-        </tr>
-    </thead>
-    <tbody>
-        {{# elements}}
-            <tr>
-                <td><img src="imgs/produit.jpg" /></td>
-                <th class="largecol">
-                    <a href="Produit.php?id_produit={{id_produit}}">{{> Produit-nom}}</a>
-                </th>
-                <td>
-                    <ul class="infosdetail">
-                        <li>
-                            <span>unitée : </span>
-                            {{> Produit-unite}}
-                        </li>
-                        <li>
-                            <span>stock : </span>
-                            {{> Produit-stocks_previsionnel}}
-                        </li>
-                        <li>
-                            <span>quantité : </span>
-                            {{> ElementCommande-quantite_commande-mod}}
-                        </li>
-                        <li>
-                            <span>prix unitaire : </span>
-                            {{> Produit-prix_unitaire_ttc}}
-                        </li>
-                        <li>
-                            <span>prix total : </span>
-                            {{> ElementCommande-prix_total_element_ttc}}
-                        </li>
-                    </ul>
-                </td>
-            </tr>
-        {{/ elements}}
-    </tbody>
-</table>
-{{# commande}}
-    <section class="whitePanel center">
-        la commande contient {{> Commande-nb_elements}} produits différents pour un montant de {{> Commande-prix_total_commande_ttc}} TTC ({{> Commande-prix_total_commande_HT}} HT + {{> Commande-tva_total_commande}} TVA).
+{{# elements | ?}}
+    <section class="whitePanel">
+        <p>Votre paniers doit être validé jeudi au plus tards pour être livré cette semaine.</p>
+        <p>Les paniers non validés ne sont pas pris en compte, c'est pour vous comme pour nous l'assurance d'évité un malentendu.</p>
+        <p>Les livraisons sont effectuées le vendredi et le samedi selon nos capacitées.</p>
     </section>
-{{/ commande}}
-{{/ elements.0 | ?}}
-{{^ elements.0 | !}}
+    {{# elements | Lookup_categorie}}
+        <h4>{{categorie}}</h4>
+        <table class="tablepanier">
+            <thead>
+                <tr>
+                    <td>Photo</td>
+                    <td>Produit</td>
+                    <td>informations</td>
+                    <td>Commande</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{# values}}
+                    <tr>
+                        <td><img src="imgs/produit.jpg" /></td>
+                        <th class="largecol">
+                            <a href="Produit.php?id_produit={{id_produit}}">{{> Produit-nom}}</a>
+                        </th>
+                        <td>
+                            <ul class="infosdetail">
+                                <li>
+                                    <span>unitée : </span>
+                                    {{> Produit-unite}}
+                                </li>
+                                <li>
+                                    <span>stock : </span>
+                                    {{> Produit-stocks_previsionnel}}
+                                </li>
+                                <li>
+                                    <span>prix unitaire : </span>
+                                    {{> Produit-prix_unitaire_ttc}}
+                                </li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul class="infosdetail">
+                                <li>
+                                    <span>quantité : </span>
+                                    {{> ElementCommande-quantite_commande-mod}}
+                                </li>
+                                <li>
+                                    <span>prix total : </span>
+                                    {{> ElementCommande-prix_total_element_ttc}}
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                {{/ values}}
+            </tbody>
+        </table>
+    {{/ elements | Lookup_categorie}}
+    {{# commande}}
+        <section class="whitePanel center">
+            la commande contient {{> Commande-nb_elements}} produits différents pour un montant de {{> Commande-prix_total_commande_ttc}} TTC ({{> Commande-prix_total_commande_HT}} HT + {{> Commande-tva_total_commande}} TVA).
+        </section>
+    {{/ commande}}
+{{/ elements | ?}}
+{{# elements | !}}
     <p class="whitePanel center">
         Votre panier est actuelement vide.
         Consulté la <a href="Produits.php">Nos produits</a> pour faire vos emplettes!
     </p>
-{{/ elements.0 | !}}
+{{/ elements | !}}

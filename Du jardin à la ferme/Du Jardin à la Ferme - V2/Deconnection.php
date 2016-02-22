@@ -10,10 +10,10 @@ API::useAPI(function(API $api){
     {
         $api->API_compte_deconnecter();
     }
-        
-    $layout->writeHeader("Déconnection");
     
-    ?> Vous êtes maintenant déconnecter, à bientôt.<?php
-        
-    $layout->writeFooter();
+    echo $layout->renderHeader('Déconnection');
+    
+    echo $layout->render('{{> SimpleMessage}}','Vous êtes maintenant déconnecté, à bientôt.');
+    
+    echo $layout->renderFooter();
 });

@@ -710,6 +710,9 @@
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.css" />
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.js" />
     <Content Include="testClient.html" />
+    <Content Include="tmplt\CreationCompte.mustache" />
+    <Content Include="tmplt\Connection.mustache" />
+    <Content Include="tmplt\SimpleMessage.mustache" />
     <Content Include="tmplt\Commande-prix_total_commande_ht.mustache" />
     <Content Include="tmplt\Commande-nb_elements.mustache" />
     <Content Include="tmplt\Commande-tva_total_commande.mustache" />
