@@ -1,7 +1,9 @@
 <?php
 require_once './private/config.php';
-require_once './private/layouttest.php';
+require_once './private/testlayout.php';
 require_once './private/api.php';
+
+
 
 API::useAPI(function(API $api){
     $layout=new LAYOUT($api);
