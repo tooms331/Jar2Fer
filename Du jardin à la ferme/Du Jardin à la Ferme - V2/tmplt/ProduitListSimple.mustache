@@ -1,0 +1,10 @@
+{{# . | Lookup_categorie}}
+    <div class="whitePanel">
+        <h5>{{categorie}}</h5>
+        <ul>
+            {{# values}}
+                <li><a href="Produit.php?id_produit={{id_produit}}">{{> Produit-nom}}</a></li>
+            {{/ values}}
+        </ul>
+    </div>
+{{/ . | Lookup_categorie}}

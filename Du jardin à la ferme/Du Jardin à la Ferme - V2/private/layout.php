@@ -97,87 +97,11 @@ class LAYOUT
     }
     
     
-    /**
-     * Summary of writeProduit_nom
-     * @param _Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduit_nom($produit, $modifiable=true)
-    {
-        if($modifiable)
-            echo $this->render("{{>Produit-nom-mod}}",$produit);
-        else
-            echo $this->render("{{>Produit-nom}}",$produit);
-    }
-    /**
-     * Summary of writeProduit_prix_unitaire_ttc
-     * @param _Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduit_prix_unitaire_ttc($produit, $modifiable=true)
-    {
-        if($modifiable)
-            echo $this->render("{{>Produit-prix_unitaire_ttc-mod}}",$produit);
-        else
-            echo $this->render("{{>Produit-prix_unitaire_ttc}}",$produit);
-    }
-    /**
-     * Summary of writeProduit_description
-     * @param _Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduit_description( $produit, $modifiable=true)
-    {
-        if($modifiable)
-            echo $this->render("{{>Produit-description-mod}}",$produit);
-        else
-            echo $this->render("{{>Produit-description}}",$produit);
-    }
-    /**
-     * Summary of writeProduit_nom
-     * @param _Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduit_unite($produit, $modifiable=true)
-    {
-        if($modifiable)
-            echo $this->render("{{>Produit-unite-mod}}",$produit);
-        else
-            echo $this->render("{{>Produit-unite}}",$produit);
-    }
-    
-    
-    /**
-     * Summary of writeProduitCommande_quantite_commande
-     * @param _ElementCommande|_Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduitCommande_quantite_commande($produit, $modifiable=true)
-    {
-        if($modifiable)
-            echo $this->render("{{>ElementCommande-quantite_commande-mod}}",$produit);
-        else
-            echo $this->render("{{>ElementCommande-quantite_commande}}",$produit);
-    }
-    
-    
-    
-    
     public function safeWrite($text)
     {
         echo htmlspecialchars($text);
     }
     
-    public function writeDecimal($prix,$decimal =2,$decimalsep=".")
-    {
-        $this->safeWrite(number_format ( $prix, $decimal, $decimalsep , ""));
-    }
-    
-    public function writePrix($prix,$decimalsep=".")
-    {
-        $this->writeDecimal($prix,2,$decimalsep);
-        $this->safeWrite(" €");
-    }
     
     public function writeHeader($title)
     {

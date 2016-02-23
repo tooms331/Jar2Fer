@@ -708,6 +708,9 @@
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.css" />
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.js" />
     <Content Include="testClient.html" />
+    <Content Include="tmplt\ProduitListDetails.mustache" />
+    <Content Include="tmplt\ProduitListSimple.mustache" />
+    <Content Include="tmplt\RechercheProduits.mustache" />
     <Content Include="tmplt\CreationCompte.mustache" />
     <Content Include="tmplt\Connection.mustache" />
     <Content Include="tmplt\SimpleMessage.mustache" />
