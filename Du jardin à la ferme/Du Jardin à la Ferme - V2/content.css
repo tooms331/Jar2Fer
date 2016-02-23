@@ -1,15 +1,15 @@
 
 
-.contentPanel {
+.whitePanel {
 }
 
-    .contentPanel p {
+    .whitePanel p {
         padding: 0.1em 1em;
-        text-indent: 1em;
+        text-indent: 0.5em;
         text-align: justify;
     }
 
-    .contentPanel h5 {
+    .whitePanel h5 {
         margin: 0.5em 0em;
         color: #1A7505;
         font-size: 1.2em;
@@ -17,7 +17,7 @@
         padding-left: 1em;
     }
 
-    .contentPanel h6 {
+    .whitePanel h6 {
         margin: 0.5em 0em;
         padding-left: 1.5em;
         font-size: 1.1em;
@@ -26,7 +26,7 @@
         color: #1A7505;
     }
 
-    .contentPanel p.citation {
+    .whitePanel p.citation {
         text-indent: 0em;
         text-align: center;
         font-weight: bold;
@@ -36,29 +36,30 @@
         background-color: #ACCAA7;
     }
 
-    .contentPanel p.signature {
+    .whitePanel p.signature {
         text-indent: 1em;
         text-align: end;
         font-weight: bold;
     }
 
-    .contentPanel ul,
-    .contentPanel ol {
+    .whitePanel ul:not(.infosdetail),
+    .whitePanel ol:not(.infosdetail) {
         margin-left: 4em;
         margin-top: 0.2em;
         margin-bottom: 0.2em;
         border-left: 2em solid #ACCAA7;
     }
 
-        .contentPanel ol > li {
+        .whitePanel ol:not(.infosdetail) > li {
             list-style: decimal;
         }
 
-        .contentPanel ul > li {
+        .whitePanel ul:not(.infosdetail) > li {
             list-style: disc;
         }
-
-    .contentPanel li {
+        
+    .whitePanel ol:not(.infosdetail) > li,
+    .whitePanel ul:not(.infosdetail) > li {
         padding: .2em;
         display: list-item;
     }

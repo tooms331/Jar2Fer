@@ -58,7 +58,6 @@ a {
         color: #760001;
     }
 
-
 body > header {
     display: block;
     padding-left: 4em;
@@ -71,7 +70,6 @@ body > nav {
     background-color: ivory;
     border-top: 1px solid green;
     border-bottom: 1px solid green;
-    margin-top: 1em;
 }
 
     body > nav > ul {
@@ -109,8 +107,6 @@ h3 {
     background-color: #1A7505;
     padding: 0.5em;
     color: white;
-    margin-bottom: 1em;
-    margin-top: 1em;
 }
 h4 {
     text-align: center;
@@ -130,11 +126,23 @@ h5 {
 
 .Main {
     display: block;
+    padding: 0em 0.5em;
     margin: auto;
-    max-width: 60em;
+    max-width: 61em;
 }
+
 .center{
     text-align:center;
+}
+
+.whitePanel {
+    display: block;
+    width: 100%;
+    border: 1px solid green;
+    background-color: ivory;
+    margin: 0.5em 0em;
+    padding: 0.5em;
+    border-radius: 1em;
 }
 
 .tableproduits {
@@ -243,16 +251,13 @@ h5 {
                 font-weight: bold;
             }
 
-.whitePanel {
-    display: block;
-    width: 100%;
-    border: 1px solid green;
-    background-color: ivory;
-    margin: 0.5em 0em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
-    border-radius: 1em;
+.whitePanel ul.simpleList {
+
 }
+    .whitePanel ul.simpleList > li {
+        display:inline-block;
+    }
+
 
 .produitInfoPanel {
     display: table;
@@ -278,4 +283,12 @@ h5 {
 }
 
 .produitDescriptionPanel {
+}
+
+body>*{
+    margin-bottom:0.5em;
+}
+
+.Main>*{
+    margin-bottom:0.5em;
 }
