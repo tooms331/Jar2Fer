@@ -31,11 +31,13 @@ API::useAPI(function(API $api){
     }
     else if(count($produits)<=20)
     {
-        echo $layout->render("{{>ProduitListDetails}}",$produits);
+        $categorized =$layout->Lookup_categories($produits);
+        echo $layout->render("{{>ProduitListDetails}}",$categorized);
     }
     else
     {   
-        echo $layout->render("{{>ProduitListSimple}}",$produits);
+        $categorized = $layout->Lookup_categories($produits);
+        echo $layout->render("{{>ProduitListSimple}}",$categorized);
     }
     
     echo $layout->renderFooter();

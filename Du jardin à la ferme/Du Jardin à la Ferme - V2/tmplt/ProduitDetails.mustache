@@ -1,5 +1,5 @@
 {{# .}}
-    <h4>{{categorie}} / {{> Produit-nom}}</h4>
+    <h4>{{> Categorie-nom}} / {{> Produit-nom}}</h4>
     <section class="produitInfoPanel">
     <div class="whitePanel">
         <img src="imgs/produit.jpg" />
@@ -9,7 +9,7 @@
         <ul class="infosdetail">
             <li>
                 <span>catégorie : </span>
-                <span>{{categorie}}</span>
+                <span>{{> Categorie-nom}}</span>
             </li>
             <li>
                 <span>produit : </span>

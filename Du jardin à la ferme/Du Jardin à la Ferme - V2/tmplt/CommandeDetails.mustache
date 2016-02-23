@@ -4,8 +4,8 @@
         <p>Les paniers non validés ne sont pas pris en compte, c'est pour vous comme pour nous l'assurance d'évité un malentendu.</p>
         <p>Les livraisons sont effectuées le vendredi et le samedi selon nos capacitées.</p>
     </section>
-    {{# elements | Lookup_categorie}}
-        <h4>{{categorie}}</h4>
+    {{# elements }}
+        <h4>{{> Categorie-nom}}</h4>
         <table class="tablepanier">
             <thead>
                 <tr>
@@ -54,7 +54,7 @@
                 {{/ values}}
             </tbody>
         </table>
-    {{/ elements | Lookup_categorie}}
+    {{/ elements}}
     {{# commande}}
         <section class="whitePanel center">
             la commande contient {{> Commande-nb_elements}} produits différents pour un montant de {{> Commande-prix_total_commande_ttc}} TTC ({{> Commande-prix_total_commande_HT}} HT + {{> Commande-tva_total_commande}} TVA).

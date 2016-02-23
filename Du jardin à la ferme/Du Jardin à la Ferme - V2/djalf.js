@@ -152,11 +152,15 @@ $(function () {
         }
     }
 
+    function UPD_Categorie(categorie) {
+        var selectors = { id_categorie: categorie.id_categorie };
+        UPD_DOM_VAL('Categorie-nom', selectors, categorie.categorie);
+    }
     function UPD_Produit(produit) {
+        UPD_Categorie(produit);
         var selectors = { id_produit: produit.id_produit };
         UPD_DOM_VAL('Produit-id_categorie', selectors, produit.id_categorie);
         UPD_DOM_VAL('Produit-produit', selectors, produit.produit);
-        UPD_DOM_VAL('Produit-categorie', selectors, produit.categorie);
         UPD_DOM_VAL('Produit-prix_unitaire_ttc', selectors, produit.prix_unitaire_ttc);
         UPD_DOM_VAL('Produit-unite', selectors, produit.unite);
         UPD_DOM_VAL('Produit-tva', selectors, produit.tva);

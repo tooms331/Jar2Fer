@@ -1,5 +1,5 @@
-{{# . | Lookup_categorie}}
-<h4>{{categorie}}</h4>
+{{# . }}
+<h4>{{> Categorie-nom}}</h4>
 <table class="tableproduits">
     <thead>
         <tr>
@@ -41,4 +41,4 @@
         {{/ values}}
     </tbody>
 </table>
-{{/ . | Lookup_categorie}}
+{{/ . }}
