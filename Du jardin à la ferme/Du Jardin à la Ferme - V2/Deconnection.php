@@ -1,6 +1,6 @@
 <?php
 require_once './private/config.php';
-require_once './private/layout.php';
+require_once './private/testlayout.php';
 require_once './private/api.php';
 
 
