@@ -91,6 +91,7 @@ class LAYOUT
                 return $value;
         }
     }
+    
     private function createViewForObject($value)
     {
         $view = [];
@@ -130,6 +131,7 @@ class LAYOUT
         }
         return $view;
     }
+    
     private function createViewFor_CompteBase($value, &$view)
     {
         $view['id_compte'] = $value->id_compte;

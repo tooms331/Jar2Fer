@@ -648,7 +648,6 @@ class BDD
                 'ProduitCommande',
                 'SELECT 
 	                view_produits.*,
-                    view_elements_commande.id_element_commande,
                     :id_commande as id_commande,
                     COALESCE(view_elements_commande.quantite_commande,0) AS quantite_commande,
                     view_elements_commande.quantite_reel,
