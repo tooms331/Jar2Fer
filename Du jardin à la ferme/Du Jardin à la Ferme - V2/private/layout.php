@@ -95,21 +95,4 @@ class LAYOUT
     {   
         return $this->render('{{>footer}}');
     }
-    
-    
-    public function safeWrite($text)
-    {
-        echo htmlspecialchars($text);
-    }
-    
-    
-    public function writeHeader($title)
-    {
-        echo $this->renderHeader((string)$title);
-    }
-    
-    public function writeFooter()
-    {
-        echo $this->renderFooter();
-    }
 }
