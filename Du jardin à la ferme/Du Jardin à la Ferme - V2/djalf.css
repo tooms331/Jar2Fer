@@ -108,6 +108,7 @@ h3 {
     padding: 0.5em;
     color: white;
 }
+.Main > details > summary,
 h4 {
     text-align: center;
     color: #1A7505;
@@ -115,6 +116,8 @@ h4 {
     background-color: ivory;
     padding: 0.5em;
     border-radius: 1em;
+    clear: both;
+    font-weight: bold;
 }
 h5 {
         margin: 0.5em 0em;
@@ -124,17 +127,38 @@ h5 {
         padding-left: 1em;
     }
 
+details {
+    display: block; /* Pour les navigateurs n'implémentant pas <details> et <summary> */
+}
+
+details {
+    display: block; /* Pour les navigateurs n'implémentant pas <details> et <summary> */
+}
+summary {
+    display: block;
+}
+
 .Main {
     display: block;
     padding: 0em 0.5em;
     margin: auto;
     max-width: 61em;
 }
+.stack > * {
+    display:block
+}
 
 .center{
     text-align:center;
 }
 
+.fullwidth{
+    width:100%;
+}
+
+.block{
+    display:block;
+}
 .whitePanel {
     display: block;
     width: 100%;
@@ -143,6 +167,19 @@ h5 {
     margin: 0.5em 0em;
     padding: 0.5em;
     border-radius: 1em;
+}
+.whitePanel:after {
+    content: " ";
+    display: table;
+    clear: both;
+}
+
+.floatleft{
+    float: left;
+}
+
+.floatright{
+    float: right;
 }
 
 .tableproduits {
@@ -235,7 +272,9 @@ h5 {
 .infosdetail {
     display: inline-table;
 }
-
+.infosdetail.block{
+    display: table;
+}
     .infosdetail > * {
     display: table-row;
     }

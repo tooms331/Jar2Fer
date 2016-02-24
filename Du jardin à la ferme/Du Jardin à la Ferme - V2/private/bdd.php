@@ -2,7 +2,7 @@
 require_once 'config.php';
 require_once 'password.php';
 require_once 'entities.php';
-require_once '../libs/HTMLPurifier.standalone.php';
+require_once '/libs/HTMLPurifier.standalone.php';
 
 
 /**
