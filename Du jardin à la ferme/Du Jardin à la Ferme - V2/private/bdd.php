@@ -2,7 +2,7 @@
 require_once 'config.php';
 require_once 'password.php';
 require_once 'entities.php';
-require_once '/libs/HTMLPurifier.standalone.php';
+require_once '../libs/HTMLPurifier.standalone.php';
 
 
 /**
@@ -1050,14 +1050,14 @@ class BDD
                 ]
             );
             
-            return $this->Commande_lister_Elements($id_commande);
+            return $this->Commande_Recupere($id_commande);
         });
     }
     
     /**
      * supprime une commande
      * @param int $id_commande 
-     * @return Commande
+     * @return bool
      */
     public function Commande_Supprimer($id_commande)
     {   
@@ -1076,7 +1076,7 @@ class BDD
                 ]
             );
             
-            return $this->Commande_Recupere($id_commande);
+            return true;
         });
     }
     
