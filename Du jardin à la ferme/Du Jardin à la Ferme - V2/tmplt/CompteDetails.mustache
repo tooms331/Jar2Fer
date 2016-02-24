@@ -3,8 +3,9 @@
     Nous nous engageons à ce que les informations que vous nous communiquer ne servent qu'as la bonne gestion de la ferme par exemple : établissement des factures, gestion des livraisons...
     <strong>En particulier, nous ne communiquons pas et ne communiquerons jamais d'informations sur votre compte a des fin d'analyse marketing de démarchage ou autre opération commercial.</strong>
 </p>
-<details>
+<details {{# erreur_demande_statut}} open="open" {{/ erreur_demande_statut}}>
     <summary>Statut du Compte : {{statut}}</summary>
+    {{# erreur_demande_statut}}{{> SimpleMessage}}{{/ erreur_demande_statut}}
     <form class="whitePanel" action="Connection.php" accept-charset="utf-8" enctype="multipart/form-data">
 
         <p>Votre statut actuel est : <b>{{statut}}</b></p>
@@ -24,17 +25,18 @@
             <label><input type="radio" name="demande_statut" value="Premium" /> <u><b>Engagement Libre Service : </b></u></label>
             <p style="padding-left:2em;">
                 Vous vous engagez chaque semaine à faire une commande d'un certain montant. En contre parti, les commandes vous sont ouverte dés le lundi jusqu'au vendredi.<br />
-                <label><i>Montant de votre engagement : <input type="number" name="Engagement" min="0" step="1" value="10" /> €</i></label>
+                <label><i>Montant de votre engagement : <input type="number" name="engagement" min="0" step="1" value="10" /> €</i></label>
             </p>
         </div>
         <br />
-        <input type="hidden" name="type" value="STATUT" />
+        <input type="hidden" name="type" value="Demande-Statut" />
         <input class="floatright" type="submit" value="Demander un changement de statut" />
     </form>
 </details>
 
-<details>
+<details {{# erreur_change_password}} open="open" {{/ erreur_change_password}}>
     <summary>Mot de passe : </summary>
+    {{# erreur_change_password}}{{> SimpleMessage}}{{/ erreur_change_password}}
     <form class="whitePanel" action="Connection.php" accept-charset="utf-8" enctype="multipart/form-data">
         <p>Vous pouvez modifier votre mot de passe</p>
         <ul class="infosdetail block">
@@ -51,77 +53,77 @@
                 <input id="motdepasse_nouveau_confirmation_modification" name="motdepasse_nouveau_confirmation" type="password" />
             </li>
         </ul>
-        <input type="hidden" name="type" value="ChangePassword" />
+        <input type="hidden" name="type" value="Change-Password" />
         <input class="floatright" type="submit" value="Modifier mon mot de passe" />
     </form>
 </details>
 
-<details>
+<details {{# erreur_change_adresses}} open="open" {{/ erreur_change_adresses}}>
     <summary>Facturation et livraison : </summary>
-
+    {{# erreur_change_adresses}}{{> SimpleMessage}}{{/ erreur_change_adresses}}
     <form class="whitePanel" action="Connection.php" accept-charset="utf-8" enctype="multipart/form-data">
         <p>Vous pouvez indiquez vos adresses de facturation et de livaison</p>
-        <h5>Facturation</h5>
-        <ul class="infosdetail block">
-            <li>
-                <label for="titre_facturation">Titre : </label>
-                <input id="titre_facturation" name="titre_facturation" type="text" />
-            </li>
-            <li>
-                <label for="prenom_facturation">Prénom : </label>
-                <input id="prenom_facturation" name="prenom_facturation" type="text" />
-            </li>
-            <li>
-                <label for="nom_facturation">Nom : </label>
-                <input id="nom_facturation" name="nom_facturation" type="text" />
-            </li>
-            <li>
-                <label for="adresse_A_facturation">Adresse : </label>
-                <span class="stack">
-                    <input id="adresse_A_facturation" name="adresse_A_facturation" type="text" />
-                    <input id="adresse_B_facturation" name="adresse_B_facturation" type="text" />
-                </span>
-            </li>
-            <li>
-                <label for="codepostal_facturation">Code postal : </label>
-                <input id="codepostal_facturation" name="codepostal_facturation" type="text" />
-            </li>
-            <li>
-                <label for="ville_facturation">Ville : </label>
-                <input id="ville_facturation" name="ville_facturation" type="text" />
-            </li>
-        </ul>
-        <h5>Livraison</h5>
-        <ul class="infosdetail block">
-            <li>
-                <label for="titre_livraison">Titre : </label>
-                <input id="titre_livraison" name="titre_livraison" type="text" />
-            </li>
-            <li>
-                <label for="prenom_livraison">Prénom : </label>
-                <input id="prenom_livraison" name="prenom_livraison" type="text" />
-            </li>
-            <li>
-                <label for="nom_livraison">Nom : </label>
-                <input id="nom_livraison" name="nom_livraison" type="text" />
-            </li>
-            <li>
-                <label for="adresse_A_livraison">Adresse : </label>
-                <span class="stack">
-                    <input id="adresse_A_livraison" name="adresse_A_livraison" type="text" />
-                    <input id="adresse_B_livraison" name="adresse_B_livraison" type="text" />
-                </span>
-            </li>
-            <li>
-                <label for="codepostal_livraison">Code postal : </label>
-                <input id="codepostal_livraison" name="codepostal_livraison" type="text" />
-            </li>
-            <li>
-                <label for="ville_livraison">Ville : </label>
-                <input id="ville_livraison" name="ville_livraison" type="text" />
-            </li>
-        </ul>
-        <input type="hidden" name="type" value="ChangeAdresses" />
+        <div class="try2cols">
+            <fieldset>
+                <legend>Facturation</legend>
+                <ul class="infosdetail block fullwidth">
+                    <li>
+                        <label for="titre_facturation">Titre : </label>
+                        <input id="titre_facturation" name="titre_facturation" type="text" />
+                    </li>
+                    <li>
+                        <label for="prenom_facturation">Prénom : </label>
+                        <input id="prenom_facturation" name="prenom_facturation" type="text" />
+                    </li>
+                    <li>
+                        <label for="nom_facturation">Nom : </label>
+                        <input id="nom_facturation" name="nom_facturation" type="text" />
+                    </li>
+                    <li>
+                        <label for="adresse_facturation">Adresse : </label>
+                        <textarea id="adresse_facturation" name="adresse_facturation"></textarea>
+                    </li>
+                    <li>
+                        <label for="codepostal_facturation">Code postal : </label>
+                        <input id="codepostal_facturation" name="codepostal_facturation" type="text" />
+                    </li>
+                    <li>
+                        <label for="ville_facturation">Ville : </label>
+                        <input id="ville_facturation" name="ville_facturation" type="text" />
+                    </li>
+                </ul>
+            </fieldset>
+            <fieldset>
+                <legend>Livraison</legend>
+                <ul class="infosdetail block fullwidth">
+                    <li>
+                        <label for="titre_livraison">Titre : </label>
+                        <input id="titre_livraison" name="titre_livraison" type="text" />
+                    </li>
+                    <li>
+                        <label for="prenom_livraison">Prénom : </label>
+                        <input id="prenom_livraison" name="prenom_livraison" type="text" />
+                    </li>
+                    <li>
+                        <label for="nom_livraison">Nom : </label>
+                        <input id="nom_livraison" name="nom_livraison" type="text" />
+                    </li>
+                    <li>
+                        <label for="adresse_livraison">Adresse : </label>
+                        <textarea id="adresse_livraison" name="adresse_livraison"></textarea>
+                    </li>
+                    <li>
+                        <label for="codepostal_livraison">Code postal : </label>
+                        <input id="codepostal_livraison" name="codepostal_livraison" type="text" />
+                    </li>
+                    <li>
+                        <label for="ville_livraison">Ville : </label>
+                        <input id="ville_livraison" name="ville_livraison" type="text" />
+                    </li>
+                </ul>
+            </fieldset>
+        </div>
+        <input type="hidden" name="type" value="Change-Adresses" />
         <input class="floatright" type="submit" value="Modififier mes addresses" />
     </form>
 </details>

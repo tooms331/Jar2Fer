@@ -127,6 +127,25 @@ h5 {
         padding-left: 1em;
     }
 
+fieldset {
+    border: 1px solid #1A7505;
+    border-radius: 1em;
+}
+.try2cols{
+    display:block;
+    text-align:center;
+}
+.try2cols>*{
+    display:block;
+    display:inline-block;
+    min-width:49%;
+    text-align:left;
+}
+fieldset>legend {
+    color: #1A7505;
+    font-weight: bold;
+}
+
 details {
     display: block; /* Pour les navigateurs n'implémentant pas <details> et <summary> */
 }
@@ -176,10 +195,12 @@ summary {
 
 .floatleft{
     float: left;
+    margin:0.2em;
 }
 
 .floatright{
     float: right;
+    margin:0.2em;
 }
 
 .tableproduits {
@@ -283,6 +304,7 @@ summary {
             display: table-cell;
             text-align: left;
             white-space: nowrap;
+            vertical-align: middle;
         }
 
             .infosdetail > * > *:first-child {

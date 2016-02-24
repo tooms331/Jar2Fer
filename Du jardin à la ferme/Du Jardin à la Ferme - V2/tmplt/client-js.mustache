@@ -1,0 +1,52 @@
+function createApiClient(onerrorcb) {
+    function call_core(commande,params)
+    {
+        var defered = $.Deferred();
+        var postprom = $.post(
+            "endpoint.php",
+            {
+                commande: commande,
+                params: params
+            }
+        );
+        postprom.done(function (result) {
+            if(result.status == 'success')
+            {
+                defered.resolve(result.value);
+            }
+            else
+            {
+                defered.reject(result.value);
+            }
+        });
+        postprom.fail(function(err){
+            try
+            {
+                var result =JSON.parse(err.responseText.trim());
+                if(result.status == 'success')
+                {
+                    defered.resolve(result.value);
+                }
+                else
+                {
+                    defered.reject(result.value);
+                }
+            }
+            catch(ex)
+            {
+                defered.reject('erreur non gérée');
+            }
+        });
+	    var prom = defered.promise();
+        if(onerrorcb)
+            prom.fail(onerrorcb);
+        return prom;
+    }
+    return {
+{{# . }}
+        {{ method }} : function({{ parameters }}) {
+            return call_core('{{ method }}', arguments);
+        },
+{{/ . }}
+    };
+};
