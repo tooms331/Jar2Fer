@@ -1,8 +1,8 @@
 <?php
-require_once 'config.php';
-require_once 'password.php';
-require_once 'entities.php';
-require_once '/libs/HTMLPurifier.standalone.php';
+require_once('./private/config.php');
+require_once('./private/entities.php');
+require_once('./libs/password.php');
+require_once('./libs/HTMLPurifier.standalone.php');
 
 
 /**

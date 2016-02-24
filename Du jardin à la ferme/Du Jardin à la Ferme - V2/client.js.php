@@ -1,5 +1,6 @@
 <?php 
-require_once './private/api.php';
+require_once('./private/config.php');
+require_once('./private/api.php');
 header('Content-Type: application/javascript; charset:utf-8');
 header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Expires: 0');

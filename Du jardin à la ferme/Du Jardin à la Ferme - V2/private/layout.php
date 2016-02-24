@@ -1,6 +1,9 @@
 <?php
-require_once 'config.php';
-require_once 'api.php';
+require_once('./private/config.php');
+require_once('./private/entities.php');
+require_once('./private/api.php');
+require_once('./libs/password.php');
+require_once('./libs/mustache.php');
 
 class LAYOUT
 {   

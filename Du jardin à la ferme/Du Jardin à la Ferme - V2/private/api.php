@@ -1,7 +1,7 @@
 <?php 
-require_once './private/config.php';
-require_once './private/bdd.php';
-require_once('./private/mustache.php');
+require_once('./private/config.php');
+require_once('./private/entities.php');
+require_once('./private/bdd.php');
 
 class API
 { 
@@ -395,5 +395,4 @@ class API
         
         return $this->bdd->Commande_Modifier_Element($id_commande, $id_produit, $quantite);
     }
-    
 }
