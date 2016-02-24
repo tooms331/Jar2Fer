@@ -54,9 +54,9 @@ a {
     cursor: pointer;
 }
 
-    a:hover {
+    /*a:hover {
         color: #760001;
-    }
+    }*/
 
 body > header {
     display: block;
@@ -131,27 +131,22 @@ fieldset {
     border: 1px solid #1A7505;
     border-radius: 1em;
 }
-.try2cols{
+.inlines{
     display:block;
     text-align:center;
 }
-.try2cols>*{
-    display:block;
+.inlines>*{
     display:inline-block;
-    min-width:49%;
     text-align:left;
 }
+
 fieldset>legend {
     color: #1A7505;
     font-weight: bold;
+    font-size: 1.05em;
 }
-
 details {
-    display: block; /* Pour les navigateurs n'implémentant pas <details> et <summary> */
-}
-
-details {
-    display: block; /* Pour les navigateurs n'implémentant pas <details> et <summary> */
+    display: block;
 }
 summary {
     display: block;
@@ -289,7 +284,27 @@ summary {
                 .tablepanier > tbody > tr > * > img {
                     height: 3em;
                 }
-
+.blockProperties,
+.fluidProperties {
+    display:block;
+}
+.fluidProperties >*{
+    display:inline-block;
+}
+.blockProperties>*{
+    display:block;
+}
+.blockProperties>*,
+.fluidProperties >*{
+    margin: 0.2em 1em;
+    padding: 0.2em;
+    border: 1px solid #ACCAA7;
+    border-left-width: 1em;
+}
+.blockProperties.stacked >*>*,
+.fluidProperties.stacked >*>*{
+    display:block;
+}
 .infosdetail {
     display: inline-table;
 }
@@ -307,7 +322,7 @@ summary {
             vertical-align: middle;
         }
 
-            .infosdetail > * > *:first-child {
+            .infosdetail > * > :first-child {
                 text-align: right;
                 font-weight: bold;
             }

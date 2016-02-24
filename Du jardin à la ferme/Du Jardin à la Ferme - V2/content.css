@@ -23,7 +23,7 @@
         font-size: 1.1em;
         font-weight: bold;
         text-decoration: underline;
-        color: #1A7505;
+        font-size: 1em;
     }
 
     .whitePanel p.citation {
@@ -42,24 +42,24 @@
         font-weight: bold;
     }
 
-    .whitePanel ul:not(.infosdetail),
-    .whitePanel ol:not(.infosdetail) {
+    .whitePanel ul:not([class]),
+    .whitePanel ol:not([class]) {
         margin-left: 4em;
         margin-top: 0.2em;
         margin-bottom: 0.2em;
         border-left: 2em solid #ACCAA7;
     }
 
-        .whitePanel ol:not(.infosdetail) > li {
+        .whitePanel ol:not([class]) > li {
             list-style: decimal;
         }
 
-        .whitePanel ul:not(.infosdetail) > li {
+        .whitePanel ul:not([class]) > li {
             list-style: disc;
         }
         
-    .whitePanel ol:not(.infosdetail) > li,
-    .whitePanel ul:not(.infosdetail) > li {
+    .whitePanel ol:not([class]) > li,
+    .whitePanel ul:not([class]) > li {
         padding: .2em;
         display: list-item;
     }

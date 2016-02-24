@@ -79,14 +79,14 @@ $(function () {
         elm.attr('size', elm.val().length);
     }
 
-    $('input[type="text"]')
-        .keyup(resizeInput)
-        .change(resizeInput)
-        .each(resizeInput);
-    $('input[type="number"]')
-        .keyup(resizeInput)
-        .change(resizeInput)
-        .each(resizeInput);
+    //$('input[type="text"]')
+    //    .keyup(resizeInput)
+    //    .change(resizeInput)
+    //    .each(resizeInput);
+    //$('input[type="number"]')
+    //    .keyup(resizeInput)
+    //    .change(resizeInput)
+    //    .each(resizeInput);
 
     $('[data-decimals]')
         .change(checkDecimals)
@@ -210,7 +210,7 @@ $(function () {
             .done(UPD_Produit);
     });
     
-    bindEDITOR('Produit-description', UPD_Produit, function (elm, editor) {
+    bindEDITOR('Produit-description', function (elm, editor) {
         apiClient
             .produit_modifier_description(elm.data("id_produit"), editor.getData())
             .done(UPD_Produit);

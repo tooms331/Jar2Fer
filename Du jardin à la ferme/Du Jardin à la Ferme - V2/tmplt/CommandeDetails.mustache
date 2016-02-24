@@ -56,8 +56,26 @@
         </table>
     {{/ elements}}
     {{# commande}}
+        <h4>Résumé de la commande : </h4>
         <section class="whitePanel center">
-            la commande contient {{> Commande-nb_elements}} produits différents pour un montant de {{> Commande-prix_total_commande_ttc}} TTC ({{> Commande-prix_total_commande_HT}} HT + {{> Commande-tva_total_commande}} TVA).
+            <ul class="infosdetail floatright">
+                <li>
+                    <span>Nombre de produits : </span>
+                    {{> Commande-nb_elements}}
+                </li>
+                <li>
+                    <span>Montant hors-taxe : </span>
+                    {{> Commande-prix_total_commande_HT}}
+                </li>
+                <li>
+                    <span>Montant de la TVA : </span>
+                    {{> Commande-tva_total_commande}}
+                </li>
+                <li style="font-size:1.2em;">
+                    <span>Montant toutes-taxes-comprises : </span>
+                    {{> Commande-prix_total_commande_ttc}}
+                </li>
+            </ul>
         </section>
     {{/ commande}}
 {{/ elements | ?}}
