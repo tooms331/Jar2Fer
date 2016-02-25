@@ -180,6 +180,7 @@
     <Folder Include="libs\standalone\HTMLPurifier\Printer\" />
     <Folder Include="tmplt\" />
     <Folder Include="private\" />
+    <Folder Include="tmplt\cache\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="libs\ckeditor\adapters\jquery.js" />

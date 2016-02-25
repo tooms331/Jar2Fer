@@ -63,7 +63,10 @@ class API
         {
             if($CompteConnecte===false)
             {
-                $CompteConnecte=$this->bdd->Compte_Recuperer((int)$_SESSION['CompteConnecte']);
+                if(isset($_SESSION['CompteConnecte']))
+                    $CompteConnecte=$this->bdd->Compte_Recuperer((int)$_SESSION['CompteConnecte']);
+                else
+                    $CompteConnecte=null;
             }
         }
         else

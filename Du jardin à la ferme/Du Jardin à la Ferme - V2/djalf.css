@@ -52,11 +52,12 @@ textarea {
 
 a {
     cursor: pointer;
+    color: #1200FF;
 }
 
-    /*a:hover {
-        color: #760001;
-    }*/
+    a:hover {
+        background-color: #ACCAA7;
+    }
 
 body > header {
     display: block;
@@ -75,31 +76,33 @@ body > nav {
     body > nav > ul {
         text-align: center;
     }
+
         body > nav > ul > li {
             display: inline-block;
         }
 
-        body > nav > ul > li > a {
-            display: inline-block;
-            margin: 0.2em 0.5em;
-            border: 1px solid #ACCAA7;
-            padding: 0.5em;
-            border-radius: 0.5em;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #1A7505;
-        }
-
-            body > nav > ul > li > a:hover {
-                background-color: #ACCAA7;
-                text-decoration:none;
+            body > nav > ul > li > a {
+                display: inline-block;
+                margin: 0.2em 0.5em;
+                border: 1px solid #ACCAA7;
+                padding: 0.5em;
+                border-radius: 0.5em;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 1.1em;
+                color: #1A7505;
             }
+
+                body > nav > ul > li > a:hover {
+                    background-color: #ACCAA7;
+                    text-decoration: none;
+                }
+
 h1 {
 }
 
 h2 {
-        color: #1A7505;
+    color: #1A7505;
 }
 
 h3 {
@@ -108,6 +111,7 @@ h3 {
     padding: 0.5em;
     color: white;
 }
+
 .Main > details > summary,
 h4 {
     text-align: center;
@@ -119,35 +123,44 @@ h4 {
     clear: both;
     font-weight: bold;
 }
+
 h5 {
-        margin: 0.5em 0em;
-        color: #1A7505;
-        font-size: 1.2em;
-        border-bottom: 1px solid #1A7505;
-        padding-left: 1em;
-    }
+    margin: 0.5em 0em;
+    color: #1A7505;
+    font-size: 1.2em;
+    border-bottom: 1px solid #1A7505;
+    padding-left: 1em;
+}
+
+img {
+    vertical-align: middle;
+}
 
 fieldset {
     border: 1px solid #1A7505;
     border-radius: 1em;
 }
-.inlines{
-    display:block;
-    text-align:center;
-}
-.inlines>*{
-    display:inline-block;
-    text-align:left;
+
+.inlines {
+    display: block;
+    text-align: center;
 }
 
-fieldset>legend {
+    .inlines > * {
+        display: inline-block;
+        text-align: left;
+    }
+
+fieldset > legend {
     color: #1A7505;
     font-weight: bold;
     font-size: 1.05em;
 }
+
 details {
     display: block;
 }
+
 summary {
     display: block;
 }
@@ -158,21 +171,27 @@ summary {
     margin: auto;
     max-width: 61em;
 }
+
 .stack > * {
-    display:block
+    display: block;
 }
 
-.center{
+.center {
+    width: auto;
+    margin: auto;
+}
+
+.textcenter {
     text-align:center;
 }
-
-.fullwidth{
-    width:100%;
+.fullwidth {
+    width: 100%;
 }
 
-.block{
-    display:block;
+.block {
+    display: block;
 }
+
 .whitePanel {
     display: block;
     width: 100%;
@@ -182,20 +201,145 @@ summary {
     padding: 0.5em;
     border-radius: 1em;
 }
-.whitePanel:after {
-    content: " ";
-    display: table;
-    clear: both;
-}
 
-.floatleft{
+    .whitePanel:after {
+        content: " ";
+        display: table;
+        clear: both;
+    }
+
+    .whitePanel p {
+        padding: 0.1em 1em;
+        text-indent: 0.5em;
+        text-align: justify;
+    }
+
+    .whitePanel h5 {
+        margin: 0.5em 0em;
+        color: #1A7505;
+        font-size: 1.2em;
+        border-bottom: 1px solid #1A7505;
+        padding-left: 1em;
+        text-align: center;
+    }
+
+    .whitePanel h6 {
+        margin: 0.5em 0em;
+        padding-left: 1.5em;
+        font-size: 1.1em;
+        font-weight: bold;
+        text-decoration: underline;
+        font-size: 1em;
+    }
+
+
+    .whitePanel .signature {
+        text-indent: 1em;
+        text-align: end;
+        font-weight: bold;
+    }
+
+    .whitePanel .citation {
+        text-indent: 0em;
+        text-align: center;
+        font-weight: bold;
+        margin: 1em 4em;
+        padding: 1em;
+        border-left: 5px solid #1A7505;
+        background-color: #ACCAA7;
+    }
+
+    .whitePanel .alert {
+        text-indent: 0em;
+        text-align: center;
+        font-weight: bold;
+        margin: 1em 4em;
+        padding: 1em;
+        border-left: 5px solid #1A7505;
+        background-color: #ACCAA7;
+    }
+
+    .whitePanel ul.simpleList,
+    .whitePanel ul:not([class]),
+    .whitePanel ol:not([class]) {
+        margin: 0.2em 2em;
+        margin-bottom: 0.2em;
+        border-left: 2em solid #ACCAA7;
+    }
+
+        .whitePanel ol:not([class]) > li {
+            list-style: decimal;
+        }
+
+        .whitePanel ul:not([class]) > li {
+            list-style: disc;
+        }
+
+        .whitePanel ol:not([class]) > li,
+        .whitePanel ul:not([class]) > li {
+            padding: .2em;
+            display: list-item;
+        }
+
+        .whitePanel ul.simpleList > li {
+            display: inline-block;
+            padding: 0.2em;
+        }
+
+    .whitePanel table:not([class]) {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0em 0.4em;
+    }
+
+        .whitePanel table:not([class]) > thead {
+            display: none;
+        }
+
+        .whitePanel table:not([class]) > tbody > tr > * {
+            padding: 0.1em 0.5em;
+            border-top: 1px solid #ACCAA7;
+            border-bottom: 1px solid #ACCAA7;
+            vertical-align: middle;
+        }
+
+        .whitePanel table:not([class]) > tbody > tr > th {
+            width: 100%;
+            text-align: left;
+        }
+        
+        .whitePanel table:not([class]) > tbody > tr > th:only-child,
+        .whitePanel table:not([class]) > tfoot > tr > th:only-child {
+            color: #1A7505;
+            text-align: center;
+            border-width: 0px;
+            border-bottom: 1px solid #1A7505;
+        }
+
+            .whitePanel table:not([class]) > * > tr > th:only-child {
+                text-align: center;
+            }
+
+        .whitePanel table:not([class]) > tbody > tr > :first-child {
+            border-left: 2em solid #ACCAA7;
+        }
+
+        .whitePanel table:not([class]) > tbody > tr > :last-child {
+            border-right: 1px solid #ACCAA7;
+        }
+        
+        .whitePanel table:not([class]) > tfoot > tr > * {
+            text-align: right;
+        }
+        
+.floatleft {
     float: left;
-    margin:0.2em;
+    margin: 0.2em;
 }
 
-.floatright{
+.floatright {
     float: right;
-    margin:0.2em;
+    margin: 0.2em;
 }
 
 .tableproduits {
@@ -267,10 +411,11 @@ summary {
                 font-size: 1.2em;
                 text-align: left;
             }
+
             .tablepanier > tbody > tr > .largecol {
                 width: auto;
             }
-            
+
 
             .tablepanier > tbody > tr > * {
                 display: table-cell;
@@ -284,35 +429,44 @@ summary {
                 .tablepanier > tbody > tr > * > img {
                     height: 3em;
                 }
+
 .blockProperties,
 .fluidProperties {
-    display:block;
+    display: block;
 }
-.fluidProperties >*{
-    display:inline-block;
-}
-.blockProperties>*{
-    display:block;
-}
-.blockProperties>*,
-.fluidProperties >*{
-    margin: 0.2em 1em;
-    padding: 0.2em;
-    border: 1px solid #ACCAA7;
-    border-left-width: 1em;
-}
-.blockProperties.stacked >*>*,
-.fluidProperties.stacked >*>*{
-    display:block;
-}
+
+    .fluidProperties > * {
+        display: inline-block;
+    }
+
+    .blockProperties > * {
+        display: block;
+    }
+
+    .blockProperties > *,
+    .fluidProperties > * {
+        margin: 0.2em 1em;
+        padding: 0.2em;
+        border: 1px solid #ACCAA7;
+        border-left-width: 1em;
+    }
+
+    .blockProperties.stacked > * > *,
+    .fluidProperties.stacked > * > * {
+        display: block;
+    }
+
 .infosdetail {
-    display: inline-table;
-}
-.infosdetail.block{
     display: table;
+    border-spacing: 0.2em;
 }
+
+    .infosdetail.block {
+        display: table;
+    }
+
     .infosdetail > * {
-    display: table-row;
+        display: table-row;
     }
 
         .infosdetail > * > * {
@@ -322,18 +476,10 @@ summary {
             vertical-align: middle;
         }
 
-            .infosdetail > * > :first-child {
-                text-align: right;
-                font-weight: bold;
-            }
-
-.whitePanel ul.simpleList {
-
-}
-    .whitePanel ul.simpleList > li {
-        display:inline-block;
-    }
-
+        .infosdetail > * > :first-child {
+            text-align: right;
+            font-weight: bold;
+        }
 
 .produitDetails {
     display: table;
@@ -347,7 +493,8 @@ summary {
         width: 0.5em;
         height: 100%;
     }
-    .produitDetails > :last-child  {
+
+    .produitDetails > :last-child {
         width: auto;
     }
 
@@ -355,10 +502,10 @@ summary {
         width: 15em;
     }
 
-body>*{
-    margin-bottom:0.5em;
+body > * {
+    margin-bottom: 0.5em;
 }
 
-.Main>*{
-    margin-bottom:0.5em;
+.Main > * {
+    margin-bottom: 0.5em;
 }

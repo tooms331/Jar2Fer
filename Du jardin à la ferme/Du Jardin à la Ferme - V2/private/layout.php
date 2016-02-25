@@ -2,7 +2,6 @@
 require_once('./private/config.php');
 require_once('./private/entities.php');
 require_once('./private/api.php');
-require_once('./libs/password.php');
 require_once('./libs/mustache.php');
 
 class LAYOUT
@@ -23,6 +22,7 @@ class LAYOUT
         $this->m = new Mustache_Engine(array(
             'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt'),
             'pragmas'=>[Mustache_Engine::PRAGMA_FILTERS],
+            'cache'=>new Mustache_Cache_FilesystemCache(dirname(dirname(__FILE__)).'/tmplt/cache'),
             'helpers'=>[
                 'render'=>function($template, Mustache_LambdaHelper $lambdaHelper){
                     $context = $lambdaHelper->getContext();

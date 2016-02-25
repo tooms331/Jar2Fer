@@ -7,7 +7,7 @@ require_once('./private/layout.php');
 API::useAPI(function(API $api){
     $layout=new LAYOUT($api);
     
-    $rechercheProduit= ((string)$_REQUEST['rechercheProduit'])?:"";
+    $rechercheProduit=isset($_REQUEST['rechercheProduit'])? (string)$_REQUEST['rechercheProduit']:"";
     $produits = $api->API_produits_lister($rechercheProduit);
     
     echo $layout->renderHeader("Nos Produits");

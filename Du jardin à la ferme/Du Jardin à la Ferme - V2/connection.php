@@ -11,10 +11,9 @@ API::useAPI(function(API $api){
     
     if(!$api->estAuthentifier())
     {   
-        $email = (string)$_REQUEST['email'];
-        $motdepasse = (string)$_REQUEST['motdepasse'];
-        $type = (string)$_REQUEST['type'];
-        
+        $email=isset($_REQUEST['email'])? (string)$_REQUEST['email']:"";
+        $motdepasse=isset($_REQUEST['motdepasse'])? (string)$_REQUEST['motdepasse']:"";
+        $type=isset($_REQUEST['type'])? (string)$_REQUEST['type']:"";
         
         if(!empty($email) && !empty($motdepasse))
         {
