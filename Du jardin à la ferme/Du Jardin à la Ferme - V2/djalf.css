@@ -124,14 +124,14 @@ h4 {
     font-weight: bold;
 }
 
-h5 {
-    margin: 0.5em 0em;
-    color: #1A7505;
-    font-size: 1.2em;
-    border-bottom: 1px solid #1A7505;
-    padding-left: 1em;
-}
-
+   h5 {
+        margin: 0.5em 0em;
+        color: #1A7505;
+        font-size: 1.2em;
+    border-bottom: 2px solid #1A7505;
+        padding-left: 1em;
+        text-align: center;
+    }
 img {
     vertical-align: middle;
 }
@@ -171,7 +171,9 @@ summary {
     margin: auto;
     max-width: 61em;
 }
-
+.nobr{
+    white-space:nowrap;
+}
 .stack > * {
     display: block;
 }
@@ -214,14 +216,6 @@ summary {
         text-align: justify;
     }
 
-    .whitePanel h5 {
-        margin: 0.5em 0em;
-        color: #1A7505;
-        font-size: 1.2em;
-        border-bottom: 1px solid #1A7505;
-        padding-left: 1em;
-        text-align: center;
-    }
 
     .whitePanel h6 {
         margin: 0.5em 0em;
@@ -292,44 +286,40 @@ summary {
         border-spacing: 0em 0.4em;
     }
 
-        .whitePanel table:not([class]) > thead {
+        .whitePanel table:not([class]) > thead,
+        .whitePanel table:not([class]) > tfoot {
             display: none;
         }
 
         .whitePanel table:not([class]) > tbody > tr > * {
             padding: 0.1em 0.5em;
-            border-top: 1px solid #ACCAA7;
-            border-bottom: 1px solid #ACCAA7;
+            border-top: 2px solid #ACCAA7;
+            border-bottom: 2px solid #ACCAA7;
+            border-left: 1px dotted #ACCAA7;
             vertical-align: middle;
         }
 
         .whitePanel table:not([class]) > tbody > tr > th {
-            width: 100%;
             text-align: left;
         }
         
-        .whitePanel table:not([class]) > tbody > tr > th:only-child,
-        .whitePanel table:not([class]) > tfoot > tr > th:only-child {
+        .whitePanel table:not([class]) > tbody > tr > th:only-child {
             color: #1A7505;
             text-align: center;
             border-width: 0px;
-            border-bottom: 1px solid #1A7505;
+            border-bottom: 2px solid #1A7505;
         }
 
-            .whitePanel table:not([class]) > * > tr > th:only-child {
+            .whitePanel table:not([class]) > tbody > tr > th:only-child {
                 text-align: center;
             }
 
-        .whitePanel table:not([class]) > tbody > tr > :first-child {
+        .whitePanel table:not([class]) > tbody > tr > *:first-child {
             border-left: 2em solid #ACCAA7;
         }
 
-        .whitePanel table:not([class]) > tbody > tr > :last-child {
-            border-right: 1px solid #ACCAA7;
-        }
-        
-        .whitePanel table:not([class]) > tfoot > tr > * {
-            text-align: right;
+        .whitePanel table:not([class]) > tbody > tr > *:last-child {
+            border-right: 2px solid #ACCAA7;
         }
         
 .floatleft {
@@ -381,55 +371,6 @@ summary {
             }
 
 
-.tablepanier {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-    .tablepanier > thead {
-        display: none;
-    }
-
-    .tablepanier > tbody {
-        display: block;
-        padding: 0em 1em;
-    }
-
-        .tablepanier > tbody > tr {
-            display: table;
-            border: 1px solid green;
-            background-color: ivory;
-            margin: 0.5em 0em;
-            padding: 0.5em;
-            border-radius: 1em;
-            width: 100%;
-            table-layout: auto;
-        }
-
-            .tablepanier > tbody > tr > th {
-                font-size: 1.2em;
-                text-align: left;
-            }
-
-            .tablepanier > tbody > tr > .largecol {
-                width: auto;
-            }
-
-
-            .tablepanier > tbody > tr > * {
-                display: table-cell;
-                vertical-align: middle;
-                padding: 0.5em;
-                width: 1%;
-                white-space: nowrap;
-                text-align: right;
-            }
-
-                .tablepanier > tbody > tr > * > img {
-                    height: 3em;
-                }
-
 .blockProperties,
 .fluidProperties {
     display: block;
@@ -458,6 +399,7 @@ summary {
 
 .infosdetail {
     display: table;
+    margin:auto;
     border-spacing: 0.2em;
 }
 

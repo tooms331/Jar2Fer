@@ -74,19 +74,23 @@ $(function () {
         return true;
     }
 
-    function resizeInput() {
-        var elm = $(this);
-        elm.attr('size', elm.val().length);
-    }
-
-    //$('input[type="text"]')
-    //    .keyup(resizeInput)
-    //    .change(resizeInput)
-    //    .each(resizeInput);
-    //$('input[type="number"]')
-    //    .keyup(resizeInput)
-    //    .change(resizeInput)
-    //    .each(resizeInput);
+    
+    
+    $('.fitToParent')
+        .each(function(){
+            var elm = $(this);
+            var parent = elm.parent();
+            new ResizeSensor(parent, function () {
+                elm.outerWidth(parent.width());
+                elm.outerHeight(parent.height());
+            });
+        })
+        .each(function resizeInput() {
+            var elm = $(this);
+            var parent = elm.parent();
+            elm.outerWidth(parent.width());
+            elm.outerHeight(parent.height());
+        });
 
     $('[data-decimals]')
         .change(checkDecimals)

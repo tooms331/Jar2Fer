@@ -13,7 +13,8 @@ API::useAPI(function(API $api){
     
     echo $layout->renderHeader("Mon Panier");
     
-    $categorized = $layout->Lookup_categories($elements);
+    $categorized =$layout->Lookup($elements,'id_categorie',['id_categorie'=>'id_categorie','categorie'=>'categorie']);
+        
     echo $layout->render('{{> CommandeDetails}}', [
         'commande'=>$panier,
         'elements'=>$categorized

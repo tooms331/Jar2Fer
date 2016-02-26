@@ -914,12 +914,17 @@ class Mustache_Context
     }
     public function findInBlock($id)
     {
+        $block = null;
         foreach ($this->blockStack as $context) {
             if (array_key_exists($id, $context)) {
-                return $context[$id];
+                if($block===null){
+                    $block = $context[$id];
+                }else if($block[0]===$context[$id][0]){
+                    $block = $context[$id];
+                }
             }
         }
-        return '';
+        return $block?:'';
     }
     private function findVariableInStack($id, array $stack)
     {

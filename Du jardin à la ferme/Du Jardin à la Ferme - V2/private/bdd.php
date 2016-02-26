@@ -859,6 +859,43 @@ class BDD
         });
     }
     
+    
+    
+    /**
+     * Récupère une commande spécifique
+     * @param int|null $id_compte 
+     * limite la listes à un compte spécifique
+     * @throws ErrorException 
+     * @return Commande[]
+     */
+    public function Commande_Lister($id_compte=null)
+    {
+        $id_compte=(int)$id_compte;
+        
+        return $this->InTransaction(function()use($id_compte){
+            $params = [];
+            $Where = '';
+            
+            if($id_compte)
+            {
+                $Where.='WHERE ';
+                $Where.='(id_compte = :id_compte)';
+                $params[':id_compte']=$id_compte;
+            }
+            
+            $commandes = $this->getAllObjects(
+                'Commande',
+                'SELECT 
+                    view_commande_detail.*
+                FROM view_commande_detail 
+                '.$Where.'
+                ORDER BY etat+0, date_creation_commande',
+                $params
+            );
+            return $commandes;
+        });
+    }
+    
     /**
      * Récupère une commande spécifique
      * @param int $id_commande 
@@ -1053,7 +1090,6 @@ class BDD
             return $this->Commande_Recupere($id_commande);
         });
     }
-    
     /**
      * supprime une commande
      * @param int $id_commande 

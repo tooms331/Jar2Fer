@@ -32,12 +32,12 @@ API::useAPI(function(API $api){
     }
     else if(count($produits)<=20)
     {
-        $categorized =$layout->Lookup_categories($produits);
+        $categorized =$layout->Lookup($produits,'id_categorie',['id_categorie'=>'id_categorie','categorie'=>'categorie']);
         echo $layout->render("{{>ProduitListDetails}}",$categorized);
     }
     else
     {   
-        $categorized = $layout->Lookup_categories($produits);
+        $categorized =$layout->Lookup($produits,'id_categorie',['id_categorie'=>'id_categorie','categorie'=>'categorie']);
         echo $layout->render("{{>ProduitListSimple}}",$categorized);
     }
     

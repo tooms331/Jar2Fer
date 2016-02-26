@@ -27,6 +27,8 @@
   <ItemGroup>
     <Compile Include="libs\ckeditor\samples\old\assets\posteddata.php" />
     <Compile Include="libs\ckeditor\samples\old\sample_posteddata.php" />
+    <Compile Include="GestionCommandes.php" />
+    <Compile Include="libs\ResizeSensor.js" />
     <Compile Include="MonCompte.php" />
     <Compile Include="Deconnection.php" />
     <Compile Include="endpoint.php" />
@@ -63,6 +65,7 @@
     <Compile Include="private\config.php" />
     <Compile Include="private\entities.php" />
     <Compile Include="libs\password.php" />
+    <Compile Include="test.php" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="libs\ckeditor\" />
@@ -710,6 +713,7 @@
     <Content Include="libs\standalone\HTMLPurifier\Printer\ConfigForm.js" />
     <Content Include="testClient.html" />
     <Content Include="tmplt\client-js.mustache" />
+    <Content Include="tmplt\CommandeList.mustache" />
     <Content Include="tmplt\CompteDetails.mustache" />
     <Content Include="tmplt\Categorie-nom.mustache" />
     <Content Include="tmplt\ProduitListDetails.mustache" />

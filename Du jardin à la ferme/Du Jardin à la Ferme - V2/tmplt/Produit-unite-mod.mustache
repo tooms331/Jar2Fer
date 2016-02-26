@@ -1,5 +1,6 @@
 {{# session.estAdministrateur}}
      <span><select data-djalf="Produit-unite" 
+                   class="fitToParent"
                    data-id_produit="{{id_produit}}">
         {{# uniteOptions }}
             <option value="{{value}}"{{# selected}} selected="selected"{{/ selected}}>{{display}}</option>

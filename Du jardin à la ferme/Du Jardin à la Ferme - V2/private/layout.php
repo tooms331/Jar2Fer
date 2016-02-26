@@ -194,23 +194,24 @@ class LAYOUT
         $view['prix_total_commande_ht'] = number_format($value->prix_total_commande_ht,2,".","");
         $view['tva_total_commande'] = number_format($value->tva_total_commande,2,".","");
     }
-    public function Lookup_categories($values){
+    
+    public function Lookup($values,$keyProp,$extracts){
         $buff = [];
         foreach($values as $value)
         {
-            $categorie=$value->categorie;
-            $id_categorie=$value->id_categorie;
-            if(!isset($buff[$categorie]))
-                $buff[$categorie]=['categorie'=>$categorie, 'id_categorie'=>$id_categorie, 'values'=>[$value]];
-            else
-                $buff[$categorie]['values'][]=$value;
+            $key=$value->$keyProp;
+            if(!isset($buff[$key])){
+                $buff[$key]=array_map(function($evalue)use($value){return $value->$evalue;},$extracts);
+                $buff[$key]['values']=[];
+            }
+            $buff[$key]['values'][]=$value;
         }
-        foreach($buff as $value)
-        {
-            uasort($value['values'],function($a,$b){ return strnatcmp($a->produit,$b->produit);});
-        }
+        //foreach($buff as $value)
+        //{
+        //    //uasort($value['values'],function($a,$b){ return strnatcmp($a->produit,$b->produit);});
+        //}
         $buff = array_values($buff);
-        uasort($buff,function($a,$b){ return strnatcmp($a['categorie'],$b['categorie']);});
+        //uasort($buff,function($a,$b){ return strnatcmp($a['etat'],$b['etat']);});
         return $buff;
     }
 }

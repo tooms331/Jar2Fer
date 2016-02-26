@@ -377,6 +377,20 @@ class API
         return $this->bdd->Commande_Vider($id_commande);
     }
     
+    public function API_commande_lister($id_compte)
+    {   
+        if(!$this->estAdmin())
+        {
+            if(!$this->estAuthentifier())
+            {
+                throw new ErrorException("Vous devez vous authentifier pour accéder à cette fonctionalitée.");
+            }
+            
+            $id_compte=$this->compteConnecte()->id_compte;
+        }
+        return $this->bdd->Commande_Lister($id_compte);
+    }
+    
     public function API_commande_valider($id_commande)
     {   
         $id_commande=(int)$id_commande;
