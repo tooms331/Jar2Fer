@@ -1,7 +1,9 @@
 <?php
-require_once './private/config.php';
-require_once './private/layout.php';
-require_once './private/api.php';
+require_once('./private/config.php');
+require_once('./private/entities.php');
+require_once('./private/api.php');
+require_once('./private/layout.php');
+
 
 API::useAPI(function(API $api){
     $layout=new LAYOUT($api);
@@ -10,10 +12,10 @@ API::useAPI(function(API $api){
     {
         $api->API_compte_deconnecter();
     }
-        
-    $layout->writeHeader("Déconnection");
     
-    ?> Vous êtes maintenant déconnecter, à bientôt.<?php
-        
-    $layout->writeFooter();
+    echo $layout->renderHeader('Déconnection');
+    
+    echo $layout->render('{{> SimpleMessage}}','Vous êtes maintenant déconnecté, à bientôt.');
+    
+    echo $layout->renderFooter();
 });

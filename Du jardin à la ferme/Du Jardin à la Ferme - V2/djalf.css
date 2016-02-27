@@ -52,12 +52,12 @@ textarea {
 
 a {
     cursor: pointer;
+    color: #1200FF;
 }
 
     a:hover {
-        color: #760001;
+        background-color: #ACCAA7;
     }
-
 
 body > header {
     display: block;
@@ -71,37 +71,38 @@ body > nav {
     background-color: ivory;
     border-top: 1px solid green;
     border-bottom: 1px solid green;
-    margin-top: 1em;
 }
 
     body > nav > ul {
         text-align: center;
     }
+
         body > nav > ul > li {
             display: inline-block;
         }
 
-        body > nav > ul > li > a {
-            display: inline-block;
-            margin: 0.2em 0.5em;
-            border: 1px solid #ACCAA7;
-            padding: 0.5em;
-            border-radius: 0.5em;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #1A7505;
-        }
-
-            body > nav > ul > li > a:hover {
-                background-color: #ACCAA7;
-                text-decoration:none;
+            body > nav > ul > li > a {
+                display: inline-block;
+                margin: 0.2em 0.5em;
+                border: 1px solid #ACCAA7;
+                padding: 0.5em;
+                border-radius: 0.5em;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 1.1em;
+                color: #1A7505;
             }
+
+                body > nav > ul > li > a:hover {
+                    background-color: #ACCAA7;
+                    text-decoration: none;
+                }
+
 h1 {
 }
 
 h2 {
-        color: #1A7505;
+    color: #1A7505;
 }
 
 h3 {
@@ -109,9 +110,9 @@ h3 {
     background-color: #1A7505;
     padding: 0.5em;
     color: white;
-    margin-bottom: 1em;
-    margin-top: 1em;
 }
+
+.Main > details > summary,
 h4 {
     text-align: center;
     color: #1A7505;
@@ -119,22 +120,216 @@ h4 {
     background-color: ivory;
     padding: 0.5em;
     border-radius: 1em;
+    clear: both;
+    font-weight: bold;
 }
-h5 {
+
+   h5 {
         margin: 0.5em 0em;
         color: #1A7505;
         font-size: 1.2em;
-        border-bottom: 1px solid #1A7505;
+    border-bottom: 2px solid #1A7505;
         padding-left: 1em;
+        text-align: center;
     }
+img {
+    vertical-align: middle;
+}
+
+fieldset {
+    border: 1px solid #1A7505;
+    border-radius: 1em;
+}
+
+.inlines {
+    display: block;
+    text-align: center;
+}
+
+    .inlines > * {
+        display: inline-block;
+        text-align: left;
+    }
+
+fieldset > legend {
+    color: #1A7505;
+    font-weight: bold;
+    font-size: 1.05em;
+}
+
+details {
+    display: block;
+}
+
+summary {
+    display: block;
+}
 
 .Main {
     display: block;
+    padding: 0em 0.5em;
     margin: auto;
-    max-width: 60em;
+    max-width: 61em;
 }
-.center{
+.nobr{
+    white-space:nowrap;
+}
+.stack > * {
+    display: block;
+}
+
+.center {
+    width: auto;
+    margin: auto;
+}
+
+.textcenter {
     text-align:center;
+}
+.fullwidth {
+    width: 100%;
+}
+
+.block {
+    display: block;
+}
+
+.whitePanel {
+    display: block;
+    width: 100%;
+    border: 1px solid green;
+    background-color: ivory;
+    margin: 0.5em 0em;
+    padding: 0.5em;
+    border-radius: 1em;
+}
+
+    .whitePanel:after {
+        content: " ";
+        display: table;
+        clear: both;
+    }
+
+    .whitePanel p {
+        padding: 0.1em 1em;
+        text-indent: 0.5em;
+        text-align: justify;
+    }
+
+
+    .whitePanel h6 {
+        margin: 0.5em 0em;
+        padding-left: 1.5em;
+        font-size: 1.1em;
+        font-weight: bold;
+        text-decoration: underline;
+        font-size: 1em;
+    }
+
+
+    .whitePanel .signature {
+        text-indent: 1em;
+        text-align: end;
+        font-weight: bold;
+    }
+
+    .whitePanel .citation {
+        text-indent: 0em;
+        text-align: center;
+        font-weight: bold;
+        margin: 1em 4em;
+        padding: 1em;
+        border-left: 5px solid #1A7505;
+        background-color: #ACCAA7;
+    }
+
+    .whitePanel .alert {
+        text-indent: 0em;
+        text-align: center;
+        font-weight: bold;
+        margin: 1em 4em;
+        padding: 1em;
+        border-left: 5px solid #1A7505;
+        background-color: #ACCAA7;
+    }
+
+    .whitePanel ul.simpleList,
+    .whitePanel ul:not([class]),
+    .whitePanel ol:not([class]) {
+        margin: 0.2em 2em;
+        margin-bottom: 0.2em;
+        border-left: 2em solid #ACCAA7;
+    }
+
+        .whitePanel ol:not([class]) > li {
+            list-style: decimal;
+        }
+
+        .whitePanel ul:not([class]) > li {
+            list-style: disc;
+        }
+
+        .whitePanel ol:not([class]) > li,
+        .whitePanel ul:not([class]) > li {
+            padding: .2em;
+            display: list-item;
+        }
+
+        .whitePanel ul.simpleList > li {
+            display: inline-block;
+            padding: 0.2em;
+        }
+
+    .whitePanel table:not([class]) {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0em 0.4em;
+    }
+
+        .whitePanel table:not([class]) > thead,
+        .whitePanel table:not([class]) > tfoot {
+            display: none;
+        }
+
+        .whitePanel table:not([class]) > tbody > tr > * {
+            padding: 0.1em 0.5em;
+            border-top: 2px solid #ACCAA7;
+            border-bottom: 2px solid #ACCAA7;
+            border-left: 1px dotted #ACCAA7;
+            vertical-align: middle;
+        }
+
+        .whitePanel table:not([class]) > tbody > tr > th {
+            text-align: left;
+        }
+        
+        .whitePanel table:not([class]) > tbody > tr > th:only-child {
+            color: #1A7505;
+            text-align: center;
+            border-width: 0px;
+            border-bottom: 2px solid #1A7505;
+        }
+
+            .whitePanel table:not([class]) > tbody > tr > th:only-child {
+                text-align: center;
+            }
+
+        .whitePanel table:not([class]) > tbody > tr > *:first-child {
+            border-left: 2em solid #ACCAA7;
+        }
+
+        .whitePanel table:not([class]) > tbody > tr > *:last-child {
+            border-right: 2px solid #ACCAA7;
+        }
+        
+.floatleft {
+    float: left;
+    margin: 0.2em;
+}
+
+.floatright {
+    float: right;
+    margin: 0.2em;
 }
 
 .tableproduits {
@@ -176,106 +371,83 @@ h5 {
             }
 
 
-.tablepanier {
+.blockProperties,
+.fluidProperties {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
 }
 
-    .tablepanier > thead {
-        display: none;
+    .fluidProperties > * {
+        display: inline-block;
     }
 
-    .tablepanier > tbody {
+    .blockProperties > * {
         display: block;
-        padding: 0em 1em;
     }
 
-        .tablepanier > tbody > tr {
-            display: table;
-            border: 1px solid green;
-            background-color: ivory;
-            margin: 0.5em 0em;
-            padding: 0.5em;
-            border-radius: 1em;
-            width: 100%;
-            table-layout: auto;
-        }
+    .blockProperties > *,
+    .fluidProperties > * {
+        margin: 0.2em 1em;
+        padding: 0.2em;
+        border: 1px solid #ACCAA7;
+        border-left-width: 1em;
+    }
 
-            .tablepanier > tbody > tr > th {
-                font-size: 1.2em;
-                text-align: left;
-            }
-            .tablepanier > tbody > tr > .largecol {
-                width: auto;
-            }
-            
-
-            .tablepanier > tbody > tr > * {
-                display: table-cell;
-                vertical-align: middle;
-                padding: 0.5em;
-                width: 1%;
-                white-space: nowrap;
-                text-align: right;
-            }
-
-                .tablepanier > tbody > tr > * > img {
-                    height: 3em;
-                }
+    .blockProperties.stacked > * > *,
+    .fluidProperties.stacked > * > * {
+        display: block;
+    }
 
 .infosdetail {
-    display: inline-table;
+    display: table;
+    margin:auto;
+    border-spacing: 0.2em;
 }
 
+    .infosdetail.block {
+        display: table;
+    }
+
     .infosdetail > * {
-    display: table-row;
+        display: table-row;
     }
 
         .infosdetail > * > * {
             display: table-cell;
             text-align: left;
             white-space: nowrap;
+            vertical-align: middle;
         }
 
-            .infosdetail > * > *:first-child {
-                text-align: right;
-                font-weight: bold;
-            }
+        .infosdetail > * > :first-child {
+            text-align: right;
+            font-weight: bold;
+        }
 
-.whitePanel {
-    display: block;
-    width: 100%;
-    border: 1px solid green;
-    background-color: ivory;
-    margin: 0.5em 0em;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
-    border-radius: 1em;
-}
-
-.produitInfoPanel {
+.produitDetails {
     display: table;
     text-align: center;
+    width: 100%;
 }
 
-    .produitInfoPanel > * {
+    .produitDetails > * {
         display: table-cell;
         vertical-align: middle;
-        width: 100%;
-    }
-    .produitInfoPanel >*:first-child  {
-        width: 0%;
-        margin-right:1em;
+        width: 0.5em;
+        height: 100%;
     }
 
-    .produitInfoPanel >*:first-child > img {
+    .produitDetails > :last-child {
+        width: auto;
+    }
+
+    .produitDetails > :first-child > img {
         width: 15em;
     }
 
-.produitInfoPanel .spacer{
-    width:1em;
+body > * {
+    margin-bottom: 0.5em;
 }
 
-.produitDescriptionPanel {
+.Main > * {
+    margin-bottom: 0.5em;
 }

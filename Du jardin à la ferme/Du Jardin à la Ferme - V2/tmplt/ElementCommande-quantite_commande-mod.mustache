@@ -1,5 +1,6 @@
-{{# session.estAdministrateur}}
+{{# id_commande | session.peutModifierCommande}}
 <span><input type="number"
+             class="fitToParent"
              data-djalf="ElementCommande-quantite_commande"
              min="0"
              step="{{unite_step}}"
@@ -9,5 +10,5 @@
              data-id_produit="{{id_produit}}"
              value="{{quantite_commande}}"
 /></span>
-{{/ session.estAdministrateur}}
-{{^ session.estAdministrateur}}{{> ElementCommande-quantite_commande}}{{/ session.estAdministrateur}}
+{{/ id_commande | session.peutModifierCommande}}
+{{^ id_commande | session.peutModifierCommande}}{{> ElementCommande-quantite_commande}}{{/ id_commande | session.peutModifierCommande}}

@@ -1,0 +1,10 @@
+{{# . }}
+<div class="whitePanel">
+    <h5>{{> Categorie-nom}}</h5>
+    <ul class="simpleList">
+        {{# values}}
+            <li><a href="Produit.php?id_produit={{id_produit}}">{{> Produit-nom}}</a></li>
+        {{/ values}}
+    </ul>
+</div>
+{{/ . }}

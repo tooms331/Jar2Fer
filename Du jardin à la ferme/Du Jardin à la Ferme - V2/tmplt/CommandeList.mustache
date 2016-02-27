@@ -1,0 +1,46 @@
+{{# commandes | ?}}
+<section class="whitePanel">
+    <table>
+        <thead>
+            <tr>
+                <td>Ref. Commande</td>
+                <td>Compte</td>
+                <td>Date</td>
+                <td>Details</td>
+            </tr>
+        </thead>
+        <tbody>
+            {{# commandes }}
+            <tr>
+                <th colspan="4">{{etat}}</th>
+            </tr>
+            {{# values}}
+            <tr>
+                <td>
+                    #{{id_commande}}
+                </td>
+                <th class="fullwidth">
+                    {{email}}
+                </th>
+                <td class="nobr">
+                    {{date_creation_commande}}
+                </td>
+                <td>
+                    <ul class="infosdetail center">
+                        <li>
+                            <span>Produits : </span>
+                            {{> Commande-nb_elements}}
+                        </li>
+                        <li>
+                            <span>TTC : </span>
+                            {{> Commande-prix_total_commande_ttc}}
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+            {{/ values}}
+            {{/ commandes}}
+        </tbody>
+    </table>    
+</section>
+{{/ commandes | ?}}

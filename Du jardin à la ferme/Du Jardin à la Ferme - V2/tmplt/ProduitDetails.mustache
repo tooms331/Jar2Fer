@@ -1,21 +1,21 @@
 {{# .}}
-    <h4>{{categorie}} / {{> Produit-nom}}</h4>
-    <section class="produitInfoPanel">
+    <h4>{{> Categorie-nom}} / {{> Produit-nom}}</h4>
+    <section class="produitDetails">
     <div class="whitePanel">
         <img src="imgs/produit.jpg" />
     </div>
-    <div class="spacer">&nbsp;</div>
+        <div> </div>
     <div class="whitePanel">
         <ul class="infosdetail">
             <li>
                 <span>catégorie : </span>
-                <span>{{categorie}}</span>
+                <span>{{> Categorie-nom}}</span>
             </li>
             <li>
                 <span>produit : </span>
                 {{> Produit-nom-mod}}
             </li>
-            {{# session.peutModifierCommande}}
+            {{# id_commande | session.peutModifierCommande}}
                 <li>
                     <span>unitée : </span>
                     {{> Produit-unite-mod}}
@@ -36,7 +36,7 @@
                     <span>prix total : </span>
                     {{> ElementCommande-prix_total_element_ttc}}
                 </li>
-            {{/ session.peutModifierCommande}}
+            {{/ id_commande | session.peutModifierCommande}}
         </ul>
     </div>
 </section>

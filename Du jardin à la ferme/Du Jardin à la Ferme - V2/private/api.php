@@ -1,7 +1,7 @@
 <?php 
-require_once './private/config.php';
-require_once './private/bdd.php';
-require_once('./private/mustache.php');
+require_once('./private/config.php');
+require_once('./private/entities.php');
+require_once('./private/bdd.php');
 
 class API
 { 
@@ -64,7 +64,10 @@ class API
         {
             if($CompteConnecte===false)
             {
-                $CompteConnecte=$this->bdd->Compte_Recuperer((int)$_SESSION['CompteConnecte']);
+                if(isset($_SESSION['CompteConnecte']))
+                    $CompteConnecte=$this->bdd->Compte_Recuperer((int)$_SESSION['CompteConnecte']);
+                else
+                    $CompteConnecte=null;
             }
         }
         else
@@ -375,6 +378,20 @@ class API
         return $this->bdd->Commande_Vider($id_commande);
     }
     
+    public function API_commande_lister($id_compte)
+    {   
+        if(!$this->estAdmin())
+        {
+            if(!$this->estAuthentifier())
+            {
+                throw new ErrorException("Vous devez vous authentifier pour accéder à cette fonctionalitée.");
+            }
+            
+            $id_compte=$this->compteConnecte()->id_compte;
+        }
+        return $this->bdd->Commande_Lister($id_compte);
+    }
+    
     public function API_commande_valider($id_commande)
     {   
         $id_commande=(int)$id_commande;
@@ -396,5 +413,4 @@ class API
         
         return $this->bdd->Commande_Modifier_Element($id_commande, $id_produit, $quantite);
     }
-    
 }

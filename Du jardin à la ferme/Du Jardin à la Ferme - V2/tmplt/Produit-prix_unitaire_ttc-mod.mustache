@@ -1,12 +1,13 @@
 {{# session.estAdministrateur}}
     <span><input type="number"
+                 class="fitToParent"
                  step="0.1"
                  min="0"
                  data-djalf="Produit-prix_unitaire_ttc"
                  data-decimals="2"
                  data-id_produit="{{id_produit}}"
                  size="3"
-                 value="{{prix_unitaire_ttc}}" /> €</span>
+                 value="{{prix_unitaire_ttc}}" /></span>
 {{/ session.estAdministrateur}}
 {{^ session.estAdministrateur}}
     {{> Produit-prix_unitaire_ttc}}

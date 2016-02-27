@@ -1,8 +1,8 @@
 <?php
-require_once 'config.php';
-require_once 'password.php';
-require_once 'entities.php';
-require_once '/libs/HTMLPurifier.standalone.php';
+require_once('./private/config.php');
+require_once('./private/entities.php');
+require_once('./libs/password.php');
+require_once('./libs/HTMLPurifier.standalone.php');
 
 
 /**
@@ -23,7 +23,6 @@ class BDD
     private $pdolink;
     
     private $purifier;
-	
     
     /**
      * Ouverture de la base de donnée
@@ -303,18 +302,24 @@ class BDD
     
     
     
-	  
+    
     /**
-     * Retourne un compte spécifique ou null
+     * Récupere un compte spécifique
      * @param int $id_compte 
-     * @return Compte|null
+     * ID du compte à récupéré
+     * @throws ErrorException 
+     * @return Compte
      */
     public function Compte_Recuperer($id_compte)
-    {	
+    {
         $id_compte=(int)$id_compte;
+        // ioyguioy
+        /*
+         *
+         * 
+         * */
         
         return $this->InTransaction(function()use($id_compte){
-			
             $compte = $this->getSingleObject(
                 'Compte',
                 'SELECT * 
@@ -584,13 +589,12 @@ class BDD
         return $this->InTransaction(function()use($id_commande,$id_produit){
             $produit = $this->getSingleObject(
                 'ProduitCommande',
-                'SELECT
+                'SELECT 
 	                view_produits.*,
-                    view_elements_commande.id_element_commande,
                     :id_commande as id_commande,
                     COALESCE(view_elements_commande.quantite_commande,0) AS quantite_commande,
                     view_elements_commande.quantite_reel,
-                     COALESCE(view_elements_commande.prix_total_element_ttc,0) AS prix_total_element_ttc
+                    COALESCE(view_elements_commande.prix_total_element_ttc,0) AS prix_total_element_ttc
                 FROM view_produits
                 LEFT OUTER JOIN view_elements_commande
 	                ON view_produits.id_produit=view_elements_commande.id_produit
@@ -628,7 +632,7 @@ class BDD
                 );
             if($dispoUniquement || !empty($rechercheProduit))
             {
-                $WHERE .='WHERE';
+                $WHERE.='WHERE';
                 if($dispoUniquement)
                     $WHERE.=' view_produits.stocks_previsionnel > 0 ';
                 if($dispoUniquement && !empty($rechercheProduit))
@@ -636,7 +640,6 @@ class BDD
                 if(!empty($rechercheProduit))
                 {
                     $WHERE.=' (view_produits.categorie LIKE :rechercheProduit OR view_produits.produit LIKE :rechercheProduit) ';
-					
                     $params[':rechercheProduit'] = '%'.$rechercheProduit.'%';
                 }
             }
@@ -645,16 +648,15 @@ class BDD
                 'ProduitCommande',
                 'SELECT 
 	                view_produits.*,
-                    view_elements_commande.id_element_commande,
                     :id_commande as id_commande,
                     COALESCE(view_elements_commande.quantite_commande,0) AS quantite_commande,
                     view_elements_commande.quantite_reel,
-                    view_elements_commande.prix_total_element_ttc
+                    COALESCE(view_elements_commande.prix_total_element_ttc,0) AS prix_total_element_ttc
                 FROM view_produits
                 LEFT OUTER JOIN view_elements_commande
 	                ON view_produits.id_produit=view_elements_commande.id_produit
 	                AND view_elements_commande.id_commande = :id_commande
-				'.$WHERE.'
+                '.$WHERE.'
                 ORDER BY view_produits.categorie,view_produits.produit',
                 $params
             );
@@ -857,6 +859,43 @@ class BDD
         });
     }
     
+    
+    
+    /**
+     * Récupère une commande spécifique
+     * @param int|null $id_compte 
+     * limite la listes à un compte spécifique
+     * @throws ErrorException 
+     * @return Commande[]
+     */
+    public function Commande_Lister($id_compte=null)
+    {
+        $id_compte=(int)$id_compte;
+        
+        return $this->InTransaction(function()use($id_compte){
+            $params = [];
+            $Where = '';
+            
+            if($id_compte)
+            {
+                $Where.='WHERE ';
+                $Where.='(id_compte = :id_compte)';
+                $params[':id_compte']=$id_compte;
+            }
+            
+            $commandes = $this->getAllObjects(
+                'Commande',
+                'SELECT 
+                    view_commande_detail.*
+                FROM view_commande_detail 
+                '.$Where.'
+                ORDER BY etat+0, date_creation_commande',
+                $params
+            );
+            return $commandes;
+        });
+    }
+    
     /**
      * Récupère une commande spécifique
      * @param int $id_commande 
@@ -947,11 +986,11 @@ class BDD
                 )
                 ON DUPLICATE KEY UPDATE
                     quantite_commande = :quantite_commande',
-                array(
+                [
                     ':id_commande'=>$id_commande,
                     ':id_produit'=>$id_produit,
                     ':quantite_commande'=>$quantite
-                )
+                ]
             );
         
             $element = $this->getSingleObject(
@@ -1051,7 +1090,6 @@ class BDD
             return $this->Commande_Recupere($id_commande);
         });
     }
-    
     /**
      * supprime une commande
      * @param int $id_commande 

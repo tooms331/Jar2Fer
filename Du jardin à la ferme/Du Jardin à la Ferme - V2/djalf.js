@@ -74,19 +74,23 @@ $(function () {
         return true;
     }
 
-    function resizeInput() {
-        var elm = $(this);
-        elm.attr('size', elm.val().length);
-    }
-
-    $('input[type="text"]')
-        .keyup(resizeInput)
-        .change(resizeInput)
-        .each(resizeInput);
-    $('input[type="number"]')
-        .keyup(resizeInput)
-        .change(resizeInput)
-        .each(resizeInput);
+    
+    
+    $('.fitToParent')
+        .each(function(){
+            var elm = $(this);
+            var parent = elm.parent();
+            new ResizeSensor(parent, function () {
+                elm.outerWidth(parent.width());
+                elm.outerHeight(parent.height());
+            });
+        })
+        .each(function resizeInput() {
+            var elm = $(this);
+            var parent = elm.parent();
+            elm.outerWidth(parent.width());
+            elm.outerHeight(parent.height());
+        });
 
     $('[data-decimals]')
         .change(checkDecimals)
@@ -152,36 +156,39 @@ $(function () {
         }
     }
 
+    function UPD_Categorie(categorie) {
+        var selectors = { id_categorie: categorie.id_categorie };
+        UPD_DOM_VAL('Categorie-nom', selectors, categorie.categorie);
+    }
     function UPD_Produit(produit) {
-        var id_produit = produit.id_produit;
-        UPD_DOM_VAL('Produit-id_categorie', { 'id_produit': id_produit }, produit.id_categorie);
-        UPD_DOM_VAL('Produit-produit', { 'id_produit': id_produit }, produit.produit);
-        UPD_DOM_VAL('Produit-categorie', { 'id_produit': id_produit }, produit.categorie);
-        UPD_DOM_VAL('Produit-prix_unitaire_ttc', { 'id_produit': id_produit }, produit.prix_unitaire_ttc);
-        UPD_DOM_VAL('Produit-unite', { 'id_produit': id_produit }, produit.unite);
-        UPD_DOM_VAL('Produit-tva', { 'id_produit': id_produit }, produit.tva);
-        UPD_DOM_VAL('Produit-stocks_previsionnel', { 'id_produit': id_produit }, produit.stocks_previsionnel);
-        UPD_DOM_VAL('Produit-stocks_courant', { 'id_produit': id_produit }, produit.stocks_courant);
+        UPD_Categorie(produit);
+        var selectors = { id_produit: produit.id_produit };
+        UPD_DOM_VAL('Produit-id_categorie', selectors, produit.id_categorie);
+        UPD_DOM_VAL('Produit-produit', selectors, produit.produit);
+        UPD_DOM_VAL('Produit-prix_unitaire_ttc', selectors, produit.prix_unitaire_ttc);
+        UPD_DOM_VAL('Produit-unite', selectors, produit.unite);
+        UPD_DOM_VAL('Produit-tva', selectors, produit.tva);
+        UPD_DOM_VAL('Produit-stocks_previsionnel', selectors, produit.stocks_previsionnel);
+        UPD_DOM_VAL('Produit-stocks_courant', selectors, produit.stocks_courant);
     }
 
     function UPD_ProduitCommande(produitCommande) {
         UPD_Produit(produitCommande);
-        var id_commande = produitCommande.id_commande;
-        var id_produit = produitCommande.id_produit;
+        var selectors = { id_commande: produitCommande.id_commande, id_produit: produitCommande.id_produit };
 
-        UPD_DOM_VAL('ElementCommande-id_commande', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.id_commande);
-        UPD_DOM_VAL('ElementCommande-quantite_commande', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.quantite_commande);
-        UPD_DOM_VAL('ElementCommande-quantite_reel', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.quantite_reel);
-        UPD_DOM_VAL('ElementCommande-prix_total_element_ttc', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.prix_total_element_ttc);
-        UPD_DOM_VAL('ElementCommande-prix_total_element_ht', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.prix_total_element_ht);
-        UPD_DOM_VAL('ElementCommande-tva_total_element', { 'id_commande': id_commande, 'id_produit': id_produit }, produitCommande.tva_total_element);
+        UPD_DOM_VAL('ElementCommande-id_commande', selectors, produitCommande.id_commande);
+        UPD_DOM_VAL('ElementCommande-quantite_commande', selectors, produitCommande.quantite_commande);
+        UPD_DOM_VAL('ElementCommande-quantite_reel', selectors, produitCommande.quantite_reel);
+        UPD_DOM_VAL('ElementCommande-prix_total_element_ttc', selectors, produitCommande.prix_total_element_ttc);
+        UPD_DOM_VAL('ElementCommande-prix_total_element_ht', selectors, produitCommande.prix_total_element_ht);
+        UPD_DOM_VAL('ElementCommande-tva_total_element', selectors, produitCommande.tva_total_element);
     }
 
     function UPD_Commande(commande) {
-        var id_commande = commande.id_commande;
-        UPD_DOM_VAL('Commande-prix_total_commande_ttc', { 'id_commande': id_commande }, commande.prix_total_commande_ttc);
-        UPD_DOM_VAL('Commande-prix_total_commande_ht', { 'id_commande': id_commande }, commande.prix_total_commande_ht);
-        UPD_DOM_VAL('Commande-tva_total_commande', { 'id_commande': id_commande }, commande.tva_total_commande);
+        var selectors = { id_commande: commande.id_commande };
+        UPD_DOM_VAL('Commande-prix_total_commande_ttc', selectors, commande.prix_total_commande_ttc);
+        UPD_DOM_VAL('Commande-prix_total_commande_ht', selectors, commande.prix_total_commande_ht);
+        UPD_DOM_VAL('Commande-tva_total_commande', selectors, commande.tva_total_commande);
     }
 
     function UPD_ProduitCommandeDetail(produitCommandeDetail) {
@@ -207,7 +214,7 @@ $(function () {
             .done(UPD_Produit);
     });
     
-    bindEDITOR('Produit-description', UPD_Produit, function (elm, editor) {
+    bindEDITOR('Produit-description', function (elm, editor) {
         apiClient
             .produit_modifier_description(elm.data("id_produit"), editor.getData())
             .done(UPD_Produit);

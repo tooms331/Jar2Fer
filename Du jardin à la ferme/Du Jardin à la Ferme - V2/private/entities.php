@@ -40,10 +40,8 @@ trait _CompteDetail
     
     protected function _CompteInit(){
         $this->_CompteBaseInit();
-        setNtype($this->id_compte,'int');
         setNtype($this->statut,'string');
         setNtype($this->demande_statut,'string');
-        setNtype($this->email,'string');
         setNtype($this->date_creation_compte,'string');
     }
 }
@@ -107,10 +105,7 @@ trait _Produit
 
 trait _ElementCommande
 {
-    /**
-     * @var int
-     */
-    public $id_element_commande;
+    use _Produit;
     /**
      * @var int
      */
@@ -141,7 +136,7 @@ trait _ElementCommande
     public $tva_total_element;
     
     protected function _ElementCommandeInit(){
-        setNtype($this->id_element_commande,'int');
+        $this->_ProduitInit();
         setNtype($this->id_produit,'int');
         setNtype($this->id_commande,'int');
         setNtype($this->quantite_commande,'double');
@@ -202,44 +197,10 @@ trait _Commande
     }
 }
 
-trait _VariationStock
-{
-    /**
-     * @var int
-     */
-    public $id_variation_stock;
-    /** 
-     * @var int
-     */
-    public $id_produit;
-    /**
-     * @var string
-     */ 
-    public $date_variation;
-    /**
-     * @var double
-     */
-    public $variation;
-    /**
-     * @var string
-     */
-    public $type_variation;
-    /**
-     * @var string
-     */
-    public $remarque;
-    
-    protected function _VariationStockInit(){
-        setNtype($this->id_variation_stock,'int');
-        setNtype($this->id_produit,'int');
-        setNtype($this->date_variation,'string');
-        setNtype($this->variation,'double');
-        setNtype($this->type_variation,'string');
-        setNtype($this->remarque,'string');
-    }
+class Entity{
 }
 
-class Compte
+class Compte extends Entity
 {
     use _CompteDetail;
     
@@ -255,7 +216,7 @@ class Compte
     }
 }
 
-class Categorie
+class Categorie extends Entity
 {
     use _Categorie;
 
@@ -264,7 +225,7 @@ class Categorie
     }
 }
 
-class Produit
+class Produit extends Entity
 {
     use _Categorie, _Produit;
     
@@ -278,30 +239,28 @@ class Produit
     }
 }
 
-class ProduitCommande
+class ProduitCommande extends Entity
 {
-    use _Categorie, _Produit, _ElementCommande;
+    use _Categorie, _ElementCommande;
     
     public function __construct(){
         $this->_CategorieInit();
-        $this->_ProduitInit();
         $this->_ElementCommandeInit();
     }
 }
 
-class ProduitCommandeDetail
+class ProduitCommandeDetail extends Entity
 {
-    use _Categorie, _Produit, _ElementCommande, _Commande;
+    use _Categorie, _ElementCommande, _Commande;
     
     public function __construct(){
         $this->_CategorieInit();
-        $this->_ProduitInit();
         $this->_ElementCommandeInit();
         $this->_CommandeInit();
     }
 }
 
-class Commande
+class Commande extends Entity
 {
     use _Commande;
     
@@ -312,22 +271,6 @@ class Commande
     const ETAT_TERMINE = 'Terminé';
     
     public function __construct(){
-        $this->_CompteBaseInit();
         $this->_CommandeInit();
-    }
-}
-
-class VariationStock
-{
-    use _VariationStock;
-    
-    const TYPE_ACHAT = 'ACHAT';
-    const TYPE_VENTE = 'VENTE';
-    const TYPE_PERTE = 'PERTE';
-    const TYPE_AUTRE = 'AUTRE';
-    const TYPE_RECOLTE = 'RECOLTE';
-    
-    public function __construct(){
-        $this->_VariationStockInit();
     }
 }

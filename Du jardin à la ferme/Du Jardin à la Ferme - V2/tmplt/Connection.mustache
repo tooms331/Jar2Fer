@@ -1,0 +1,19 @@
+<details open="open">
+    <summary>Connection à mon compte</summary>
+    <form class="whitePanel center" action="Connection.php" accept-charset="utf-8" enctype="multipart/form-data">
+        <p>{{ . }}</p>
+        <ul class="infosdetail">
+            <li>
+                <label for="email_connection">Email :</label>
+                <input id="email_connection" name="email" type="email" />
+            </li>
+            <li>
+                <label for="motdepasse_connection">Mot de passe :</label>
+                <input id="motdepasse_connection" name="motdepasse" type="password" />
+            </li>
+        </ul>
+        <br /><br />
+        <input type="hidden" id="type" name="type" value="AUTHENTIFICATION" />
+        <input type="submit" value="Se connecter" />
+    </form>
+</details>

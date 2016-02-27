@@ -1,11 +1,10 @@
 {{# session.estAdministrateur}}
      <span><select data-djalf="Produit-unite" 
+                   class="fitToParent"
                    data-id_produit="{{id_produit}}">
-        {{# unite }}
-            {{# globals.unites }}
-                <option value="{{.}}"{{# helpers.inParents}} selected="selected"{{/ helpers.inParents}}>{{.}}</option>
-            {{/ globals.unites}}
-        {{/ unite }}
+        {{# uniteOptions }}
+            <option value="{{value}}"{{# selected}} selected="selected"{{/ selected}}>{{display}}</option>
+        {{/ uniteOptions }}
     </select></span>
 {{/ session.estAdministrateur}}
 {{^ session.estAdministrateur}}

@@ -1,0 +1,46 @@
+{{# . }}
+<details open="open">
+    <summary>{{> Categorie-nom}}</summary>
+    <table class="tableproduits">
+        <thead>
+            <tr>
+                <td>Produit</td>
+                <td>Photo</td>
+                {{# id_commande | session.peutModifierCommande}}
+                <td>Commande</td>
+                {{/ id_commande | session.peutModifierCommande}}
+            </tr>
+        </thead>
+        <tbody>
+            {{# values}}
+            <tr>
+                <th><a href="Produit.php?id_produit={{id_produit}}">{{> Produit-nom}}</a></th>
+                <td><img src="imgs/produit.jpg" /></td>
+                {{# id_commande | session.peutModifierCommande}}
+                <td>
+                    <ul class="infosdetail">
+                        <li>
+                            <span>unitée : </span>
+                            {{> Produit-unite}}
+                        </li>
+                        <li>
+                            <span>prix unitaire : </span>
+                            {{> Produit-prix_unitaire_ttc}}
+                        </li>
+                        <li>
+                            <span>stock : </span>
+                            {{> Produit-stocks_previsionnel}}
+                        </li>
+                        <li>
+                            <span>commande : </span>
+                            {{> ElementCommande-quantite_commande-mod}}
+                        </li>
+                    </ul>
+                </td>
+                {{/ id_commande | session.peutModifierCommande}}
+            </tr>
+            {{/ values}}
+        </tbody>
+    </table>
+</details>
+{{/ . }}

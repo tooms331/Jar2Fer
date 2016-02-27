@@ -1,0 +1,153 @@
+{{# compte}}
+<p class="whitePanel">
+    Vous pouvez consulter et modifier les informations de votre profil. <br />
+    Nous nous engageons à ce que les informations que vous nous communiquer ne servent qu'as la bonne gestion de la ferme par exemple : établissement des factures, gestion des livraisons...
+    <strong>En particulier, nous ne communiquons pas et ne communiquerons jamais d'informations sur votre compte a des fin d'analyse marketing de démarchage ou autre opération commercial.</strong>
+</p>
+
+<details {{# erreur_demande_statut}} open="open" {{/ erreur_demande_statut}}>
+    <summary>Statut du Compte : {{statut}}</summary>
+    {{# erreur_demande_statut}}{{> SimpleMessage}}{{/ erreur_demande_statut}}
+    <form class="whitePanel" action="Connection.php" accept-charset="utf-8" enctype="multipart/form-data">
+
+        <p>Votre statut actuel est : <b>{{statut}}</b></p>
+        <p>Vous pouvez faire une demande de modification de statut :</p>
+        <ul class="blockProperties">
+            <li>
+                <label><input checked="checked" type="radio" name="demande_statut" value="Panier" /> <u><b>Panier : </b></u></label>
+                <p style="padding-left:2em;">
+                    Vous vous engagez chaque semaine à prendre notre "panier de la semaine", vous pouvez à tout moment rompre cet engagement, la rupture seras effective dès la semaine suivante.
+                </p>
+            </li>
+            <li>
+                <label><input type="radio" name="demande_statut" value="LibreService" /> <u><b>Libre Service : </b></u></label>
+                <p style="padding-left:2em;">
+                    Chaque semaine vous pouvez effectuer une commande entre le mercredi et le vendredi.
+                </p>
+            </li>
+            <li>
+                <label><input type="radio" name="demande_statut" value="Premium" /> <u><b>Engagement Libre Service : </b></u></label>
+                <p style="padding-left:2em;">
+                    Vous vous engagez chaque semaine à faire une commande d'un certain montant. En contre parti, les commandes vous sont ouverte dés le lundi jusqu'au vendredi.<br />
+                    <label><i>Montant de votre engagement : <input type="number" name="engagement" min="0" step="1" value="10" /> €</i></label>
+                </p>
+            </li>
+        </ul>
+        <input type="hidden" name="type" value="Demande-Statut" />
+        <input class="floatright" type="submit" value="Demander un changement de statut" />
+    </form>
+</details>
+
+<details {{# erreur_change_password}} open="open" {{/ erreur_change_password}}>
+    <summary>Mot de passe : </summary>
+    {{# erreur_change_password}}{{> SimpleMessage}}{{/ erreur_change_password}}
+    <form class="whitePanel" action="Connection.php" accept-charset="utf-8" enctype="multipart/form-data">
+        <fieldset>
+            <legend>Vous pouvez modifier votre mot de passe</legend>
+            <ul class="fluidProperties textcenter stacked">
+                <li>
+                    <label for="motdepasse_actuel_modification">Mot de passe actuel : </label>
+                    <input id="motdepasse_actuel_modification" name="motdepasse" type="password" />
+                </li>
+                <wbr />
+                <li>
+                    <label for="motdepasse_nouveau_modification">Nouveau mot de passe : </label>
+                    <input id="motdepasse_nouveau_modification" name="motdepasse_nouveau" type="password" />
+                </li>
+                <li>
+                    <label for="motdepasse_nouveau_confirmation_modification">Nouveau mot de passe : </label>
+                    <input id="motdepasse_nouveau_confirmation_modification" name="motdepasse_nouveau_confirmation" type="password" />
+                </li>
+            </ul>
+        </fieldset>
+        <input type="hidden" name="type" value="Change-Password" />
+        <input class="floatright" type="submit" value="Modifier mon mot de passe" />
+    </form>
+</details>
+
+<details {{# erreur_change_adresses}} open="open" {{/ erreur_change_adresses}}>
+    <summary>Facturation et livraison : </summary>
+    {{# erreur_change_adresses}}{{> SimpleMessage}}{{/ erreur_change_adresses}}
+    <form class="whitePanel" action="Connection.php" accept-charset="utf-8" enctype="multipart/form-data">
+        <p>Vous pouvez indiquer vos adresses de facturation et de livaison</p>
+        <div class="inlines">
+            <fieldset>
+                <legend>Facturation</legend>
+                <h6>Contact : </h6>
+                <ul class="blockProperties stacked">
+                    <li>
+                        <label for="titre_facturation">Titre : </label>
+                        <input id="titre_facturation" name="titre_facturation" type="text" />
+                    </li>
+                    <li>
+                        <label for="prenom_facturation">Prénom : </label>
+                        <input id="prenom_facturation" name="prenom_facturation" type="text" />
+                    </li>
+                    <li>
+                        <label for="nom_facturation">Nom : </label>
+                        <input id="nom_facturation" name="nom_facturation" type="text" />
+                    </li>
+                    <li>
+                        <label for="tel_facturation">Téléphone : </label>
+                        <input id="tel_facturation" name="tel_facturation" type="text" />
+                    </li>
+                </ul>
+                <h6>Adresse : </h6>
+                <ul class="blockProperties stacked">
+                    <li>
+                        <label for="adresse_facturation">Adresse : </label>
+                        <textarea id="adresse_facturation" name="adresse_facturation"></textarea>
+                    </li>
+                    <li>
+                        <label for="codepostal_facturation">Code postal : </label>
+                        <input id="codepostal_facturation" name="codepostal_facturation" type="text" />
+                    </li>
+                    <li>
+                        <label for="ville_facturation">Ville : </label>
+                        <input id="ville_facturation" name="ville_facturation" type="text" />
+                    </li>
+                </ul>
+            </fieldset>
+            <fieldset>
+                <legend>Livraison</legend>
+                <h6>Contact : </h6>
+                <ul class="blockProperties stacked">
+                    <li>
+                        <label for="titre_livraison">Titre : </label>
+                        <input id="titre_livraison" name="titre_livraison" type="text" />
+                    </li>
+                    <li>
+                        <label for="prenom_livraison">Prénom : </label>
+                        <input id="prenom_livraison" name="prenom_livraison" type="text" />
+                    </li>
+                    <li>
+                        <label for="nom_livraison">Nom : </label>
+                        <input id="nom_livraison" name="nom_livraison" type="text" />
+                    </li>
+                    <li>
+                        <label for="tel_livraison">Téléphone : </label>
+                        <input id="tel_livraison" name="tel_livraison" type="text" />
+                    </li>
+                </ul>
+                <h6>Adresse : </h6>
+                <ul class="blockProperties stacked">
+                    <li>
+                        <label for="adresse_livraison">Adresse : </label>
+                        <textarea id="adresse_livraison" name="adresse_livraison"></textarea>
+                    </li>
+                    <li>
+                        <label for="codepostal_livraison">Code postal : </label>
+                        <input id="codepostal_livraison" name="codepostal_livraison" type="text" />
+                    </li>
+                    <li>
+                        <label for="ville_livraison">Ville : </label>
+                        <input id="ville_livraison" name="ville_livraison" type="text" />
+                    </li>
+                </ul>
+            </fieldset>
+        </div>
+        <input type="hidden" name="type" value="Change-Adresses" />
+        <input class="floatright" type="submit" value="Modififier mes addresses" />
+    </form>
+</details>
+{{/ compte}}

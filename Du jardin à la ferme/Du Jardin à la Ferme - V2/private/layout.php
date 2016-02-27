@@ -1,6 +1,8 @@
 <?php
-require_once 'config.php';
-require_once 'api.php';
+require_once('./private/config.php');
+require_once('./private/entities.php');
+require_once('./private/api.php');
+require_once('./libs/mustache.php');
 
 class LAYOUT
 {   
@@ -18,337 +20,198 @@ class LAYOUT
         $this->api = $api;
         
         $this->m = new Mustache_Engine(array(
-            'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt')
+            'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(dirname(__FILE__)) . '/tmplt'),
+            'pragmas'=>[Mustache_Engine::PRAGMA_FILTERS],
+            'cache'=>new Mustache_Cache_FilesystemCache(dirname(dirname(__FILE__)).'/tmplt/cache'),
+            'helpers'=>[
+                'render'=>function($template, Mustache_LambdaHelper $lambdaHelper){
+                    $context = $lambdaHelper->getContext();
+                    $context->push($context->last()['data']);
+                    return $template;
+                },
+                '?'=>function($value){
+                    return !!$value;
+                },
+                '!'=>function($value){
+                    return !$value;
+                }
+            ]
         ));
     }
 
-    public function render($template, $data)
+    public function render($template, $data=true)
     {   
-        return $this->m->render('{{# datas}}'.$template.'{{/ datas}}',
-            [
-                'helpers'=>[
-                    'inParents'=>function($template,Mustache_LambdaHelper $helper){
-                        $mContext=$helper->getContext();
-                        $lastContext = $mContext->last();
-                        $valueExists = $mContext->findValueInParents($lastContext);
-                        return $valueExists?$template:"";
-                    }
-                ],
-                'globals'=>[
-                    'unites' => array(Produit::UNITE_BOUQUET,Produit::UNITE_PIECE,Produit::UNITE_KILOGRAMME)
-                ],
-                'session'=>[
-                    'compte'=>$this->api->compteConnecte(),
-                    'estAuthentifier'=>$this->api->estAuthentifier(),
-                    'estAdministrateur'=>$this->api->estAdmin(),
-                    'estDesactive'=>$this->api->estDésactivé(),
-                    'estLibreService'=>$this->api->estLibreService(),
-                    'estNouveau'=>$this->api->estNouveau(),
-                    'estPanier'=>$this->api->estPanier(),
-                    'estPremium'=>$this->api->estPremium(),
-                    'peutCommander'=>$this->api->peutCommander(),
-                    'peutModifierCommande'=>function($template,$helper){
-                        $id_commande = (int)$helper->getContext()->find('id_commande');
-                        $res = $this->api->peutModifierCommande($id_commande);
-                        return $res?$template:"";
-                     },
-                    'nePeutModifierCommande'=>function($template,$helper){
-                        $id_commande = (int)$helper->getContext()->find('id_commande');
-                        $res = $this->api->peutModifierCommande($id_commande);
-                        return $res?"":$template;
-                     }
-                ],
-                'datas'=>$data
-            ]
-            
-        );
+        $data=$this->createView($data);
+        return $this->m->render("{{# render}}$template{{/ render}}",[
+            'session'=>[
+                'compte'=>$this->api->compteConnecte(),
+                'estAuthentifier'=>$this->api->estAuthentifier(),
+                'estAdministrateur'=>$this->api->estAdmin(),
+                'estDesactive'=>$this->api->estDésactivé(),
+                'estLibreService'=>$this->api->estLibreService(),
+                'estNouveau'=>$this->api->estNouveau(),
+                'estPanier'=>$this->api->estPanier(),
+                'estPremium'=>$this->api->estPremium(),
+                'peutCommander'=>$this->api->peutCommander(),
+                'peutModifierCommande'=>function($value){
+                    return $this->api->peutModifierCommande($value);
+                }
+            ],
+            'data'=>$data
+        ]);
         
     }
     
     public function renderHeader($pageTitle)
-    {   
-        return $this->render('{{>header}}', $pageTitle);
+    {
+        return $this->render("{{>header}}",$pageTitle);
     }
     
     public function renderFooter()
     {   
-        return $this->render('{{>footer}}', true);
+        return $this->render('{{>footer}}');
     }
     
-    public function renderProduit_nom($produit,$modifiable=true)
-    {   
-        if($modifiable)
-        {
-            return $this->render('{{>Produit-nom-mod}}', $produit);
-        }
-        else
-        {
-            return $this->render('{{>Produit-nom}}', $produit);
-        }
-    }
-    
-    public function renderProduit_prix_unitaire_ttc($produit,$modifiable=true)
-    {   
-        if($modifiable)
-        {
-            return $this->render('{{>Produit-prix_unitaire_ttc-mod}}', $produit);
-        }
-        else
-        {
-            return $this->render('{{>Produit-prix_unitaire_ttc}}', $produit);
-        }
-    }
-    
-    public function renderProduit_unite($produit,$modifiable=true)
-    {   
-        if($modifiable)
-        {
-            return $this->render('{{>Produit-unite-mod}}', $produit);
-        }
-        else
-        {
-            return $this->render('{{>Produit-unite}}', $produit);
-        }
-    }
-    
-    public function renderProduit_description($produit,$modifiable=true)
-    {   
-        if($modifiable)
-        {
-            return $this->render('{{>Produit-description-mod}}', $produit);
-        }
-        else
-        {
-            return $this->render('{{>Produit-description}}', $produit);
-        }
-    }
-    
-    public function renderElementCommande_quantite_commande($elementCommande,$modifiable=true)
-    {   
-        if($modifiable)
-        {
-            return $this->render('{{>ElementCommande-quantite_commande-mod}}', $elementCommande);
-        }
-        else
-        {
-            return $this->render('{{>ElementCommande-quantite_commande}}', $elementCommande);
-        }
-    }
-    
-    /**
-     * Summary of writeProduit_nom
-     * @param _Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduit_nom($produit, $modifiable=true)
+    private function createView($value)
     {
-        $modifiable=(bool)$modifiable;
-        if($modifiable && $this->api->estAdmin($produit->id_commande))
+        switch(gettype($value))
         {
-            echo '<span><input';
-            echo ' type="text"';
-            echo ' data-djalf="Produit-produit"';
-            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';
-            echo ' value="';$this->safeWrite($produit->produit);echo '"';
-            echo '/></span>';
-        }
-        else
-        {
-            echo '<span';
-            echo ' data-djalf="Produit-produit"';
-            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
-            $this->safeWrite($produit->produit);
-            echo '</span>';
-        }
-    }
-    /**
-     * Summary of writeProduit_prix_unitaire_ttc
-     * @param _Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduit_prix_unitaire_ttc($produit, $modifiable=true)
-    {
-        $modifiable=(bool)$modifiable;
-        if($modifiable && $this->api->estAdmin($produit->id_commande))
-        {
-            echo '<span><input';
-            echo ' type="number"';
-            echo ' step="0.1"';
-            echo ' min="0"';
-            echo ' data-djalf="Produit-prix_unitaire_ttc"';
-            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';
-            echo ' value="';$this->safeWrite($produit->prix_unitaire_ttc);echo '"/>';
-            echo ' €</span>';
-
-        }
-        else
-        {
-            echo '<span';
-            echo ' data-djalf="Produit-prix_unitaire_ttc"';
-            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
-            $this->safeWrite($produit->prix_unitaire_ttc);
-            echo ' </span> €';
+            case "array":
+                $arr = array_map(function($item){
+                    return $this->createView($item);
+                },$value);
+                return $arr;
+            case "object":
+                return $this->createViewForObject($value);
+            case "boolean":
+            case "integer":
+            case "double":
+            case "string":
+            case "NULL":
+            case "resource":
+            case "unknown type":
+            default:
+                return $value;
         }
     }
-    /**
-     * Summary of writeProduit_description
-     * @param _Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduit_description( $produit, $modifiable=true)
+    
+    private function createViewForObject($value)
     {
-        $modifiable=(bool)$modifiable;
-        echo '<div class="contentPanel"';
-        echo ' data-djalf="Produit-description"';
-        if($modifiable && $this->api->estAdmin()){
-            echo ' contenteditable="true"'; 
-        }
-        echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
-        echo $produit->description;
-        echo '</div>';
-    }
-    /**
-     * Summary of writeProduit_nom
-     * @param _Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduit_unite($produit, $modifiable=true)
-    {
-        $modifiable=(bool)$modifiable;
-        if($modifiable && $this->api->estAdmin($produit->id_commande))
+        $view = [];
+        if($value instanceof Entity)
         {
-            $unites = array(Produit::UNITE_BOUQUET,Produit::UNITE_PIECE,Produit::UNITE_KILOGRAMME);
-            echo '<select data-djalf="Produit-unite"';
-            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
-            foreach($unites as $unite)
+            foreach(class_uses($value) as $trait)
             {
-                $selected = $unite==$produit->unite?' selected="selected"':'';
-                echo '<option value="'.$unite.'"'.$selected.'>'.$unite.'</option>';
+                switch ($trait)
+                {
+                    case"_CompteBase":
+                        $this->createViewFor_CompteBase($value, $view);
+                        break;
+                    case"_CompteDetail":
+                        $this->createViewFor_CompteDetail($value, $view);
+                        break;
+                    case"_Categorie":
+                        $this->createViewFor_Categorie($value, $view);
+                        break;
+                    case"_Produit":
+                        $this->createViewFor_Produit($value, $view);
+                        break;
+                    case"_ElementCommande":
+                        $this->createViewFor_ElementCommande($value, $view);
+                        break;
+                    case"_Commande":
+                        $this->createViewFor_Commande($value, $view);
+                        break;
+                }
             }
-            echo '</select>';
         }
         else
         {
-            echo '<span';
-            echo ' data-djalf="Produit-unite"';
-            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
-            $this->safeWrite($produit->unite);
-            echo '</span>';
+            foreach(get_object_vars($value) as $property => $propertyvalue)
+            {
+                $view[$property]=$this->createView($propertyvalue);
+            }
         }
+        return $view;
     }
     
-    
-    /**
-     * Summary of writeProduitCommande_quantite_commande
-     * @param _ElementCommande|_Produit $produit 
-     * @param bool $modifiable 
-     */
-    public function writeProduitCommande_quantite_commande($produit, $modifiable=true)
+    private function createViewFor_CompteBase($value, &$view)
     {
-        if($modifiable && $this->api->peutModifierCommande($produit->id_commande))
-        {
-            echo '<span><input';
-            echo ' type="number"';
-            echo ' data-djalf="ProduitCommande-quantite_commande"';
-            echo ' min="0"';
-            echo ' step="';$this->safeWrite($produit->unite_step);echo '"';
-            echo ' max="';$this->safeWrite($produit->stocks_previsionnel);echo '"';
-            echo ' data-decimals="';$this->safeWrite($produit->unite_decimals);echo '"';
-            echo ' data-id_element_commande="';$this->safeWrite($produit->id_element_commande);echo '"';
-            echo ' data-id_commande="';$this->safeWrite($produit->id_commande);echo '"';
-            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '"';
-            echo ' value="';$this->safeWrite($produit->quantite_commande);echo '"';
-            echo '/></span>';
-
-        }
-        else
-        {
-            echo '<span';
-            echo ' data-djalf="ProduitCommande-quantite_commande"';
-            echo ' data-id_element_commande="';$this->safeWrite($produit->id_element_commande);echo '"';
-            echo ' data-id_commande="';$this->safeWrite($produit->id_commande);echo '"';
-            echo ' data-id_produit="';$this->safeWrite($produit->id_produit);echo '">';
-            $this->safeWrite($produit->quantite_commande);
-            echo '</span>';
-        }
+        $view['id_compte'] = $value->id_compte;
+        $view['email'] = $value->email;
     }
-    
-    
-    
-    
-    public function safeWrite($text)
+    private function createViewFor_CompteDetail($value, &$view)
     {
-        echo htmlspecialchars($text);
+        $this->createViewFor_CompteBase($value,$view);
+        $view['statut'] = $value->statut;
+        $view['demande_statut'] = $value->demande_statut;
+        $view['date_creation_compte'] = $value->date_creation_compte;
     }
-    
-    public function writeDecimal($prix,$decimal =2,$decimalsep=".")
+    private function createViewFor_Categorie($value, &$view)
     {
-        $this->safeWrite(number_format ( $prix, $decimal, $decimalsep , ""));
+        $view['id_categorie'] = $value->id_categorie;
+        $view['categorie'] = $value->categorie;
     }
-    
-    public function writePrix($prix,$decimalsep=".")
+    private function createViewFor_Produit($value, &$view)
     {
-        $this->writeDecimal($prix,2,$decimalsep);
-        $this->safeWrite(" €");
-    }
-    
-    public function writeHeader($title)
-    {
-        ?>
-            <!DOCTYPE html>
-            <html xmlns="http://www.w3.org/1999/xhtml">
-                <head>
-                    <title>Du jardin à la ferme - <?php $this->safeWrite($title) ?></title>
-
-                    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        $view['id_produit'] = $value->id_produit;
+        $view['id_categorie'] = $value->id_categorie;
+        $view['produit'] = $value->produit;
+        $view['description'] = $value->description;
+        $view['prix_unitaire_ttc'] =  number_format($value->prix_unitaire_ttc,2,".","");
+        $view['tva'] = number_format($value->tva,2,".","");;
+        $view['unite'] = $value->unite;
+        $view['stocks_previsionnel'] = number_format($value->stocks_previsionnel,$value->unite_decimals,".","");
+        $view['stocks_courant'] = number_format($value->stocks_courant,$value->unite_decimals,".","");
+        $view['unite_decimals'] = $value->unite_decimals;
+        $view['unite_step'] = $value->unite_step;
         
-                    <link rel="stylesheet" type="text/css" href="content.css" />
-                    <link rel="stylesheet" type="text/css" href="djalf.css" />
-
-                    <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
-                    <script src="http://benalman.com/code/projects/jquery-throttle-debounce/jquery.ba-throttle-debounce.js"></script>
-        
-                    <script src="ckeditor/ckeditor.js"></script>
-                    <script src="ckeditor/adapters/jquery.js"></script>
-
-                    <script src="client.js.php" type="text/javascript"></script>
-                    <script src="djalf.js" type="text/javascript"></script>
-                </head>
-                <body>
-                    <header>
-                        <h1>Du jardin à la ferme</h1>
-                        <h2>Projet de ferme durable</h2>
-                    </header>
-                    <nav>
-                        <ul>
-                            <li><a href="index.php">Accueil</a></li>
-                            <li><a href="Produits.php">Nos Produits</a></li>
-                            <?php if($this->api->peutCommander()) { ?>
-                                <li><a href="MonPanier.php">Mon Panier</a></li>
-                            <?php } ?>
-                            <?php if(!$this->api->estAuthentifier()) { ?>
-                                <li><a href="Connection.php">Connection</a></li>
-                            <?php } else{ ?>
-                                <li><a href="MonCompte.php">Mon Compte</a></li>
-                                <li><a href="Deconnection.php">Déconnection</a></li>
-                            <?php } ?>
-                        </ul>
-                    </nav>
-                    <h3><?php $this->safeWrite($title) ?></h3>
-                    <div class="Main">
-        <?php 
+        $view['uniteOptions'] = array_map(function($item)use($value){
+            return [ 'value'=>$item,'display'=>$item,'selected'=>$item==$value->unite];
+        },[Produit::UNITE_BOUQUET,Produit::UNITE_PIECE,Produit::UNITE_KILOGRAMME]);
+    }
+    private function createViewFor_ElementCommande($value, &$view)
+    {
+        $this->createViewFor_Produit($value,$view);
+        $view['id_produit'] = $value->id_produit;
+        $view['id_commande'] = $value->id_commande;
+        $view['quantite_commande'] = number_format($value->quantite_commande,$value->unite_decimals,".","");
+        $view['quantite_reel'] = isset($value->quantite_commande)?number_format($value->quantite_commande,$value->unite_decimals,".",""):null;
+        $view['prix_total_element_ttc'] = number_format($value->prix_total_element_ttc,2,".","");
+        $view['prix_total_element_ht'] = number_format($value->prix_total_element_ht,2,".","");
+        $view['tva_total_element'] = number_format($value->tva_total_element,2,".","");
+    }
+    private function createViewFor_Commande($value, &$view)
+    {
+        $this->createViewFor_CompteBase($value,$view);
+        $view['id_compte'] = $value->id_compte;
+        $view['id_commande'] = $value->id_commande;
+        $view['date_creation_commande'] = $value->date_creation_commande;
+        $view['remarque'] = $value->remarque;
+        $view['etat'] = $value->etat;
+        $view['nb_elements'] = $value->nb_elements;
+        $view['prix_total_commande_ttc'] = number_format($value->prix_total_commande_ttc,2,".","");
+        $view['prix_total_commande_ht'] = number_format($value->prix_total_commande_ht,2,".","");
+        $view['tva_total_commande'] = number_format($value->tva_total_commande,2,".","");
     }
     
-    
-    public function writeFooter()
-    {
-        ?>
-                    </div>
-                    <footer></footer>
-                </body>
-            </html>
-
-        <?php 
+    public function Lookup($values,$keyProp,$extracts){
+        $buff = [];
+        foreach($values as $value)
+        {
+            $key=$value->$keyProp;
+            if(!isset($buff[$key])){
+                $buff[$key]=array_map(function($evalue)use($value){return $value->$evalue;},$extracts);
+                $buff[$key]['values']=[];
+            }
+            $buff[$key]['values'][]=$value;
+        }
+        //foreach($buff as $value)
+        //{
+        //    //uasort($value['values'],function($a,$b){ return strnatcmp($a->produit,$b->produit);});
+        //}
+        $buff = array_values($buff);
+        //uasort($buff,function($a,$b){ return strnatcmp($a['etat'],$b['etat']);});
+        return $buff;
     }
 }
