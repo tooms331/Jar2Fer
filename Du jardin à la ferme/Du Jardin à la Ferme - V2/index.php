@@ -7,8 +7,6 @@ API::useAPI(function(API $api){
     
     $layout=new LAYOUT($api);
 	
-	
-    
     echo $layout->renderHeader('Accueil');
     
     echo $layout->render('{{> accueil}}',true);

@@ -5,6 +5,7 @@ function setNtype(&$ref,$type)
     if($ref!==null)
         settype($ref,$type);
 }
+
 trait _CompteBase
 {
     /**

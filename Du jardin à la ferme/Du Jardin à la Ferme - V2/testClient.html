@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html> 
 <head>
     <title>Test API</title>
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
+    <script src="libs/jquery-1.11.3.js"></script>
     <script src="client.js.php" type="text/javascript"></script>
     <script>
         var STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
@@ -17,7 +17,10 @@
             return result;
         }
 
-            $(function () {
+        $(function () {
+                var apiClient = createApiClient(function (err) {
+                    alert(err);
+                });
                 var param_nametemplate = $("#param_name");
                 var param_valuestemplate = $("#param_value");
                 var resulttemplate = $("#result");

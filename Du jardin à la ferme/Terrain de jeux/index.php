@@ -7,4 +7,16 @@ define('BDD_PASSWORD','Metropolis33');
 
 echo "Hello World!";
 
+class Contact{
+    public $nom;
+    public $age;
+    public $tel;
+    
+    public function Appeler(){
+        $reussi = call($this->tel);
+        
+        return $reussi
+    }
+}
+
 ?>

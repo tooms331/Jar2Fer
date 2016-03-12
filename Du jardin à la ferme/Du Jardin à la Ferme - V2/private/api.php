@@ -14,7 +14,7 @@ class API
         session_commit();
     }
     
-    public static function execute($commande, $params)
+    public static function execute(string $commande, $params)
     {
         session_start();
         $endpoint=new static();
@@ -298,8 +298,8 @@ class API
         $id_panier=null;
         if($this->peutCommander())
             $id_panier=$this->API_panier_recuperer()->id_commande;
-        
-        return $this->bdd->Produits_Lister($rechercheProduit,$id_panier,true);
+
+        return $this->bdd->Produits_Lister($rechercheProduit,$id_panier,true);;
     }
     
     public function API_produit_recuperer($id_produit)

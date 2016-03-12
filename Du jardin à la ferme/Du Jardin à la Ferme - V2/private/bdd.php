@@ -617,7 +617,7 @@ class BDD
      * retourne la quantité dans la commande spécifié
      * @param bool|null $dispoUniquement 
      * ne retourne que les produit avec un stock positif
-     * @return ProduitCommande
+     * @return ProduitCommande[]
      */
     public function Produits_Lister($rechercheProduit=null, $id_commande=null, $dispoUniquement=true)
     {
@@ -694,7 +694,7 @@ class BDD
         
         return $this->InTransaction(function()use($id_categorie, $nom, $description,$prix_unitaire_ttc, $unite){
         
-            // on vérifie si l'identifiant éxiste déjà
+           
             $count = $this->getScalar(
                 'SELECT COUNT(*) 
                 FROM produits 
